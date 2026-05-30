@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android 17 & Pixel — Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent1: #4df0a0;
+    --accent2: #7b61ff;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #e8e8f0;
+    --muted: #6a6a80;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(77,240,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77,240,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 60px 24px 80px; }
+
+  header { margin-bottom: 40px; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.1s ease forwards;
+  }
+
+  h1 span { color: var(--accent1); }
+
+  .subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.2s ease forwards;
+  }
+
+  .hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent1);
+    margin-top: 8px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.3s ease forwards;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.35s ease forwards;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { color: var(--text); border-color: var(--accent1); }
+
+  .section { margin-bottom: 48px; opacity: 0; animation: fadeUp 0.5s ease forwards; }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-label .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+
+  .section-label h2 {
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .section-label .line { flex: 1; height: 1px; background: var(--border); }
+
+  .cards { display: grid; gap: 12px; }
+  .cards.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 600px) { .cards.two { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: inherit;
+    font-family: inherit;
+    display: block;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .card:hover { transform: translateY(-2px); border-color: #3a3a50; background: #1a1a25; }
+  .card.open { background: #1a1a25; }
+  .card.open::before { opacity: 1; }
+
+  .card-header {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .card-title { font-size: 15px; font-weight: 700; }
+
+  .chevron {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+  }
+
+  .chevron svg { width: 12px; height: 12px; stroke: var(--muted); transition: stroke 0.2s; }
+  .card.open .chevron { transform: rotate(180deg); }
+  .card:hover .chevron { background: rgba(255,255,255,0.08); }
+  .card:hover .chevron svg { stroke: var(--text); }
+
+  .card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card.open .card-content { max-height: 400px; }
+
+  .card-body {
+    padding: 16px 20px 20px 20px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #aaaabc;
+    font-family: var(--mono);
+    font-weight: 400;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-body strong { color: var(--text); font-weight: 700; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 400;
+  }
+
+  .badge-a17 { background: rgba(77,240,160,0.15); color: var(--accent1); }
+  .badge-px10 { background: rgba(123,97,255,0.15); color: var(--accent2); }
+  .badge-px { background: rgba(255,209,102,0.15); color: var(--accent4); }
+
+  .cat-video .card::before { background: var(--accent1); }
+  .cat-video .card:hover, .cat-video .card.open { border-color: rgba(77,240,160,0.3); }
+  .cat-ai .card::before { background: var(--accent2); }
+  .cat-ai .card:hover, .cat-ai .card.open { border-color: rgba(123,97,255,0.3); }
+  .cat-photo .card::before { background: var(--accent4); }
+  .cat-photo .card:hover, .cat-photo .card.open { border-color: rgba(255,209,102,0.3); }
+  .cat-ux .card::before { background: var(--accent3); }
+  .cat-ux .card:hover, .cat-ux .card.open { border-color: rgba(255,107,107,0.3); }
+
+  .icon-video { background: rgba(77,240,160,0.1); }
+  .icon-ai { background: rgba(123,97,255,0.1); }
+  .icon-photo { background: rgba(255,209,102,0.1); }
+  .icon-ux { background: rgba(255,107,107,0.1); }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.5s 1s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-of-type(1) { animation-delay: 0.4s; }
+  .section:nth-of-type(2) { animation-delay: 0.55s; }
+  .section:nth-of-type(3) { animation-delay: 0.7s; }
+  .section:nth-of-type(4) { animation-delay: 0.85s; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="tag">// Feature drop</div>
+    <h1>Android 17<br><span>&</span> Pixel</h1>
+    <p class="subtitle">Les fonctions qui changent vraiment le quotidien</p>
+    <p class="hint">→ clique sur une fonction pour la déplier</p>
+  </header>
+
+  <div class="controls">
+    <button class="btn" id="expand-all">Tout déplier</button>
+    <button class="btn" id="collapse-all">Tout replier</button>
+  </div>
+
+  <div class="section cat-video">
+    <div class="section-label">
+      <div class="icon icon-video">🎬</div>
+      <h2>Vidéo & Audio</h2>
+      <div class="line"></div>
+    </div>
+    <div class="cards two">
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Screen Reactions</span><span class="badge badge-a17">Android 17</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Record ton écran + caméra frontale simultanément. L'IA <strong>détoure ta silhouette</strong> automatiquement — incrustation directe, sans fond vert physique.</div></div>
+      </button>
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Audio Magic Eraser</span><span class="badge badge-px">Pixel</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">L'IA isole les pistes audio de tes vidéos. Tu peux <strong>effacer le vent, les travaux</strong>, tout le bruit ambiant — et ne garder que la voix.</div></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="section cat-ai">
+    <div class="section-label">
+      <div class="icon icon-ai">🤖</div>
+      <h2>IA & Assistant</h2>
+      <div class="line"></div>
+    </div>
+    <div class="cards">
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Magic Cue</span><span class="badge badge-px10">Pixel 10</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Ton téléphone anticipe tes besoins. Tu parles d'un resto par message → il fouille mails + agenda et te <strong>suggère l'adresse directement dans la conversation</strong>, sans que tu cherches.</div></div>
+      </button>
+      <div class="cards two">
+        <button class="card" data-card>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title">Gemini Live</span><span class="badge badge-px">Pixel</span></div>
+            <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="card-content"><div class="card-body">Mode vocal ultra fluide. Montre n'importe quoi à l'écran → demande à voix haute <strong>"Résume-moi ça"</strong> ou infos sur une image.</div></div>
+        </button>
+        <button class="card" data-card>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title">Call Notes</span><span class="badge badge-px">Pixel</span></div>
+            <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="card-content"><div class="card-body">Après chaque appel +30s : <strong>transcription complète</strong> + résumé des points clés généré automatiquement.</div></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section cat-photo">
+    <div class="section-label">
+      <div class="icon icon-photo">📸</div>
+      <h2>Photo & Création</h2>
+      <div class="line"></div>
+    </div>
+    <div class="cards two">
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Add Me</span><span class="badge badge-px">Pixel</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Tu prends la photo de groupe, tu vas te placer, l'IA guide en AR pour <strong>fusionner les deux prises</strong>. Tout le monde est sur le cliché.</div></div>
+      </button>
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Zoom Enhance</span><span class="badge badge-px">Pixel</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Photo trop loin ? L'IA <strong>recrée les détails manquants</strong> pour rendre l'image exploitable — idéal pour lire un petit texte zoomé au max.</div></div>
+      </button>
+      <button class="card" data-card style="grid-column: span 2">
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Pixel Studio</span><span class="badge badge-px">Pixel</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Génère des images depuis du texte, fais des montages. Le truc le plus cool : tu <strong>transformes tes créations en stickers</strong> utilisables directement depuis le clavier dans n'importe quelle appli.</div></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="section cat-ux">
+    <div class="section-label">
+      <div class="icon icon-ux">⚡</div>
+      <h2>UX & Quotidien</h2>
+      <div class="line"></div>
+    </div>
+    <div class="cards">
+      <div class="cards two">
+        <button class="card" data-card>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title">Pixel Screenshots</span><span class="badge badge-px">Pixel</span></div>
+            <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="card-content"><div class="card-body">Tes captures d'écran deviennent <strong>recherchables par mot-clé</strong>. Mot de passe Wi-Fi, code Airbnb, billet de ciné — l'IA retrouve l'image ou ajoute l'event au calendrier.</div></div>
+        </button>
+        <button class="card" data-card>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title">Continue On</span><span class="badge badge-a17">Android 17</span></div>
+            <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="card-content"><div class="card-body">Tu commences un article sur le téléphone → tu allumes ta tablette → tu <strong>reprends exactement là où tu en étais</strong>. Un clic.</div></div>
+        </button>
+      </div>
+      <button class="card" data-card>
+        <div class="card-header">
+          <div class="card-title-wrap"><span class="card-title">Pause Point</span><span class="badge badge-a17">Android 17</span></div>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="card-content"><div class="card-body">Anti-scroll compulsif : <strong>10 secondes d'écran noir obligatoires</strong> avant d'ouvrir l'appli choisie. Le twist : pour désactiver la limite, tu dois redémarrer le téléphone. Ça casse le réflexe.</div></div>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <span>Sources : Google I/O · Android 17 · Pixel 10</span>
+    <span>// Juin 2026 · compilé pour Hive</span>
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('[data-card]').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('open'));
+  });
+  document.getElementById('expand-all').addEventListener('click', () => {
+    document.querySelectorAll('[data-card]').forEach(c => c.classList.add('open'));
+  });
+  document.getElementById('collapse-all').addEventListener('click', () => {
+    document.querySelectorAll('[data-card]').forEach(c => c.classList.remove('open'));
+  });
+</script>
+</body>
+</html>
