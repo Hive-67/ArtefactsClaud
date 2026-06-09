@@ -202,11 +202,11 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--brd)}
 
 /* ===== NOTEPAD ===== */
-#notepad{position:fixed;z-index:600;background:var(--bg2);border:1px solid var(--brd);border-radius:12px;box-shadow:0 8px 32px #0008;width:300px;min-height:180px;display:flex;flex-direction:column;bottom:80px;right:16px}
+#notepad{position:fixed;z-index:600;background:var(--bg2);border:1px solid var(--brd);border-radius:12px;box-shadow:0 8px 32px #0008;width:300px;min-height:180px;min-width:220px;max-width:92vw;max-height:75vh;display:flex;flex-direction:column;bottom:80px;right:16px;resize:both;overflow:hidden}
 #notepad.hidden{display:none!important}
 #notepad-header{padding:8px 10px;background:var(--bg3);cursor:move;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;user-select:none;flex-shrink:0;border-radius:11px 11px 0 0;gap:6px}
 #notepad-header span{color:var(--tx2);flex:1}
-#notepad textarea{flex:1;border:none;background:transparent;color:var(--tx);font-family:'Space Mono',monospace;font-size:.78rem;padding:10px 12px;resize:none;min-height:120px;width:100%}
+#notepad textarea{flex:1;border:none;background:transparent;color:var(--tx);font-family:'Space Mono',monospace;font-size:.78rem;padding:10px 12px;resize:none;min-height:80px;width:100%;overflow:auto}
 #notepad textarea:focus{outline:none}
 .np-btn{background:transparent;border:none;cursor:pointer;font-size:.75rem;color:var(--tx2);padding:2px 6px;border-radius:4px}
 .np-btn:hover{background:var(--bg4);color:var(--tx)}
@@ -300,6 +300,25 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
   .wd-name{font-size:.65rem}
   .wd-num{font-size:1rem}
 }
+
+/* ===== TUTORIAL ===== */
+#tuto-overlay{position:fixed;inset:0;z-index:2000;pointer-events:auto}
+#tuto-overlay.hidden{display:none!important}
+#tuto-spotlight{position:absolute;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.78);transition:left .28s ease,top .28s ease,width .28s ease,height .28s ease;pointer-events:none;z-index:1}
+#tuto-tooltip{position:absolute;background:var(--bg2);border:2px solid var(--ac);border-radius:14px;padding:16px 18px;width:270px;z-index:2;box-shadow:0 8px 32px #0009;transition:left .28s ease,top .28s ease}
+#tuto-title{font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);margin-bottom:8px}
+#tuto-desc{font-size:.75rem;color:var(--tx2);line-height:1.55;margin-bottom:14px}
+#tuto-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#tuto-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+.tuto-dot{width:7px;height:7px;border-radius:50%;background:var(--bg4);transition:all .2s;display:inline-block}
+.tuto-dot.active{background:var(--ac);width:12px;border-radius:4px}
+#tuto-skip{background:transparent;border:none;color:var(--tx2);font-size:.68rem;cursor:pointer;font-family:'Space Mono',monospace;padding:4px;white-space:nowrap}
+#tuto-skip:hover{color:var(--tx)}
+#tuto-next{padding:7px 16px;background:var(--ac);color:#fff;border:none;border-radius:8px;font-family:'Space Mono',monospace;font-size:.72rem;cursor:pointer;font-weight:700;transition:filter .15s;white-space:nowrap}
+#tuto-next:hover{filter:brightness(1.2)}
+#tuto-step-num{font-size:.65rem;color:var(--tx2);text-align:right;margin-bottom:6px}
+/* HiveOS ❓ en noir */
+.theme-hiveos #btn-help,.theme-hiveos.day #btn-help{color:#000!important}
 </style>
 </head>
 
@@ -398,6 +417,7 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
     <span>📝 Bloc-notes</span>
     <div style="display:flex;gap:4px">
       <button class="np-btn" id="notepad-copy" title="Copier">📋</button>
+      <button class="np-btn" id="notepad-mail" title="Envoyer par mail">✉️</button>
       <button class="np-btn" id="notepad-close" title="Fermer">✕</button>
     </div>
   </div>
@@ -587,6 +607,21 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
   </div>
 </div>
 
+
+<!-- ===== TUTORIAL INTERACTIF ===== -->
+<div id="tuto-overlay" class="hidden">
+  <div id="tuto-spotlight"></div>
+  <div id="tuto-tooltip">
+    <div id="tuto-step-num"></div>
+    <div id="tuto-title"></div>
+    <div id="tuto-desc"></div>
+    <div id="tuto-nav">
+      <button id="tuto-skip">Passer</button>
+      <div id="tuto-dots"></div>
+      <button id="tuto-next">Suivant →</button>
+    </div>
+  </div>
+</div>
 <!-- ===== MODAL: NOUVEAU RDV ===== -->
 <div class="modal-overlay hidden" id="modal-rdv">
   <div class="modal">
@@ -1521,7 +1556,7 @@ function initEvents(){
   $('btn-theme').addEventListener('click',()=>{buildThemeMenu();$('theme-menu').classList.toggle('hidden')});
   $('btn-daynight').addEventListener('click',()=>{ui.dayMode=!ui.dayMode;applyTheme()});
   $('btn-save').addEventListener('click',openSaveModal);
-  $('btn-help').addEventListener('click',()=>$('modal-help').classList.remove('hidden'));
+  $('btn-help').addEventListener('click',startTutorial);
   document.addEventListener('click',e=>{if(!$('theme-wrap').contains(e.target))$('theme-menu').classList.add('hidden')});
 
   // Bottom nav
@@ -1594,11 +1629,17 @@ function initEvents(){
   // Notepad
   $('notepad-close').addEventListener('click',()=>$('notepad').classList.add('hidden'));
   $('notepad-copy').addEventListener('click',()=>{navigator.clipboard.writeText($('notepad-ta').value);toast('Copié !')});
+  $('notepad-mail').addEventListener('click',()=>{
+    const txt=$('notepad-ta').value.trim();
+    window.location.href='mailto:quentin.broll@gmail.com?subject='+encodeURIComponent('Note RMS Consulting')+'&body='+encodeURIComponent(txt||'(note vide)');
+  });
   $('notepad-ta').addEventListener('input',()=>{try{store.setItem('hiveos_notepad',$('notepad-ta').value)}catch(e){}});
 
   // Help
   $('modal-help-close').addEventListener('click',()=>$('modal-help').classList.add('hidden'));
   $('modal-help').addEventListener('click',e=>{if(e.target===$('modal-help'))$('modal-help').classList.add('hidden')});
+  $('tuto-next').addEventListener('click',_nextTuto);
+  $('tuto-skip').addEventListener('click',_endTuto);
 
   // Save modal
   $('modal-save-close').addEventListener('click',()=>$('modal-save').classList.add('hidden'));
@@ -1679,10 +1720,73 @@ function dlApp(){
 
 function initNotepadDrag(){
   const np=$('notepad');const hdr=$('notepad-header');
-  let ox=0,oy=0,sx=0,sy=0,dragging=false;
-  hdr.addEventListener('mousedown',e=>{dragging=true;const r=np.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;sx=r.left;sy=r.top});
-  document.addEventListener('mousemove',e=>{if(!dragging)return;np.style.left=(e.clientX-ox)+'px';np.style.top=(e.clientY-oy)+'px';np.style.right='auto';np.style.bottom='auto'});
+  let ox=0,oy=0,dragging=false;
+  function startDrag(cx,cy){dragging=true;const r=np.getBoundingClientRect();ox=cx-r.left;oy=cy-r.top;}
+  function moveDrag(cx,cy){if(!dragging)return;np.style.left=(cx-ox)+'px';np.style.top=(cy-oy)+'px';np.style.right='auto';np.style.bottom='auto';}
+  hdr.addEventListener('mousedown',e=>{startDrag(e.clientX,e.clientY)});
+  document.addEventListener('mousemove',e=>{moveDrag(e.clientX,e.clientY)});
   document.addEventListener('mouseup',()=>{dragging=false});
+  hdr.addEventListener('touchstart',e=>{const t=e.touches[0];startDrag(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+  document.addEventListener('touchmove',e=>{if(!dragging)return;const t=e.touches[0];moveDrag(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+  document.addEventListener('touchend',()=>{dragging=false});
+}
+
+
+/* ===== TUTORIAL INTERACTIF ===== */
+const TUTO_STEPS=[
+  {id:'header-logo',title:'Logo RMS Consulting',desc:'Identité visuelle de l'application. Cliquez sur le logo pour revenir au tableau de bord depuis n'importe quelle vue.'},
+  {id:'btn-notepad',title:'📝 Bloc-notes',desc:'Ouvre un bloc-notes flottant. Déplacez-le librement, redimensionnez-le depuis ses bords. Copiez son contenu ou envoyez-le par mail en un clic.'},
+  {id:'btn-theme',title:'🎨 Thèmes',desc:'9 thèmes visuels disponibles : HiveOS, RMS, Dracula, Matrix, Cyberpunk, Spectre… Chaque thème possède un mode jour et nuit.'},
+  {id:'btn-daynight',title:'☀️ / 🌙 Jour / Nuit',desc:'Bascule entre le mode sombre (nuit) et le mode clair (jour). Le réglage est mémorisé automatiquement pour votre prochain accès.'},
+  {id:'btn-save',title:'💾 Sauvegarde',desc:'Exportez vos données en JSON pour les sauvegarder ou les transférer. Importez un fichier existant ou téléchargez l'application complète en local.'},
+  {id:'btn-help',title:'❓ Tutoriel',desc:'Vous y êtes ! Relancez ce guide à tout moment pour redécouvrir les fonctionnalités. L'aide détaillée reste aussi accessible depuis ce bouton.'},
+];
+let _tutoStep=0;
+
+function startTutorial(){
+  _tutoStep=0;
+  const dc=$('tuto-dots');
+  dc.innerHTML=TUTO_STEPS.map((_,i)=>`<span class="tuto-dot${i===0?' active':''}"></span>`).join('');
+  $('tuto-overlay').classList.remove('hidden');
+  _showTutoStep();
+}
+
+function _showTutoStep(){
+  const s=TUTO_STEPS[_tutoStep];
+  const el=$(s.id);
+  if(!el){_nextTuto();return;}
+  const r=el.getBoundingClientRect();
+  const pad=8;
+  const spot=$('tuto-spotlight');
+  spot.style.left=(r.left-pad)+'px';
+  spot.style.top=(r.top-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px';
+  spot.style.height=(r.height+pad*2)+'px';
+  $('tuto-title').textContent=s.title;
+  $('tuto-desc').textContent=s.desc;
+  $('tuto-step-num').textContent=(_tutoStep+1)+' / '+TUTO_STEPS.length;
+  $('tuto-next').textContent=_tutoStep<TUTO_STEPS.length-1?'Suivant →':'✓ Terminer';
+  document.querySelectorAll('.tuto-dot').forEach((d,i)=>d.classList.toggle('active',i===_tutoStep));
+  // Position tooltip below or above spotlight
+  const tip=$('tuto-tooltip');
+  const tw=270,th=180;
+  let tl=r.left+r.width/2-tw/2;
+  let tt=r.bottom+pad+14;
+  tl=Math.max(8,Math.min(tl,window.innerWidth-tw-8));
+  if(tt+th>window.innerHeight-20){tt=r.top-th-14;}
+  if(tt<60){tt=60;}
+  tip.style.left=tl+'px';
+  tip.style.top=tt+'px';
+}
+
+function _nextTuto(){
+  _tutoStep++;
+  if(_tutoStep>=TUTO_STEPS.length)_endTuto();
+  else _showTutoStep();
+}
+
+function _endTuto(){
+  $('tuto-overlay').classList.add('hidden');
 }
 
 /* ===== INIT ===== */
