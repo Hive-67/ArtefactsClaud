@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Récap Produits & Packs — Discord</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2e;
+    --accent: #5865f2;
+    --green: #57f287;
+    --orange: #faa61a;
+    --pink: #eb459e;
+    --purple: #9b59b6;
+    --text: #e2e2f0;
+    --muted: #6b6b8a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    padding: 2rem 1rem 4rem;
+    background-image:
+      radial-gradient(ellipse at 15% 5%, rgba(88,101,242,0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 95%, rgba(155,89,182,0.1) 0%, transparent 45%);
+    line-height: 1.6;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  h1 { font-size: clamp(1.7rem, 5vw, 2.6rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .subtitle { margin-top: 0.6rem; color: var(--muted); font-size: 0.95rem; }
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  h2 .bar { width: 3px; height: 18px; background: var(--accent); border-radius: 2px; }
+
+  /* BRIQUES / COMPOSANTS */
+  .bricks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+  @media (max-width: 600px) { .bricks { grid-template-columns: 1fr; } }
+  .brick {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .brick:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .brick-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; }
+  .brick-icon { font-size: 1.3rem; }
+  .brick-name { font-weight: 700; font-size: 0.92rem; }
+  .brick-desc { color: var(--muted); font-size: 0.8rem; }
+  .brick-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .t-auto { background: rgba(87,242,135,0.15); color: var(--green); }
+  .t-manual { background: rgba(235,69,158,0.15); color: var(--pink); }
+
+  /* SERVEURS */
+  .servers { display: grid; grid-template-columns: repeat(2,1fr); gap: 0.7rem; }
+  @media (max-width: 600px) { .servers { grid-template-columns: 1fr; } }
+  .server {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .server-icon { font-size: 1.6rem; }
+  .server-name { font-weight: 700; font-size: 0.95rem; }
+  .server-desc { color: var(--muted); font-size: 0.78rem; }
+
+  /* PACKS */
+  .packs { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.8rem; }
+  @media (max-width: 700px) { .packs { grid-template-columns: 1fr; } }
+  .pack {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.3rem 1.2rem;
+    position: relative;
+    transition: all 0.25s;
+  }
+  .pack:hover { transform: translateY(-4px); }
+  .pack.standard:hover { border-color: var(--accent); box-shadow: 0 8px 30px rgba(88,101,242,0.15); }
+  .pack.pro:hover { border-color: var(--green); box-shadow: 0 8px 30px rgba(87,242,135,0.15); }
+  .pack.premium:hover { border-color: var(--purple); box-shadow: 0 8px 30px rgba(155,89,182,0.2); }
+
+  .pack.premium { border-color: rgba(155,89,182,0.4); }
+  .pack-badge {
+    position: absolute;
+    top: -10px; right: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 3px 9px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--purple);
+    color: #fff;
+  }
+  .pack-name { font-size: 0.75rem; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .pack-price { font-size: 2rem; font-weight: 800; margin: 0.3rem 0 1rem; }
+  .pack.standard .pack-price { color: var(--accent); }
+  .pack.pro .pack-price { color: var(--green); }
+  .pack.premium .pack-price { color: var(--purple); }
+  .pack-price small { font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+  .pack-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .pack-list li { font-size: 0.8rem; display: flex; gap: 0.5rem; align-items: flex-start; }
+  .pack-list li .ck { color: var(--green); min-width: 14px; }
+  .pack-list li.off { color: var(--muted); opacity: 0.4; }
+  .pack-list li.off .ck { color: var(--muted); }
+  .price-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--orange);
+    margin-top: 1rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--border);
+  }
+
+  /* CALLOUT */
+  .note {
+    background: rgba(250,166,26,0.07);
+    border: 1px solid rgba(250,166,26,0.25);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-top: 1.5rem;
+    font-size: 0.83rem;
+    display: flex;
+    gap: 0.7rem;
+  }
+  .note .i { font-size: 1rem; }
+  .note p { color: var(--text); }
+
+  /* CONFIRM ZONE */
+  .confirm {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .confirm p { color: var(--muted); font-size: 0.85rem; }
+  .confirm strong { color: var(--text); }
+
+  /* NOTES SYSTEM */
+  .brick, .server, .pack { position: relative; }
+  .note-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 5;
+  }
+  .note-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .note-btn.has-note { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .note-box { margin-top: 0.7rem; display: none; }
+  .note-box.open { display: block; }
+  .note-box textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    padding: 0.6rem 0.7rem;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+  }
+  .note-box textarea::placeholder { color: var(--muted); }
+
+  /* EXPORT BAR */
+  .export-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(17,17,24,0.97);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 50;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .export-bar.visible { transform: translateY(0); }
+  .export-count { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+  .export-count b { color: var(--accent); }
+  .export-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .export-btn:hover { background: #4752c4; }
+  .export-btn.copied { background: var(--green); color: #000; }
+  body { padding-bottom: 6rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">Validation produit</div>
+    <h1>Récap <span>Produits & Packs</span></h1>
+    <p class="subtitle">Vérifie que j'ai bien compris ce que tu veux vendre. Corrige ce qui cloche.</p>
+  </header>
+
+  <!-- BRIQUES -->
+  <h2><span class="bar"></span>Les briques (ce qui compose tes produits)</h2>
+  <div class="bricks">
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">🏗️</span><span class="brick-name">Template Discord</span></div>
+      <div class="brick-desc">Structure complète clé en main — catégories, salons, rôles, permissions. Déployé en 1 clic via lien.</div>
+      <span class="brick-tag t-auto">automatique</span>
+      <div class="note-box"><textarea data-noteid="note-1" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">🤖</span><span class="brick-name">Prompt IA — Gestion</span></div>
+      <div class="brick-desc">Connaît toute la structure. Crée salons/catégories/rôles à la demande, prêts à copier avec emoji + police.</div>
+      <span class="brick-tag t-auto">automatique</span>
+      <div class="note-box"><textarea data-noteid="note-2" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">🧠</span><span class="brick-name">Prompt IA — Communauté</span></div>
+      <div class="brick-desc">Aide à l'identité du serveur, au recrutement, à l'animation, au développement de la communauté.</div>
+      <span class="brick-tag t-auto">automatique</span>
+      <div class="note-box"><textarea data-noteid="note-3" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">📖</span><span class="brick-name">Guide / Documentation</span></div>
+      <div class="brick-desc">Comment installer, utiliser, modifier, coller les prompts. Tout pour être autonome.</div>
+      <span class="brick-tag t-auto">automatique</span>
+      <div class="note-box"><textarea data-noteid="note-4" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">🎨</span><span class="brick-name">Prompts personnalisés</span></div>
+      <div class="brick-desc">Les 2 prompts IA adaptés sur-mesure au serveur précis du client. Demande ton intervention.</div>
+      <span class="brick-tag t-manual">manuel · premium</span>
+      <div class="note-box"><textarea data-noteid="note-5" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+    <div class="brick"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="brick-head"><span class="brick-icon">💬</span><span class="brick-name">Support humain + salon privé</span></div>
+      <div class="brick-desc">Accès direct à toi sur un serveur privé d'entraide. Ton vrai atout différenciant.</div>
+      <span class="brick-tag t-manual">manuel · premium</span>
+      <div class="note-box"><textarea data-noteid="note-6" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+  </div>
+
+  <!-- SERVEURS -->
+  <h2><span class="bar"></span>Les 4 types de serveurs</h2>
+  <div class="servers">
+    <div class="server"><button class="note-btn" onclick="toggleNote(this)">✎</button><span class="server-icon">🎮</span><div><div class="server-name">Gaming</div><div class="server-desc">Multi-jeux, sections dupliquables. Le produit pilote.</div></div>
+      <div class="note-box"><textarea data-noteid="note-7" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div></div>
+    <div class="server"><button class="note-btn" onclick="toggleNote(this)">✎</button><span class="server-icon">💼</span><div><div class="server-name">Professionnel</div><div class="server-desc">Équipes, freelances, startups.</div></div>
+      <div class="note-box"><textarea data-noteid="note-8" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div></div>
+    <div class="server"><button class="note-btn" onclick="toggleNote(this)">✎</button><span class="server-icon">👨‍👩‍👧</span><div><div class="server-name">Famille / Amis</div><div class="server-desc">Proche, intime, convivial.</div></div>
+      <div class="note-box"><textarea data-noteid="note-9" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div></div>
+    <div class="server"><button class="note-btn" onclick="toggleNote(this)">✎</button><span class="server-icon">🌐</span><div><div class="server-name">Communautaire</div><div class="server-desc">Créateurs, causes, projets collectifs.</div></div>
+      <div class="note-box"><textarea data-noteid="note-10" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div></div>
+  </div>
+  <div class="note">
+    <span class="i">💡</span>
+    <p>Chaque type de serveur = un produit déclinable en 3 packs. Soit potentiellement <strong>4 serveurs × 3 packs = 12 offres</strong>, plus un éventuel bundle.</p>
+  </div>
+
+  <!-- PACKS -->
+  <h2><span class="bar"></span>Les 3 packs (par type de serveur)</h2>
+  <div class="packs">
+
+    <div class="pack standard"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="pack-name">Standard</div>
+      <div class="pack-price">~4€ <small>?</small></div>
+      <ul class="pack-list">
+        <li><span class="ck">✓</span> Template Discord</li>
+        <li><span class="ck">✓</span> 1 prompt IA généralisé</li>
+        <li><span class="ck">✓</span> Guide complet</li>
+        <li class="off"><span class="ck">✗</span> 2e prompt IA</li>
+        <li class="off"><span class="ck">✗</span> Personnalisation</li>
+        <li class="off"><span class="ck">✗</span> Support humain</li>
+      </ul>
+      <div class="price-note">Produit d'appel · 100% automatique · scalable à l'infini</div>
+      <div class="note-box"><textarea data-noteid="note-11" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+
+    <div class="pack pro"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="pack-name">Pro</div>
+      <div class="pack-price">~14€ <small>?</small></div>
+      <ul class="pack-list">
+        <li><span class="ck">✓</span> Template Discord</li>
+        <li><span class="ck">✓</span> 2 prompts IA généralisés</li>
+        <li><span class="ck">✓</span> Guide complet</li>
+        <li><span class="ck">✓</span> Guides interactifs</li>
+        <li class="off"><span class="ck">✗</span> Personnalisation</li>
+        <li class="off"><span class="ck">✗</span> Support humain</li>
+      </ul>
+      <div class="price-note">Le best-seller visé · automatique · scalable</div>
+      <div class="note-box"><textarea data-noteid="note-12" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+
+    <div class="pack premium"><button class="note-btn" onclick="toggleNote(this)">✎</button>
+      <div class="pack-badge">Artisanal</div>
+      <div class="pack-name">Premium</div>
+      <div class="pack-price">~49€ <small>?</small></div>
+      <ul class="pack-list">
+        <li><span class="ck">✓</span> Template Discord</li>
+        <li><span class="ck">✓</span> 2 prompts <strong>100% personnalisés</strong></li>
+        <li><span class="ck">✓</span> Guide + guides interactifs</li>
+        <li><span class="ck">✓</span> Support humain (toi)</li>
+        <li><span class="ck">✓</span> Salon privé d'entraide</li>
+        <li><span class="ck">✓</span> Mises à jour incluses</li>
+      </ul>
+      <div class="price-note">Volume limité · demande ton temps · prix élevé justifié</div>
+      <div class="note-box"><textarea data-noteid="note-13" placeholder="Ta correction / remarque ici..." oninput="updateExport()"></textarea></div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <span class="i">⚠️</span>
+    <p><strong>Prix encore non figés</strong> — les montants affichés sont ceux de ton visuel, à valider ou ajuster ensemble.</p>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm">
+    <p>👉 <strong>À toi de jouer :</strong> dis-moi ce qui est faux, mal compris, ou à ajouter. Une fois validé, on passe à la roadmap.</p>
+  </div>
+
+</div>
+
+  <div class="export-bar" id="exportBar">
+    <span class="export-count"><b id="noteCount">0</b> note(s) écrite(s)</span>
+    <button class="export-btn" id="exportBtn" onclick="copyNotes()">📋 Copier mes corrections</button>
+  </div>
+
+<script>
+  const STORE = 'recap-discord-notes';
+
+  function loadNotes() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(STORE) || '{}'); } catch(e){}
+    document.querySelectorAll('.note-box textarea').forEach(t => {
+      const id = t.getAttribute('data-noteid');
+      if (saved[id]) {
+        t.value = saved[id];
+        const card = t.closest('.brick, .server, .pack');
+        card.querySelector('.note-box').classList.add('open');
+      }
+    });
+    updateExport();
+  }
+
+  function saveNotes() {
+    const data = {};
+    document.querySelectorAll('.note-box textarea').forEach(t => {
+      const id = t.getAttribute('data-noteid');
+      if (t.value.trim()) data[id] = t.value;
+    });
+    try { localStorage.setItem(STORE, JSON.stringify(data)); } catch(e){}
+  }
+
+  function toggleNote(btn) {
+    const card = btn.closest('.brick, .server, .pack');
+    const box = card.querySelector('.note-box');
+    box.classList.toggle('open');
+    if (box.classList.contains('open')) {
+      box.querySelector('textarea').focus();
+    }
+  }
+
+  function cardName(card) {
+    const n = card.querySelector('.brick-name, .server-name, .pack-name');
+    return n ? n.textContent.trim() : 'Élément';
+  }
+
+  function updateExport() {
+    saveNotes();
+    let count = 0;
+    document.querySelectorAll('.note-box textarea').forEach(t => {
+      if (t.value.trim()) count++;
+    });
+    document.getElementById('noteCount').textContent = count;
+    const bar = document.getElementById('exportBar');
+    bar.classList.toggle('visible', count > 0);
+    document.querySelectorAll('.note-btn').forEach(btn => {
+      const card = btn.closest('.brick, .server, .pack');
+      const t = card.querySelector('.note-box textarea');
+      btn.classList.toggle('has-note', t && t.value.trim());
+    });
+  }
+
+  function copyNotes() {
+    let out = '=== MES CORRECTIONS ===\n\n';
+    document.querySelectorAll('.brick, .server, .pack').forEach(card => {
+      const t = card.querySelector('.note-box textarea');
+      if (t && t.value.trim()) {
+        out += '• ' + cardName(card) + ' : ' + t.value.trim() + '\n';
+      }
+    });
+    navigator.clipboard.writeText(out).then(() => {
+      const btn = document.getElementById('exportBtn');
+      btn.classList.add('copied');
+      btn.textContent = '✓ Copié ! Colle-le moi dans le chat';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = '📋 Copier mes corrections';
+      }, 2500);
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', loadNotes);
+</script>
+</body>
+</html>

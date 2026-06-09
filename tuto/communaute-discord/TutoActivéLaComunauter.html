@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord - Communauté & Salons Forum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@500;700&family=Space+Mono&family=Fredoka+One&family=Press+Start+2P&family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Syne', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --br: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--tx);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .t-sncf { --bg:#1a1a1a;--bg2:#252525;--bg3:#2f2f2f;--bg4:#3a3a3a;--brd:rgba(255,255,255,0.08);--tx:#f0f0f0;--tx2:#b0b0b0;--ac:#dc241f;--ac2:#f9a825;--ok:#1e824c;--warn:#e67e22;--danger:#c0392b;--info:#2980b9;--c1:#dc241f;--c2:#f9a825;--c3:#1e824c;--c4:#e67e22;--c5:#2980b9; }
+        .t-sncf.day { --bg:#f8f9fb;--bg2:#eef1f5;--bg3:#e0e4ea;--bg4:#d2d7df;--brd:rgba(0,0,0,0.06);--tx:#1a1d23;--tx2:#5a6170; }
+        .t-sncf::before, .t-sncf.day::before { background: radial-gradient(ellipse at 10% 0%, var(--ac) 0%, transparent 50%), radial-gradient(ellipse at 90% 100%, var(--ac2) 0%, transparent 50%); opacity:.06; }
+        .t-bleu { --bg:#0a1628;--bg2:#112240;--bg3:#1a3154;--bg4:#234068;--brd:rgba(255,255,255,0.06);--tx:#e6f0ff;--tx2:#90b4d9;--ac:#1565c0;--ac2:#42a5f5;--ok:#2e7d32;--warn:#ef6c00;--danger:#c62828;--info:#0288d1;--c1:#1565c0;--c2:#42a5f5;--c3:#2e7d32;--c4:#ef6c00;--c5:#c62828; }
+        .t-bleu.day { --bg:#f4f7fc;--bg2:#e4eaf4;--bg3:#d0dae8;--bg4:#bcc8db;--brd:rgba(0,0,0,0.05);--tx:#0a1929;--tx2:#3a5070; }
+        .t-bleu::before, .t-bleu.day::before { background: radial-gradient(ellipse at 15% 5%, var(--ac) 0%, transparent 45%), radial-gradient(ellipse at 85% 95%, var(--ac2) 0%, transparent 45%); opacity:.05; }
+        .t-dracula { --bg:#282a36;--bg2:#21222c;--bg3:#3a3d4f;--bg4:#4a4e63;--brd:rgba(255,255,255,0.06);--tx:#f8f8f2;--tx2:#a0a0b0;--ac:#bd93f9;--ac2:#ff79c6;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--info:#8be9fd;--c1:#bd93f9;--c2:#ff79c6;--c3:#50fa7b;--c4:#ffb86c;--c5:#ff5555; }
+        .t-dracula.day { --bg:#f5f5fa;--bg2:#e8e8f0;--bg3:#d8d8e2;--bg4:#c8c8d4;--brd:rgba(0,0,0,0.05);--tx:#1e1e2e;--tx2:#555570; }
+        .t-dracula::before, .t-dracula.day::before { background: radial-gradient(ellipse at 20% 0%, var(--ac) 0%, transparent 40%), radial-gradient(ellipse at 80% 100%, var(--ac2) 0%, transparent 40%); opacity:.07; }
+        .t-windows95 { --bg:#008080;--bg2:#c0c0c0;--bg3:#a0a0a0;--bg4:#808080;--brd:rgba(0,0,0,0.3);--tx:#000000;--tx2:#222222;--ac:#000080;--ac2:#808080;--ok:#008000;--warn:#808000;--danger:#800000;--info:#0000ff;--c1:#000080;--c2:#008000;--c3:#808000;--c4:#800000;--c5:#0000ff; }
+        .t-windows95.day { --bg:#c0c0c0;--bg2:#d4d4d4;--bg3:#a0a0a0;--bg4:#808080;--brd:rgba(0,0,0,0.3);--tx:#000000;--tx2:#222222; }
+        .t-terminal { --bg:#0c0c0c;--bg2:#1a1a1a;--bg3:#222;--bg4:#2a2a2a;--brd:rgba(0,255,0,0.15);--tx:#00ff00;--tx2:#00aa00;--ac:#00ff00;--ac2:#00cc00;--ok:#00ff00;--warn:#ffff00;--danger:#ff0000;--info:#00ffff;--c1:#00ff00;--c2:#00cc00;--c3:#ffff00;--c4:#ff0000;--c5:#00ffff; }
+        .t-terminal.day { --bg:#e8ffe8;--bg2:#d0f0d0;--bg3:#b8e0b8;--bg4:#a0d0a0;--brd:rgba(0,100,0,0.15);--tx:#003300;--tx2:#005500;--ac:#008000;--ac2:#00aa00;--ok:#008000;--warn:#cccc00;--danger:#cc0000;--info:#006699; }
+        .t-picsou { --bg:#2c1f0e;--bg2:#3d2e1a;--bg3:#4e3d26;--bg4:#5f4c32;--brd:rgba(255,255,255,0.08);--tx:#ffe0b2;--tx2:#c9a87c;--ac:#f9a825;--ac2:#ff8f00;--ok:#33691e;--warn:#e65100;--danger:#b71c1c;--info:#ff8f00;--c1:#f9a825;--c2:#ff8f00;--c3:#33691e;--c4:#e65100;--c5:#b71c1c; }
+        .t-picsou.day { --bg:#fffdf5;--bg2:#fff3d0;--bg3:#ffe9a0;--bg4:#ffd970;--brd:rgba(0,0,0,0.06);--tx:#3e2723;--tx2:#6d5040; }
+        .t-picsou::before, .t-picsou.day::before { background: radial-gradient(ellipse at 10% 5%, var(--ac) 0%, transparent 45%), radial-gradient(ellipse at 90% 90%, var(--ac2) 0%, transparent 45%); opacity:.08; }
+        .t-cyberpunk { --bg:#0d0221;--bg2:#150533;--bg3:#200845;--bg4:#2b0b57;--brd:rgba(255,0,193,0.15);--tx:#ff00c1;--tx2:#00e5ff;--ac:#ff00c1;--ac2:#00ffff;--ok:#39ff14;--warn:#ffea00;--danger:#ff0000;--info:#00e5ff;--c1:#ff00c1;--c2:#00ffff;--c3:#39ff14;--c4:#ffea00;--c5:#ff0000; }
+        .t-cyberpunk.day { --bg:#fce4ff;--bg2:#f0c8ff;--bg3:#e0b0f0;--bg4:#d098e0;--brd:rgba(255,0,193,0.1);--tx:#1a0028;--tx2:#4a0070;--ac:#c00090;--ac2:#0088aa; }
+        .t-cyberpunk::before, .t-cyberpunk.day::before { background: radial-gradient(ellipse at 25% 0%, var(--ac) 0%, transparent 40%), radial-gradient(ellipse at 75% 100%, var(--ac2) 0%, transparent 40%); opacity:.1; }
+        .t-pro-bleu { --bg:#0d1b2a;--bg2:#1b2838;--bg3:#293546;--bg4:#374254;--brd:rgba(255,255,255,0.06);--tx:#e8f0fe;--tx2:#90b0d0;--ac:#1a73e8;--ac2:#4a90d9;--ok:#0f9d58;--warn:#f4b400;--danger:#db4437;--info:#4285f4;--c1:#1a73e8;--c2:#4a90d9;--c3:#0f9d58;--c4:#f4b400;--c5:#db4437; }
+        .t-pro-bleu.day { --bg:#eef3fa;--bg2:#d8e4f4;--bg3:#c4d5e8;--bg4:#b0c6dc;--brd:rgba(0,0,0,0.05);--tx:#0d1b2a;--tx2:#2e4058; }
+        .t-pro-bleu::before, .t-pro-bleu.day::before { background: radial-gradient(ellipse at 15% 0%, var(--ac) 0%, transparent 45%), radial-gradient(ellipse at 85% 100%, var(--ac2) 0%, transparent 45%); opacity:.05; }
+        .t-windows95 .step-title, .t-windows95 .progress-label { font-family: 'Press Start 2P', cursive !important; }
+        .t-terminal .step-title, .t-terminal .progress-label { font-family: 'Space Mono', monospace !important; }
+        .t-dracula .step-title, .t-dracula .progress-label { font-family: 'Orbitron', sans-serif !important; }
+        .t-cyberpunk .step-title, .t-cyberpunk .progress-label { font-family: 'Orbitron', sans-serif !important; }
+        .t-picsou .step-title, .t-picsou .progress-label { font-family: 'Fredoka One', cursive !important; }
+        .t-windows95 { --br:0; }
+        .t-terminal { --br:0; }
+
+        .header {
+            position: fixed; top:0; left:0; right:0; z-index:100;
+            padding: 12px 20px; background: var(--bg2);
+            backdrop-filter: blur(12px); opacity: 0.35;
+            transition: opacity 0.2s; display: flex; align-items: center;
+            justify-content: space-between; border-bottom: 1px solid var(--brd);
+        }
+        .header:hover { opacity: 1; }
+        .header-left { display:flex; align-items:center; gap:12px; }
+        .logo {
+            font-weight: 700; font-size: 1.5rem; font-family: var(--font-display);
+            background: linear-gradient(135deg, var(--ac), var(--ac2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-actions { display:flex; gap:8px; align-items:center; }
+        .header-btn {
+            background: transparent; border: 1px solid var(--brd);
+            color: var(--tx); font-size: 1.2rem; padding: 6px 10px;
+            border-radius: 8px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+        }
+        .header-btn:hover { background: var(--bg3); border-color: var(--ac); }
+        .theme-dropdown { position: relative; }
+        .theme-menu {
+            position: absolute; right:0; top:110%; background: var(--bg2);
+            border: 1px solid var(--brd); border-radius: 12px; padding: 8px 0;
+            min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: none; z-index:200;
+        }
+        .theme-menu.open { display:block; }
+        .theme-option {
+            padding: 8px 16px; cursor:pointer; color: var(--tx);
+            transition: background 0.1s; white-space: nowrap;
+        }
+        .theme-option:hover { background: var(--bg3); color: var(--ac); }
+
+        .tutoriel-container {
+            max-width: 680px; margin: 0 auto; padding: 80px 20px 60px;
+            position: relative; z-index:1;
+        }
+        .progress-bar {
+            display:flex; align-items:center; gap:8px; margin-bottom: 32px;
+        }
+        .progress-segments {
+            display:flex; gap:4px; flex:1;
+        }
+        .progress-segment {
+            height: 6px; background: var(--bg3); border-radius: 3px;
+            flex:1; transition: background 0.3s;
+        }
+        .progress-segment.done { background: var(--ac); }
+        .progress-label {
+            font-size: 0.85rem; font-weight: 600; color: var(--tx2);
+            min-width: 45px; text-align: right;
+        }
+
+        .step-card {
+            background: var(--bg2); border: 1px solid var(--brd);
+            border-radius: var(--br); padding: 36px 32px;
+            backdrop-filter: blur(8px); transition: border-color 0.2s;
+        }
+        .step-header {
+            display:flex; gap:16px; align-items:center; margin-bottom:24px;
+        }
+        .step-icon {
+            width:48px; height:48px; background: var(--bg3);
+            border-radius: 12px; display:flex; align-items:center;
+            justify-content:center; font-size: 1.8rem;
+        }
+        .step-title {
+            font-family: var(--font-display); font-weight: 600;
+            font-size: 1.4rem; color: var(--tx);
+        }
+        .step-subtitle { color: var(--tx2); font-size: 0.9rem; margin-top:2px; }
+        .step-body { line-height: 1.6; margin-bottom: 24px; }
+        .step-body strong { color: var(--ac); }
+        .step-body code {
+            background: var(--bg3); padding: 2px 8px; border-radius: 6px;
+            font-family: var(--font-mono); font-size: 0.9rem;
+        }
+        .step-body ul { padding-left: 20px; margin-top: 8px; }
+        .step-body li { margin-bottom: 4px; }
+
+        .validation-zone {
+            background: var(--bg); border: 1px solid var(--brd);
+            border-radius: 12px; padding: 16px; transition: border-color 0.2s;
+            margin-top: 16px;
+        }
+        .validation-zone:hover { border-color: var(--ac); }
+        .validation-zone label {
+            display:flex; align-items:center; gap:8px; padding: 4px 0; cursor: pointer;
+        }
+        .validation-zone input[type="radio"],
+        .validation-zone input[type="checkbox"] { accent-color: var(--ac); }
+        .terminal-sim {
+            background: #111; color: #0f0; font-family: 'Space Mono', monospace;
+            padding: 12px; border-radius: 8px; display:flex; align-items:center; gap:8px;
+        }
+        .terminal-sim .prompt { color: #0f0; }
+        .terminal-sim input {
+            background: transparent; border: none; color: #0f0;
+            font-family: inherit; font-size: 1rem; outline: none; flex:1;
+        }
+        .feedback {
+            margin-top: 12px; padding: 8px 12px; border-radius: 8px;
+            font-weight: 500; font-size: 0.9rem;
+        }
+        .feedback.success { background: var(--ok); color:#fff; }
+        .feedback.error { background: var(--danger); color:#fff; }
+        .feedback.info { background: var(--warn); color:#fff; }
+
+        .nav-buttons {
+            display:flex; justify-content: space-between;
+            margin-top: 24px; gap:12px;
+        }
+        .nav-btn {
+            background: var(--bg2); border: 1px solid var(--brd);
+            color: var(--tx); padding: 10px 20px; border-radius: 12px;
+            cursor: pointer; font-weight: 600; transition: background 0.2s, border-color 0.2s;
+        }
+        .nav-btn:hover { border-color: var(--ac); background: var(--bg3); }
+        .nav-btn.accent { background: var(--ac); border-color: var(--ac); color: #fff; }
+        .nav-btn.accent:hover { background: var(--ac2); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+        .modal-overlay {
+            position: fixed; inset:0; background: rgba(0,0,0,0.7);
+            display:flex; align-items:center; justify-content:center; z-index:500;
+        }
+        .modal {
+            background: var(--bg2); border: 1px solid var(--brd);
+            border-radius: 16px; padding: 24px; min-width: 360px;
+            max-width: 90vw; color: var(--tx);
+        }
+        .modal h3 { font-family: var(--font-display); margin-bottom: 16px; }
+        .modal textarea {
+            width:100%; height:120px; background: var(--bg); border: 1px solid var(--brd);
+            color: var(--tx); border-radius: 8px; padding: 8px; font-family: var(--font-mono);
+            resize: vertical; margin-bottom: 12px;
+        }
+        .modal-actions { display:flex; gap:8px; flex-wrap: wrap; justify-content: flex-end; }
+        .modal button {
+            background: var(--bg3); border: 1px solid var(--brd); color: var(--tx);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+        }
+        .modal button:hover { background: var(--ac); color: #fff; border-color: var(--ac); }
+        .modal button.warn { background: var(--danger); color:#fff; border-color: var(--danger); }
+
+        .confetti {
+            position: fixed; width: 10px; height: 10px; border-radius: 2px;
+            animation: confetti-fall linear forwards; z-index: 999;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity:1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity:0; }
+        }
+    </style>
+</head>
+<body class="t-sncf">
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        /*__SEED_START__*/
+        const TUTO_STEPS = [
+            {
+                id: "intro",
+                icon: "🌐",
+                title: "Pourquoi activer la Communauté ?",
+                subtitle: "Débloquez les salons forum et plus",
+                content: `<strong>La Communauté Discord</strong> transforme un serveur classique en un espace communautaire puissant. Elle permet d'accéder à des outils comme les <strong>salons forum</strong>, les <strong>fils de discussion</strong>, les <strong>annonces</strong> et les <strong>analyses d'engagement</strong>.<br/><br/>Sans cette activation, impossible de créer un salon forum ou d'utiliser les fonctionnalités avancées de modération. Dans ce tutoriel, vous allez apprendre à <strong>activer la Communauté</strong>, créer votre premier <strong>salon forum</strong> et y publier un post.`,
+                validationType: "read",
+                validationQuestion: null,
+                validationAnswer: null,
+                validationOptions: null
+            },
+            {
+                id: "activation",
+                icon: "⚙️",
+                title: "Activer la Communauté",
+                subtitle: "Les étapes clés",
+                content: `Rendez-vous dans les <strong>Paramètres de votre serveur</strong> (clic droit sur le nom du serveur) :<ul><li>Cliquez sur <strong>Communauté</strong> dans le menu de gauche</li><li>Appuyez sur <strong>« Activer la Communauté »</strong></li><li>Configurez les réglages de sécurité (filtre des médias, niveau de vérification)</li><li>Définissez un salon d'annonces et un salon de règles</li></ul>Une fois activée, les options <strong>Forum</strong> et <strong>Annonce</strong> apparaissent lors de la création de salons.`,
+                validationType: "radio",
+                validationQuestion: "Quel menu de paramètres permet d'activer la Communauté ?",
+                validationOptions: ["Général", "Communauté", "Rôles", "Modération"],
+                validationAnswer: "Communauté"
+            },
+            {
+                id: "comprendre",
+                icon: "📚",
+                title: "Qu'est-ce qu'un salon forum ?",
+                subtitle: "Comprendre avant de créer",
+                content: `Un salon forum est un espace structuré où les membres créent des <strong>posts</strong> (discussions) avec un <strong>titre</strong>, un contenu riche et des <strong>tags</strong>. Contrairement à un salon textuel classique, chaque discussion est indépendante et peut être retrouvée facilement.<br/><br/>Parmi les caractéristiques ci-dessous, sélectionnez celles qui s'appliquent aux salons forum :`,
+                validationType: "checkbox",
+                validationQuestion: "Cochez les caractéristiques des salons forum :",
+                validationOptions: [
+                    { id: "post", label: "Création de posts avec titre obligatoire" },
+                    { id: "thread", label: "Messages éphémères qui disparaissent" },
+                    { id: "tags", label: "Tags personnalisables" },
+                    { id: "voice", label: "Salon vocal intégré" }
+                ],
+                validationAnswer: ["post", "tags"]
+            },
+            {
+                id: "creer",
+                icon: "🛠️",
+                title: "Créer un salon forum",
+                subtitle: "Mise en pratique",
+                content: `Une fois la Communauté activée, dans la liste des salons de votre serveur, cliquez sur le <strong>+</strong> (ou « Créer un salon »). Dans la fenêtre qui s'ouvre, choisissez le type <strong>Forum</strong>. Donnez un nom, ajustez les autorisations et validez.<br/><br/>Pour vérifier votre compréhension, tapez dans le terminal le type de salon à sélectionner (en français, un seul mot) :`,
+                validationType: "terminal",
+                validationQuestion: "Type de salon :",
+                validationAnswer: "forum",
+                validationOptions: null
+            },
+            {
+                id: "poster",
+                icon: "✍️",
+                title: "Publier un post dans le forum",
+                subtitle: "Lancez la discussion",
+                content: `Ouvrez votre salon forum et cliquez sur <strong>« Nouveau post »</strong> (ou « Créer un post »). Remplissez :<ul><li><strong>Titre</strong> (obligatoire)</li><li><strong>Contenu</strong> (texte, images, fichiers)</li><li><strong>Tags</strong> (facultatif mais recommandé)</li></ul>Vous pouvez aussi épingler le post ou le transformer en annonce. Les membres pourront commenter en dessous, comme dans un fil de discussion.`,
+                validationType: "radio",
+                validationQuestion: "Quel élément est obligatoire pour créer un post ?",
+                validationOptions: ["Les tags", "Le titre", "Une image", "Un fichier joint"],
+                validationAnswer: "Le titre"
+            },
+            {
+                id: "fin",
+                icon: "🎉",
+                title: "Vous maîtrisez les forums Discord",
+                subtitle: "Récapitulatif et astuces",
+                content: `Félicitations ! Vous savez désormais <strong>activer la Communauté</strong>, créer un <strong>salon forum</strong> et y <strong>publier un post</strong>. Quelques astuces supplémentaires :<ul><li>Utilisez les <strong>tags</strong> pour organiser les discussions.</li><li>Modérez régulièrement les posts épinglés.</li><li>Consultez les <strong>analyses</strong> de la Communauté pour suivre l'engagement.</li></ul>`,
+                validationType: "read",
+                validationQuestion: null,
+                validationAnswer: null,
+                validationOptions: null
+            }
+        ];
+        /*__SEED_END__*/
+
+        const THEMES = ["sncf", "bleu", "dracula", "windows95", "terminal", "picsou", "cyberpunk", "pro-bleu"];
+        const TOTAL_STEPS = TUTO_STEPS.length;
+
+        function App() {
+            const [currentStep, setCurrentStep] = useState(0);
+            const [validatedSteps, setValidatedSteps] = useState([]);
+            const [answers, setAnswers] = useState({});
+            const [theme, setTheme] = useState("sncf");
+            const [dayMode, setDayMode] = useState(false);
+            const [feedback, setFeedback] = useState(null);
+            const [showModal, setShowModal] = useState(false);
+            const [importJson, setImportJson] = useState("");
+            const [dropdownOpen, setDropdownOpen] = useState(false);
+            const [finished, setFinished] = useState(false);
+            const confettiTimers = useRef([]);
+            const terminalRef = useRef(null);
+
+            // Nettoyage des étapes validées
+            const cleanValidated = (arr) => {
+                if (!Array.isArray(arr)) return [];
+                const unique = [...new Set(arr)];
+                return unique.filter(id => TUTO_STEPS.some(s => s.id === id));
+            };
+
+            // Calcul du pourcentage
+            const validCount = cleanValidated(validatedSteps).length;
+            const progressPercent = TOTAL_STEPS === 0 ? 0 : Math.round((validCount / TOTAL_STEPS) * 100);
+
+            // Initialisation
+            useEffect(() => {
+                const storedTheme = localStorage.getItem("app-theme") || "sncf";
+                const storedDay = localStorage.getItem("app-day-mode") === "true";
+                const storedState = localStorage.getItem("hiveos_discord_tuto_state");
+                const hash = window.location.hash;
+                let loadedFromHash = false;
+
+                if (hash.startsWith("#d=")) {
+                    try {
+                        const decoded = JSON.parse(atob(hash.substring(3)));
+                        if (decoded.currentStep !== undefined) {
+                            setCurrentStep(Math.min(Math.max(0, decoded.currentStep), TOTAL_STEPS - 1));
+                            setValidatedSteps(cleanValidated(decoded.validatedSteps));
+                            setAnswers(decoded.answers || {});
+                            loadedFromHash = true;
+                        }
+                        if (decoded.theme) setTheme(decoded.theme);
+                        if (decoded.day !== undefined) setDayMode(decoded.day);
+                    } catch(e) {}
+                }
+
+                if (!loadedFromHash && storedState) {
+                    try {
+                        const parsed = JSON.parse(storedState);
+                        setCurrentStep(Math.min(Math.max(0, parsed.currentStep || 0), TOTAL_STEPS - 1));
+                        setValidatedSteps(cleanValidated(parsed.validatedSteps));
+                        setAnswers(parsed.answers || {});
+                    } catch(e) {}
+                }
+
+                setTheme(storedTheme);
+                setDayMode(storedDay);
+            }, []);
+
+            // Persistance
+            useEffect(() => {
+                const clean = cleanValidated(validatedSteps);
+                const state = { currentStep, validatedSteps: clean, answers };
+                localStorage.setItem("hiveos_discord_tuto_state", JSON.stringify(state));
+                const hashData = btoa(JSON.stringify({ ...state, theme, day: dayMode }));
+                window.location.hash = `#d=${hashData}`;
+                localStorage.setItem("app-theme", theme);
+                localStorage.setItem("app-day-mode", dayMode);
+
+                if (clean.length === TOTAL_STEPS && !finished) {
+                    setFinished(true);
+                    launchConfetti();
+                    setTimeout(() => setFinished(false), 5000);
+                }
+            }, [currentStep, validatedSteps, answers, theme, dayMode]);
+
+            useEffect(() => {
+                document.body.className = `t-${theme}${dayMode ? " day" : ""}`;
+            }, [theme, dayMode]);
+
+            const step = TUTO_STEPS[currentStep];
+            const isStepValidated = cleanValidated(validatedSteps).includes(step.id);
+
+            const handleValidate = (answer) => {
+                if (isStepValidated) return;
+                let correct = false;
+                const vt = step.validationType;
+
+                if (vt === "read") {
+                    correct = true;
+                } else if (vt === "radio" || vt === "terminal") {
+                    const correctAnswer = step.validationAnswer;
+                    correct = (answer?.toString().trim().toLowerCase() === correctAnswer?.toString().trim().toLowerCase());
+                } else if (vt === "checkbox") {
+                    const selected = Array.isArray(answer) ? answer : [];
+                    const expected = Array.isArray(step.validationAnswer) ? step.validationAnswer : [];
+                    correct = selected.length === expected.length && expected.every(id => selected.includes(id));
+                }
+
+                if (correct) {
+                    setValidatedSteps(prev => cleanValidated([...prev, step.id]));
+                    setAnswers(prev => ({ ...prev, [step.id]: answer }));
+                    setFeedback({ type: "success", message: "✅ Correct ! Étape validée." });
+                } else {
+                    setFeedback({ type: "error", message: "❌ Réponse incorrecte, réessayez." });
+                }
+                setTimeout(() => setFeedback(null), 3000);
+            };
+
+            const goNext = () => {
+                if (currentStep < TOTAL_STEPS - 1 && isStepValidated) {
+                    setFeedback(null);
+                    setCurrentStep(prev => prev + 1);
+                }
+            };
+
+            const goPrev = () => {
+                if (currentStep > 0) {
+                    setFeedback(null);
+                    setCurrentStep(prev => prev - 1);
+                }
+            };
+
+            const launchConfetti = () => {
+                const colors = ["#ff0","#f0f","#0ff","#f00","#0f0","#00f","#ff8000","#80ff00"];
+                for (let i = 0; i < 80; i++) {
+                    const timer = setTimeout(() => {
+                        const confetti = document.createElement("div");
+                        confetti.className = "confetti";
+                        confetti.style.left = Math.random() * 100 + "%";
+                        confetti.style.background = colors[Math.floor(Math.random()*colors.length)];
+                        confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+                        confetti.style.width = (Math.random() * 8 + 6) + "px";
+                        confetti.style.height = (Math.random() * 8 + 6) + "px";
+                        document.body.appendChild(confetti);
+                        setTimeout(() => confetti.remove(), 4000);
+                    }, i * 30);
+                    confettiTimers.current.push(timer);
+                }
+            };
+
+            const handleFactoryReset = () => {
+                if (window.confirm("Voulez-vous vraiment tout réinitialiser ?")) {
+                    if (window.confirm("Dernière chance : toutes les données seront effacées.")) {
+                        localStorage.removeItem("hiveos_discord_tuto_state");
+                        localStorage.removeItem("app-theme");
+                        localStorage.removeItem("app-day-mode");
+                        window.location.hash = "";
+                        setCurrentStep(0);
+                        setValidatedSteps([]);
+                        setAnswers({});
+                        setTheme("sncf");
+                        setDayMode(false);
+                        setFeedback(null);
+                        setShowsetShowModal(false);
+                    }
+                }
+            };
+
+            const exportState = () => {
+                const clean = cleanValidated(validatedSteps);
+                return JSON.stringify({ currentStep, validatedSteps: clean, answers, theme, day: dayMode }, null, 2);
+            };
+
+            const handleCopy = () => {
+                navigator.clipboard.writeText(exportState());
+                setFeedback({type:"info", message:"📋 Export copié dans le presse-papier !"});
+                setTimeout(()=>setFeedback(null),2000);
+            };
+            const handleDownload = () => {
+                const blob = new Blob([exportState()], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = "tuto_discord_state.json"; a.click();
+            };
+            const handleMerge = () => {
+                try {
+                    const imported = JSON.parse(importJson);
+                    const mergedSteps = cleanValidated([...validatedSteps, ...(imported.validatedSteps||[])]);
+                    const mergedAnswers = {...answers, ...(imported.answers||{})};
+                    setValidatedSteps(mergedSteps);
+                    setAnswers(mergedAnswers);
+                    if (imported.currentStep !== undefined) setCurrentStep(Math.min(Math.max(0, imported.currentStep), TOTAL_STEPS - 1));
+                    setFeedback({type:"success", message:"✅ Données fusionnées."});
+                } catch(e) {
+                    setFeedback({type:"error", message:"❌ JSON invalide."});
+                }
+                setTimeout(()=>setFeedback(null),3000);
+            };
+            const handleReplace = () => {
+                try {
+                    const imported = JSON.parse(importJson);
+                    const clean = cleanValidated(imported.validatedSteps || []);
+                    setCurrentStep(Math.min(Math.max(0, imported.currentStep || 0), TOTAL_STEPS - 1));
+                    setValidatedSteps(clean);
+                    setAnswers(imported.answers || {});
+                    if (imported.theme) setTheme(imported.theme);
+                    if (imported.day !== undefined) setDayMode(imported.day);
+                    setFeedback({type:"success", message:"✅ État remplacé."});
+                } catch(e) {
+                    setFeedback({type:"error", message:"❌ JSON invalide."});
+                }
+                setTimeout(()=>setFeedback(null),3000);
+            };
+            const copyUrl = () => {
+                navigator.clipboard.writeText(window.location.href);
+                setFeedback({type:"info", message:"🔗 URL copiée !"});
+                setTimeout(()=>setFeedback(null),2000);
+            };
+
+            // Composant ValidationArea
+            const ValidationArea = () => {
+                const [localAnswer, setLocalAnswer] = useState(
+                    answers[step.id] || (step.validationType === "checkbox" ? [] : "")
+                );
+                const vt = step.validationType;
+
+                useEffect(() => {
+                    setLocalAnswer(answers[step.id] || (vt === "checkbox" ? [] : ""));
+                }, [step.id]);
+
+                if (vt === "read") {
+                    return (
+                        <div>
+                            <button className="nav-btn accent" onClick={() => handleValidate(null)} disabled={isStepValidated}>
+                                {isStepValidated ? "✅ Lu" : "J'ai bien lu"}
+                            </button>
+                        </div>
+                    );
+                }
+                if (vt === "radio") {
+                    return (
+                        <div className="validation-zone">
+                            <p style={{marginBottom:8, fontWeight:600}}>{step.validationQuestion}</p>
+                            {step.validationOptions.map((opt, idx) => (
+                                <label key={idx}>
+                                    <input
+                                        type="radio"
+                                        name="radio-answer"
+                                        value={opt}
+                                        checked={localAnswer === opt}
+                                        onChange={() => setLocalAnswer(opt)}
+                                        disabled={isStepValidated}
+                                    />
+                                    {opt}
+                                </label>
+                            ))}
+                            <button
+                                className="nav-btn accent"
+                                style={{marginTop:12}}
+                                onClick={() => handleValidate(localAnswer)}
+                                disabled={!localAnswer || isStepValidated}
+                            >
+                                Valider
+                            </button>
+                        </div>
+                    );
+                }
+                if (vt === "checkbox") {
+                    const toggleOption = (id) => {
+                        if (isStepValidated) return;
+                        setLocalAnswer(prev => {
+                            if (prev.includes(id)) return prev.filter(x => x !== id);
+                            return [...prev, id];
+                        });
+                    };
+                    return (
+                        <div className="validation-zone">
+                            <p style={{marginBottom:8, fontWeight:600}}>{step.validationQuestion}</p>
+                            {step.validationOptions.map((opt) => (
+                                <label key={opt.id}>
+                                    <input
+                                        type="checkbox"
+                                        checked={localAnswer.includes(opt.id)}
+                                        onChange={() => toggleOption(opt.id)}
+                                        disabled={isStepValidated}
+                                    />
+                                    {opt.label}
+                                </label>
+                            ))}
+                            <button
+                                className="nav-btn accent"
+                                style={{marginTop:12}}
+                                onClick={() => handleValidate(localAnswer)}
+                                disabled={localAnswer.length === 0 || isStepValidated}
+                            >
+                                Valider
+                            </button>
+                        </div>
+                    );
+                }
+                if (vt === "terminal") {
+                    return (
+                        <div className="validation-zone">
+                            <div className="terminal-sim">
+                                <span className="prompt">$</span>
+                                <input
+                                    ref={terminalRef}
+                                    type="text"
+                                    placeholder="Tapez votre réponse..."
+                                    value={localAnswer}
+                                    onChange={(e) => setLocalAnswer(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === "Enter") handleValidate(localAnswer); }}
+                                    disabled={isStepValidated}
+                                />
+                            </div>
+                            <button
+                                className="nav-btn accent"
+                                style={{marginTop:8}}
+                                onClick={() => handleValidate(localAnswer)}
+                                disabled={!localAnswer || isStepValidated}
+                            >
+                                Valider
+                            </button>
+                        </div>
+                    );
+                }
+                return null;
+            };
+
+            return (
+                <>
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-left">
+                            <span className="logo">HiveOS</span>
+                        </div>
+                        <div className="header-actions">
+                            <div className="theme-dropdown">
+                                <button className="header-btn" onClick={() => setDropdownOpen(!dropdownOpen)} title="Thèmes">🎨</button>
+                                {dropdownOpen && (
+                                    <div className="theme-menu open">
+                                        {THEMES.map(t => (
+                                            <div key={t} className="theme-option" onClick={() => { setTheme(t); setDropdownOpen(false); }}>
+                                                {t.charAt(0).toUpperCase() + t.slice(1)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <button className="header-btn" onClick={() => setDayMode(!dayMode)} title={dayMode ? "Mode nuit" : "Mode jour"}>
+                                {dayMode ? "🌙" : "☀️"}
+                            </button>
+                            <button className="header-btn" onClick={() => setShowModal(true)} title="Sauvegarde">💾</button>
+                        </div>
+                    </header>
+
+                    {/* Tutoriel */}
+                    <div className="tutoriel-container">
+                        <div className="progress-bar">
+                            <div className="progress-segments">
+                                {TUTO_STEPS.map((s) => (
+                                    <div key={s.id} className={`progress-segment ${cleanValidated(validatedSteps).includes(s.id) ? "done" : ""}`}></div>
+                                ))}
+                            </div>
+                            <div className="progress-label">{progressPercent}%</div>
+                        </div>
+
+                        <div className="step-card">
+                            <div className="step-header">
+                                <div className="step-icon">{step.icon}</div>
+                                <div>
+                                    <div className="step-title">{step.title}</div>
+                                    <div className="step-subtitle">{step.subtitle}</div>
+                                </div>
+                            </div>
+                            <div className="step-body" dangerouslySetInnerHTML={{ __html: step.content }}></div>
+                            {feedback && (
+                                <div className={`feedback ${feedback.type}`}>{feedback.message}</div>
+                            )}
+                            <ValidationArea />
+                        </div>
+
+                        <div className="nav-buttons">
+                            <button className="nav-btn" onClick={goPrev} disabled={currentStep === 0}>← Précédent</button>
+                            <button className="nav-btn accent" onClick={goNext} disabled={currentStep === TOTAL_STEPS - 1 || !isStepValidated}>
+                                Suivant →
+                            </button>
+                        </div>
+                        {currentStep === TOTAL_STEPS - 1 && validCount === TOTAL_STEPS && (
+                            <div style={{textAlign:"center", marginTop:16, color:"var(--ac)", fontWeight:600}}>
+                                🎉 Tutoriel terminé ! Toutes les étapes sont validées.
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Modal Sauvegarde */}
+                    {showModal && (
+                        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h3>💾 Sauvegarde & Import</h3>
+                                <p style={{fontSize:"0.9rem", marginBottom:8}}>Export (lecture seule) :</p>
+                                <textarea readOnly value={exportState()} />
+                                <div className="modal-actions">
+                                    <button onClick={handleCopy}>Copier</button>
+                                    <button onClick={handleDownload}>Télécharger</button>
+                                </div>
+                                <p style={{fontSize:"0.9rem", marginTop:12, marginBottom:8}}>Import (collez un JSON) :</p>
+                                <textarea
+                                    placeholder="Collez ici un export JSON..."
+                                    value={importJson}
+                                    onChange={e => setImportJson(e.target.value)}
+                                />
+                                <div className="modal-actions">
+                                    <button onClick={handleMerge}>Fusionner</button>
+                                    <button onClick={handleReplace}>Remplacer tout</button>
+                                    <button onClick={copyUrl}>Copier l'URL</button>
+                                    <button className="warn" onClick={handleFactoryReset}>Remise à zéro</button>
+                                </div>
+                                <button style={{marginTop:16}} onClick={() => setShowModal(false)}>Fermer</button>
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+</body>
+</html>

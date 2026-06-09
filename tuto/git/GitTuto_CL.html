@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HiveOS_DP_DS — Git de A à Z</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&family=Fredoka+One&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;min-height:100vh;transition:background .3s,color .3s;--br:12px;--brr:8px;background:var(--bg);color:var(--tx)}
+#root{position:relative;z-index:1}
+
+/* ── THEMES ── */
+.t-hive{--bg:#1a1a1a;--bg2:#252525;--bg3:#2f2f2f;--bg4:#3a3a3a;--brd:rgba(255,255,255,.08);--tx:#f0f0f0;--tx2:#b0b0b0;--ac:#dc241f;--ac2:#f9a825;--ok:#1e824c;--warn:#e67e22;--danger:#c0392b;--info:#2980b9}
+.t-hive.day{--bg:#f8f9fb;--bg2:#eef1f5;--bg3:#e0e4ea;--bg4:#d2d7df;--brd:rgba(0,0,0,.06);--tx:#1a1d23;--tx2:#5a6170}
+.t-bleu{--bg:#0a1628;--bg2:#112240;--bg3:#1a3154;--bg4:#234068;--brd:rgba(255,255,255,.06);--tx:#e6f0ff;--tx2:#90b4d9;--ac:#1565c0;--ac2:#42a5f5;--ok:#2e7d32;--warn:#ef6c00;--danger:#c62828;--info:#0288d1}
+.t-bleu.day{--bg:#f4f7fc;--bg2:#e4eaf4;--bg3:#d0dae8;--bg4:#bcc8db;--brd:rgba(0,0,0,.05);--tx:#0a1929;--tx2:#3a5070}
+.t-dracula{--bg:#282a36;--bg2:#21222c;--bg3:#3a3d4f;--bg4:#4a4e63;--brd:rgba(255,255,255,.06);--tx:#f8f8f2;--tx2:#a0a0b0;--ac:#bd93f9;--ac2:#ff79c6;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--info:#8be9fd;font-family:'Orbitron',sans-serif}
+.t-dracula.day{--bg:#f5f5fa;--bg2:#e8e8f0;--bg3:#d8d8e2;--bg4:#c8c8d4;--brd:rgba(0,0,0,.05);--tx:#1e1e2e;--tx2:#555570}
+.t-windows95{--bg:#008080;--bg2:#c0c0c0;--bg3:#a0a0a0;--bg4:#808080;--brd:rgba(0,0,0,.3);--tx:#000;--tx2:#222;--ac:#000080;--ac2:#0000aa;--ok:#008000;--warn:#808000;--danger:#800000;--info:#00f;--br:0;--brr:0;font-family:'Press Start 2P',cursive}
+.t-windows95.day{--bg:#c0c0c0;--bg2:#d4d4d4;--bg3:#bbb;--bg4:#aaa}
+.t-terminal{--bg:#0c0c0c;--bg2:#1a1a1a;--bg3:#222;--bg4:#2a2a2a;--brd:rgba(0,255,0,.15);--tx:#0f0;--tx2:#0a0;--ac:#0f0;--ac2:#0c0;--ok:#0f0;--warn:#ff0;--danger:#f00;--info:#0ff;--br:0;--brr:0;font-family:'Space Mono',monospace}
+.t-terminal.day{--bg:#e8ffe8;--bg2:#d0f0d0;--bg3:#b8e0b8;--bg4:#a0d0a0;--brd:rgba(0,100,0,.15);--tx:#003300;--tx2:#005500;--ac:#080}
+.t-picsou{--bg:#2c1f0e;--bg2:#3d2e1a;--bg3:#4e3d26;--bg4:#5f4c32;--brd:rgba(255,255,255,.08);--tx:#ffe0b2;--tx2:#c9a87c;--ac:#f9a825;--ac2:#ff8f00;--ok:#33691e;--warn:#e65100;--danger:#b71c1c;--info:#ff8f00;font-family:'Fredoka One',cursive}
+.t-picsou.day{--bg:#fffdf5;--bg2:#fff3d0;--bg3:#ffe9a0;--bg4:#ffd970;--brd:rgba(0,0,0,.06);--tx:#3e2723;--tx2:#6d5040}
+.t-cyberpunk{--bg:#0d0221;--bg2:#150533;--bg3:#200845;--bg4:#2b0b57;--brd:rgba(255,0,193,.15);--tx:#ff00c1;--tx2:#00e5ff;--ac:#ff00c1;--ac2:#0ff;--ok:#39ff14;--warn:#ffea00;--danger:#f00;--info:#00e5ff;font-family:'Orbitron',sans-serif}
+.t-cyberpunk.day{--bg:#fce4ff;--bg2:#f0c8ff;--bg3:#e0b0f0;--bg4:#d098e0;--brd:rgba(255,0,193,.1);--tx:#1a0028;--tx2:#4a0070;--ac:#c00090;--ac2:#0088aa}
+.t-pro-bleu{--bg:#0d1b2a;--bg2:#1b2838;--bg3:#293546;--bg4:#374254;--brd:rgba(255,255,255,.06);--tx:#e8f0fe;--tx2:#90b0d0;--ac:#1a73e8;--ac2:#4a90d9;--ok:#0f9d58;--warn:#f4b400;--danger:#db4437;--info:#4285f4}
+.t-pro-bleu.day{--bg:#eef3fa;--bg2:#d8e4f4;--bg3:#c4d5e8;--bg4:#b0c6dc;--brd:rgba(0,0,0,.05);--tx:#0d1b2a;--tx2:#2e4058}
+
+/* ── BG OVERLAYS ── */
+.bg-ov{position:fixed;inset:0;z-index:0;pointer-events:none}
+.t-hive .bg-ov,.t-hive.day .bg-ov{background:radial-gradient(ellipse at 10% 0%,#dc241f,transparent 50%),radial-gradient(ellipse at 90% 100%,#f9a825,transparent 50%);opacity:.06}
+.t-bleu .bg-ov,.t-bleu.day .bg-ov{background:radial-gradient(ellipse at 15% 5%,#1565c0,transparent 45%),radial-gradient(ellipse at 85% 95%,#42a5f5,transparent 45%);opacity:.05}
+.t-dracula .bg-ov,.t-dracula.day .bg-ov{background:radial-gradient(ellipse at 20% 0%,#bd93f9,transparent 40%),radial-gradient(ellipse at 80% 100%,#ff79c6,transparent 40%);opacity:.07}
+.t-windows95 .bg-ov,.t-terminal .bg-ov{display:none}
+.t-picsou .bg-ov,.t-picsou.day .bg-ov{background:radial-gradient(ellipse at 10% 5%,#f9a825,transparent 45%),radial-gradient(ellipse at 90% 90%,#ff8f00,transparent 45%);opacity:.08}
+.t-cyberpunk .bg-ov,.t-cyberpunk.day .bg-ov{background:radial-gradient(ellipse at 25% 0%,#ff00c1,transparent 40%),radial-gradient(ellipse at 75% 100%,#0ff,transparent 40%);opacity:.10}
+.t-pro-bleu .bg-ov,.t-pro-bleu.day .bg-ov{background:radial-gradient(ellipse at 15% 0%,#1a73e8,transparent 45%),radial-gradient(ellipse at 85% 100%,#4a90d9,transparent 45%);opacity:.05}
+
+/* ── BASE ── */
+code{font-family:'Space Mono',monospace;background:var(--bg3);color:var(--ac);padding:2px 6px;border-radius:4px;font-size:.85em}
+strong{color:var(--ac2,var(--ac))}
+p{margin:.45rem 0;line-height:1.7;font-size:.875rem}
+ul{padding-left:1.3rem;margin:.35rem 0}
+li{margin:.32rem 0;font-size:.855rem;line-height:1.6}
+li code{font-size:.8em}
+
+/* ── LAYOUT ── */
+.page{max-width:680px;margin:0 auto;padding:76px 20px 60px}
+
+/* ── HEADER (invisible) ── */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:9px 18px;transition:transform .25s ease}
+.hdr.hide{transform:translateY(-100%)}
+.logo-w{display:flex;flex-direction:column;gap:1px}
+.logo-t{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--ac),var(--ac2,var(--ac)));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none;cursor:default}
+.logo-s{font-family:'Space Mono',monospace;font-size:.52rem;color:var(--tx2);letter-spacing:.12em;text-transform:uppercase}
+.hdr-r{display:flex;gap:5px;align-items:center}
+.sb{background:var(--bg2);border:1px solid var(--brd);color:var(--tx);border-radius:var(--brr,8px);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.92rem;cursor:pointer;transition:background .14s,border-color .14s,transform .1s}
+.sb:hover{background:var(--bg3);border-color:var(--ac)}
+.sb:active{transform:scale(.9)}
+.tm-w{position:relative}
+.tm{position:absolute;top:calc(100% + 7px);right:0;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--br,12px);overflow:hidden;min-width:155px;box-shadow:0 8px 28px rgba(0,0,0,.35);z-index:200}
+.ti{display:flex;align-items:center;gap:7px;padding:9px 13px;cursor:pointer;font-size:.8rem;color:var(--tx);transition:background .1s}
+.ti:hover{background:var(--bg3)}
+.ti.a{color:var(--ac);font-weight:600}
+
+/* ── MODALS ── */
+.mbg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+.mod{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--br,16px);padding:22px;width:100%;max-width:490px;max-height:84vh;overflow-y:auto;position:relative}
+.mod h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:13px;color:var(--tx)}
+.mcl{position:absolute;top:13px;right:13px;background:none;border:none;color:var(--tx2);font-size:1.1rem;cursor:pointer;padding:3px 8px;border-radius:6px;transition:background .14s}
+.mcl:hover{background:var(--bg3)}
+.ms{margin-bottom:16px}
+.mst{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2);margin-bottom:6px}
+.mod textarea,.mod input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--brd);color:var(--tx);border-radius:var(--brr,8px);padding:8px 10px;font-family:'Space Mono',monospace;font-size:.74rem;resize:vertical}
+.mod textarea{min-height:72px}
+.mod textarea:focus,.mod input[type=text]:focus{outline:none;border-color:var(--ac)}
+.mod input[type=text]{margin-bottom:5px}
+.mb{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:var(--brr,8px);border:1px solid var(--brd);background:var(--bg3);color:var(--tx);font-size:.77rem;cursor:pointer;transition:background .12s,border-color .12s;margin:4px 5px 0 0}
+.mb:hover{background:var(--bg4);border-color:var(--ac)}
+.mb.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.mb.p:hover{opacity:.87}
+.mb.d{background:var(--danger);color:#fff;border-color:var(--danger)}
+
+/* ── TABS + PROGRESS ── */
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:9px}
+.tab{padding:9px 20px;border-radius:var(--br,12px);border:1.5px solid var(--brd);background:var(--bg2);color:var(--tx);font-weight:600;font-size:.865rem;cursor:pointer;transition:all .17s;position:relative}
+.tab.a{background:var(--ac);border-color:var(--ac);color:#fff}
+.tab.lk{opacity:.42;cursor:not-allowed}
+.lktip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--brd);color:var(--tx2);font-size:.67rem;padding:5px 9px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;z-index:50}
+.tab.lk:hover .lktip{opacity:1}
+.prgs{margin-bottom:18px}
+.pr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.prl{font-size:.68rem;color:var(--tx2);width:88px;flex-shrink:0;text-align:right;font-family:'Space Mono',monospace}
+.prt{flex:1;height:4px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.prf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2,var(--ac)));border-radius:99px;transition:width .4s ease}
+.prp{font-size:.67rem;color:var(--tx2);width:30px;font-family:'Space Mono',monospace}
+.qmeta{text-align:center;font-size:.77rem;color:var(--tx2);margin-bottom:12px;font-family:'Space Mono',monospace}
+.qmeta span{color:var(--ac);font-weight:700}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:26px;animation:fd .22s ease;outline:none}
+@keyframes fd{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.chd{display:flex;align-items:flex-start;gap:13px;margin-bottom:18px}
+.ci{width:44px;height:44px;background:var(--bg3);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0}
+.ct{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--tx);line-height:1.2}
+.cs{font-size:.8rem;color:var(--tx2);margin-top:3px}
+.cbdy{font-size:.875rem;line-height:1.7;color:var(--tx);margin-bottom:18px}
+
+/* ── VALIDATION ── */
+.vsep{border-top:1px solid var(--brd);padding-top:17px}
+.vq{font-weight:600;font-size:.9rem;color:var(--tx);margin-bottom:12px;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 13px;border:1.5px solid var(--brd);border-radius:var(--brr,8px);background:var(--bg3);color:var(--tx);cursor:pointer;font-size:.845rem;text-align:left;transition:all .12s;width:100%}
+.opt:hover:not(:disabled){border-color:var(--ac);background:var(--bg4)}
+.opt.sel{border-color:var(--ac);background:var(--bg4);color:var(--ac)}
+.opt.ok{border-color:var(--ok)!important;background:rgba(30,130,76,.14)!important;color:var(--ok)!important}
+.opt.bad{border-color:var(--danger)!important;background:rgba(192,57,43,.14)!important;color:var(--danger)!important}
+.opt:disabled{cursor:default}
+.on{min-width:21px;height:21px;border-radius:5px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;font-family:'Space Mono',monospace;color:var(--tx2);flex-shrink:0;transition:all .12s}
+.opt.sel .on{background:var(--ac);color:#fff}
+.cbr{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;border:1.5px solid var(--brd);border-radius:var(--brr,8px);background:var(--bg3);color:var(--tx);cursor:pointer;font-size:.845rem;transition:all .12s;user-select:none;line-height:1.45}
+.cbr:hover{border-color:var(--ac)}
+.cbr.sel{border-color:var(--ac);background:var(--bg4)}
+.cbr.ok{border-color:var(--ok)!important;background:rgba(30,130,76,.14)!important;color:var(--ok)!important}
+.cbr.bad{border-color:var(--danger)!important;background:rgba(192,57,43,.14)!important}
+.cbx{width:16px;height:16px;border:1.5px solid var(--brd);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;transition:all .12s;margin-top:2px}
+.cbr.sel .cbx,.cbr.ok .cbx{background:var(--ac);border-color:var(--ac);color:#fff}
+.cbr.bad .cbx{background:var(--danger);border-color:var(--danger);color:#fff}
+.trm{background:#111;border-radius:var(--brr,8px);padding:11px 14px;margin-bottom:11px;border:1px solid rgba(0,255,0,.2)}
+.trml{display:flex;align-items:center;gap:8px}
+.trmp{color:#0f0;font-family:'Space Mono',monospace;font-size:.85rem;flex-shrink:0}
+.trmi{background:none;border:none;outline:none;color:#0f0;font-family:'Space Mono',monospace;font-size:.85rem;flex:1;caret-color:#0f0}
+
+/* ── FEEDBACK ── */
+.fb{display:flex;align-items:flex-start;gap:8px;padding:10px 13px;border-radius:var(--brr,8px);margin-top:9px;font-size:.835rem;line-height:1.55;animation:fd .18s}
+.fb.ok{background:rgba(30,130,76,.12);border:1px solid var(--ok);color:var(--ok)}
+.fb.er{background:rgba(192,57,43,.12);border:1px solid var(--danger);color:var(--danger)}
+
+/* ── BUTTONS ── */
+.nr{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+.btn{padding:8px 17px;border-radius:var(--brr,8px);border:1.5px solid var(--brd);background:var(--bg3);color:var(--tx);font-size:.845rem;font-weight:600;cursor:pointer;transition:all .14s}
+.btn:hover:not(:disabled){background:var(--bg4);border-color:var(--ac)}
+.btn:disabled{opacity:.33;cursor:not-allowed}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn.p:hover:not(:disabled){opacity:.87}
+
+/* ── SCORE SCREEN ── */
+.ssc{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:34px 26px;text-align:center;animation:fd .28s}
+.snum{font-family:'Syne',sans-serif;font-size:3.6rem;font-weight:800;line-height:1;margin-bottom:4px}
+.ssub{color:var(--tx2);font-size:.88rem;margin-bottom:18px;font-family:'Space Mono',monospace}
+.smsg{font-size:1.05rem;font-weight:600;margin-bottom:22px}
+.smsg.ok{color:var(--ok)}
+.smsg.fail{color:var(--danger)}
+.ssc .nr{justify-content:center}
+
+/* ── PRACTICE ACCORDION ── */
+.pcat{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--br,16px);margin-bottom:9px;overflow:hidden;animation:fd .22s}
+.pch{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none;transition:background .14s}
+.pch:hover{background:var(--bg3)}
+.pct-l{display:flex;align-items:center;gap:9px}
+.pct-ic{font-size:1.15rem}
+.pct-ti{font-weight:600;font-size:.92rem;color:var(--tx)}
+.pct-ok{color:var(--ok);font-size:.88rem}
+.pch-r{display:flex;align-items:center;gap:7px}
+.pct-cn{font-size:.72rem;color:var(--tx2);font-family:'Space Mono',monospace}
+.chev{color:var(--tx2);font-size:.78rem;transition:transform .2s;display:inline-block}
+.chev.op{transform:rotate(180deg)}
+.psteps{padding:4px 18px 14px}
+.pstep{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:var(--brr,8px);cursor:pointer;transition:background .12s;margin-bottom:1px;font-size:.84rem;color:var(--tx);line-height:1.45}
+.pstep:hover{background:var(--bg3)}
+.pstep.dn{text-decoration:line-through;color:var(--tx2)}
+.pcb{width:15px;height:15px;border:1.5px solid var(--brd);border-radius:4px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.62rem;transition:all .13s}
+.pstep.dn .pcb{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ── CONFETTI ── */
+.cfc{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.cfp{position:absolute;border-radius:2px;animation:cff linear forwards}
+@keyframes cff{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ── WINDOWS95 SPECIAL ── */
+.t-windows95 .sb,.t-windows95 .btn,.t-windows95 .opt,.t-windows95 .tab{border-style:solid;border-color:#fff #808080 #808080 #fff;border-width:2px;box-shadow:none;background:var(--bg2)}
+.t-windows95 .ct,.t-windows95 h1{font-size:.75rem}
+.t-windows95 .cs{font-size:.6rem}
+.t-windows95 .card{border:2px solid;border-color:#fff #808080 #808080 #fff}
+.t-windows95 .tab.a{background:var(--ac);color:#fff;border-color:#000080}
+
+/* ── TERMINAL SPECIAL ── */
+.t-terminal .trm{border:1px solid var(--ac)}
+.t-terminal code{background:transparent;border:1px solid var(--ac);color:var(--ac)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .page{padding:68px 12px 40px}
+  .card{padding:18px 14px}
+  .tabs{flex-direction:column;align-items:stretch}
+  .tab{text-align:center}
+  .snum{font-size:2.8rem}
+  .ct{font-size:1.05rem}
+  .prl{width:72px;font-size:.63rem}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script id="baked-state">
+window.__BAKED_STATE__ = null;
+</script>
+
+<script>
+/*__SEED_START__*/
+var SEED_DATA = {
+  steps: [
+    /* ======== THÉORIE ======== */
+    {
+      id:'t1', isQuiz:false,
+      icon:'🌱', title:"C'est quoi Git ?",
+      subtitle:'Le système de versioning incontournable',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Git est un <strong>système de contrôle de version distribué</strong> créé en 2005 par Linus Torvalds (l'auteur du noyau Linux). En clair : il photographie l'état de tes fichiers à chaque étape de ton travail.</p>
+<p>Concrètement, Git te permet de :</p>
+<ul>
+<li>Revenir à n'importe quelle version antérieure de ton projet</li>
+<li>Travailler à plusieurs sans écraser le travail des autres</li>
+<li>Tester des idées dans des <strong>branches isolées</strong>, sans toucher au code principal</li>
+<li>Avoir un historique complet : qui a changé quoi, quand, pourquoi</li>
+</ul>
+<p><strong>Distribué</strong> signifie que tu as une copie <em>complète</em> du projet et de tout son historique en local. Tu n'as pas besoin d'internet pour travailler — la synchro avec un serveur reste optionnelle.</p>
+<p>💡 <strong>Git ≠ GitHub.</strong> Git = l'outil installé sur ta machine. GitHub = la plateforme web qui héberge des dépôts Git (comme GitLab, Gitea, Bitbucket…)</p>`
+    },
+    {
+      id:'t2', isQuiz:false,
+      icon:'🗂️', title:'Les 3 zones de Git',
+      subtitle:'Working Directory, Staging Area, Repository',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Git organise ton travail en <strong>3 zones distinctes</strong>. C'est le concept le plus important à maîtriser.</p>
+<ul>
+<li><strong>Working Directory</strong> : tes fichiers sur le disque. Tu codes ici. Les modifs ne sont pas encore suivies.</li>
+<li><strong>Staging Area</strong> (ou Index) : zone de préparation. Tu y places les fichiers prêts à être "snapshotés" avec <code>git add</code>. Tu choisis précisément quoi inclure dans le prochain commit.</li>
+<li><strong>Repository</strong> (dossier <code>.git</code>) : l'historique permanent. Chaque <code>git commit</code> y enregistre un snapshot immuable.</li>
+</ul>
+<p>Le flux de travail :</p>
+<ul>
+<li>Tu codes dans le <strong>Working Directory</strong></li>
+<li><code>git add fichier.txt</code> → passe en <strong>Staging Area</strong></li>
+<li><code>git commit -m "message"</code> → snapshot dans le <strong>Repository</strong></li>
+</ul>
+<p>💡 La Staging Area est la vraie force de Git : elle te permet de découper tes changements en <strong>commits atomiques</strong> clairs, même si tu as modifié 10 fichiers d'un coup.</p>`
+    },
+    {
+      id:'t3', isQuiz:false,
+      icon:'⌨️', title:'Commandes de base',
+      subtitle:'init, add, commit, status, log, diff, restore',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Les commandes que tu utiliseras au quotidien :</p>
+<ul>
+<li><code>git init</code> — initialise un dépôt Git (crée le dossier caché <code>.git/</code>)</li>
+<li><code>git status</code> — état des fichiers (rouge = non tracké, vert = stagé)</li>
+<li><code>git add .</code> — ajoute <strong>tous</strong> les fichiers modifiés/nouveaux à la Staging Area</li>
+<li><code>git add fichier.txt</code> — ajoute un fichier précis</li>
+<li><code>git commit -m "feat: ma feature"</code> — crée un snapshot avec message</li>
+<li><code>git log --oneline</code> — historique compact (hash court + message)</li>
+<li><code>git diff</code> — montre les modifications non encore stagées</li>
+<li><code>git restore fichier.txt</code> — annule les modifs d'un fichier (non commitées)</li>
+</ul>
+<p>💡 <strong>Règle des commits :</strong> 1 commit = 1 modification logique. Utilise des préfixes : <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code>, <code>chore:</code>. Jamais de message "wip" ou "fix stuff".</p>`
+    },
+    {
+      id:'t4', isQuiz:false,
+      icon:'🌿', title:'Les branches',
+      subtitle:'Isoler, expérimenter, fusionner en toute sécurité',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Une <strong>branche</strong> est un pointeur vers un commit. Par défaut tu es sur <code>main</code>. Les branches te permettent de travailler en parallèle sans toucher au code principal.</p>
+<ul>
+<li><code>git branch</code> — liste les branches locales (<code>*</code> = branche courante)</li>
+<li><code>git checkout -b feature/ma-feature</code> — crée ET bascule sur la nouvelle branche</li>
+<li><code>git switch -c feature/ma-feature</code> — idem (syntaxe moderne, Git 2.23+)</li>
+<li><code>git checkout main</code> ou <code>git switch main</code> — revenir sur main</li>
+<li><code>git merge feature/ma-feature</code> — fusionne la branche dans la branche courante</li>
+<li><code>git branch -d feature/ma-feature</code> — supprime la branche (après merge)</li>
+</ul>
+<p>💡 <strong>Workflow standard :</strong> crée une branche pour chaque feature ou bugfix. Une fois terminé et testé, merge dans main et supprime la branche. Main reste toujours propre et deployable.</p>`
+    },
+    {
+      id:'t5', isQuiz:false,
+      icon:'🌐', title:'Dépôts distants',
+      subtitle:'clone, push, pull, fetch — synchroniser avec GitHub',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Un <strong>remote</strong> est un serveur qui héberge ton dépôt (GitHub, GitLab, Gitea…). Git peut synchroniser ton dépôt local avec ce serveur.</p>
+<ul>
+<li><code>git clone https://github.com/user/repo.git</code> — copie un dépôt distant en local</li>
+<li><code>git remote add origin https://github.com/user/repo.git</code> — lie un remote à ton dépôt local</li>
+<li><code>git remote -v</code> — vérifie les remotes configurés</li>
+<li><code>git push -u origin main</code> — envoie tes commits ET configure le tracking</li>
+<li><code>git push</code> — envoie tes commits (après avoir configuré le tracking)</li>
+<li><code>git pull</code> — récupère ET fusionne les changements distants (= fetch + merge)</li>
+<li><code>git fetch</code> — récupère les données sans fusionner (pour inspecter avant)</li>
+</ul>
+<p>💡 Le remote par défaut s'appelle conventionnellement <code>origin</code>. Après un premier <code>git push -u origin main</code>, un simple <code>git push</code> ou <code>git pull</code> sait tout seul où aller.</p>`
+    },
+    {
+      id:'t6', isQuiz:false,
+      icon:'🛡️', title:'.gitignore & bonnes pratiques',
+      subtitle:'Ce que Git ne doit jamais versionner',
+      validationType:'read', validationQuestion:null, validationAnswer:null, validationOptions:null, feedback:null,
+      content:`<p>Le fichier <code>.gitignore</code> liste les fichiers et dossiers à ne <strong>jamais</strong> versionner. À créer à la racine du projet.</p>
+<p>Exemples de contenu :</p>
+<ul>
+<li><code>node_modules/</code> — dépendances npm (volumineuses, reproductibles)</li>
+<li><code>.env</code> — variables d'environnement et <strong>secrets</strong> (clés API, mots de passe)</li>
+<li><code>*.log</code> — tous les fichiers .log</li>
+<li><code>dist/</code> ou <code>build/</code> — fichiers compilés/générés</li>
+<li><code>.DS_Store</code> — metadata macOS</li>
+</ul>
+<p><strong>Règle absolue :</strong> ne jamais commiter de secrets. Une fois pushé sur GitHub (même privé), considère-le comme compromis — même si tu le supprimes après.</p>
+<p>💡 <strong>gitignore.io</strong> génère des .gitignore prêts à l'emploi selon ton stack. Pour la convention des messages, utilise Conventional Commits : <code>feat:</code> nouvelle feature, <code>fix:</code> correction de bug, <code>docs:</code> documentation, <code>refactor:</code> restructuration, <code>chore:</code> maintenance.</p>`
+    },
+
+    /* ======== QUIZ (10 questions) ======== */
+    {
+      id:'q1', isQuiz:true,
+      icon:'❓', title:'Question 1 / 10', subtitle:'Initialisation',
+      validationType:'terminal',
+      validationQuestion:'Tape la commande pour initialiser un nouveau dépôt Git dans le dossier courant.',
+      validationAnswer:['git init'],
+      validationOptions:null,
+      feedback:'`git init` crée un dossier caché `.git/` qui contient tout l\'historique et la config de ton dépôt. Rien d\'autre ne change dans ton dossier.',
+      content:''
+    },
+    {
+      id:'q2', isQuiz:true,
+      icon:'❓', title:'Question 2 / 10', subtitle:'Les zones',
+      validationType:'radio',
+      validationQuestion:'Quel est le rôle de la Staging Area ?',
+      validationAnswer:'Préparer les fichiers qui seront inclus dans le prochain commit',
+      validationOptions:[
+        'Stocker l\'historique permanent des commits',
+        'Préparer les fichiers qui seront inclus dans le prochain commit',
+        'Synchroniser automatiquement avec GitHub',
+        'Créer une nouvelle branche de travail'
+      ],
+      feedback:'La Staging Area est une zone intermédiaire. `git add` y place tes fichiers. `git commit` prend tout ce qui est en staging pour créer un snapshot permanent. Ce mécanisme en 2 temps est la force de Git.',
+      content:''
+    },
+    {
+      id:'q3', isQuiz:true,
+      icon:'❓', title:'Question 3 / 10', subtitle:'État du dépôt',
+      validationType:'terminal',
+      validationQuestion:'Quelle commande affiche l\'état de tes fichiers (modifiés, stagés, non trackés) ?',
+      validationAnswer:['git status'],
+      validationOptions:null,
+      feedback:'`git status` est la commande que tu taperas des milliers de fois. Elle te dit exactement où en sont tes fichiers dans les 3 zones. Réflexe : tape-la avant et après chaque action.',
+      content:''
+    },
+    {
+      id:'q4', isQuiz:true,
+      icon:'❓', title:'Question 4 / 10', subtitle:'Staging Area',
+      validationType:'radio',
+      validationQuestion:'Quelle commande ajoute TOUS les fichiers modifiés et nouveaux à la Staging Area ?',
+      validationAnswer:'git add .',
+      validationOptions:[
+        'git add README.md',
+        'git add --all-files',
+        'git add .',
+        'git commit -a'
+      ],
+      feedback:'`git add .` ajoute tout le dossier courant (modifiés + nouveaux). `git add -A` fait pareil depuis la racine du dépôt. `git commit -a` bypasse la staging mais ne tracke pas les nouveaux fichiers non encore suivis.',
+      content:''
+    },
+    {
+      id:'q5', isQuiz:true,
+      icon:'❓', title:'Question 5 / 10', subtitle:'Branches',
+      validationType:'checkbox',
+      validationQuestion:'Quelles commandes créent ET basculent immédiatement sur une nouvelle branche ? (2 réponses)',
+      validationAnswer:['a','c'],
+      validationOptions:[
+        {id:'a', label:'git checkout -b feature'},
+        {id:'b', label:'git branch feature'},
+        {id:'c', label:'git switch -c feature'},
+        {id:'d', label:'git new feature'}
+      ],
+      feedback:'`checkout -b` est la méthode classique. `switch -c` est la syntaxe moderne (Git 2.23+). Les deux créent la branche ET y basculent en une seule commande. `git branch` crée sans basculer.',
+      content:''
+    },
+    {
+      id:'q6', isQuiz:true,
+      icon:'❓', title:'Question 6 / 10', subtitle:'Remote — push',
+      validationType:'terminal',
+      validationQuestion:'Tape la commande de base pour envoyer tes commits locaux vers le dépôt distant.',
+      validationAnswer:['git push','git push origin main','git push -u origin main'],
+      validationOptions:null,
+      feedback:'`git push` envoie tes commits vers le remote configuré. La première fois, utilise `git push -u origin main` pour configurer le tracking — ensuite `git push` tout seul suffit.',
+      content:''
+    },
+    {
+      id:'q7', isQuiz:true,
+      icon:'❓', title:'Question 7 / 10', subtitle:'Remote — pull',
+      validationType:'radio',
+      validationQuestion:'`git pull` est équivalent à quelle combinaison de commandes ?',
+      validationAnswer:'git fetch + git merge',
+      validationOptions:[
+        'git clone + git add',
+        'git fetch uniquement',
+        'git fetch + git merge',
+        'git push en sens inverse'
+      ],
+      feedback:'`git pull` = `git fetch` (récupère les données distantes) + `git merge` (intègre dans ta branche courante). Certains pros préfèrent les deux étapes séparément pour plus de contrôle sur l\'intégration.',
+      content:''
+    },
+    {
+      id:'q8', isQuiz:true,
+      icon:'❓', title:'Question 8 / 10', subtitle:'Cloner un projet',
+      validationType:'radio',
+      validationQuestion:"Tu veux commencer à travailler sur un projet existant sur GitHub. Quelle commande utilises-tu ?",
+      validationAnswer:'git clone <url>',
+      validationOptions:[
+        'git init puis git remote add origin <url>',
+        'git clone <url>',
+        'git fetch <url>',
+        'git download <url>'
+      ],
+      feedback:'`git clone` télécharge le dépôt complet avec tout son historique en local. `git init + git remote add` s\'utilise quand tu crées un nouveau projet local que tu veux lier à GitHub.',
+      content:''
+    },
+    {
+      id:'q9', isQuiz:true,
+      icon:'❓', title:'Question 9 / 10', subtitle:'Merge vs Rebase',
+      validationType:'radio',
+      validationQuestion:'Quelle est la différence principale entre `git merge` et `git rebase` ?',
+      validationAnswer:"rebase réécrit l'historique pour le rendre linéaire, merge crée un commit de fusion",
+      validationOptions:[
+        'merge est plus rapide que rebase',
+        "rebase réécrit l'historique pour le rendre linéaire, merge crée un commit de fusion",
+        'merge supprime la branche source après fusion',
+        'il n\'y a aucune différence fonctionnelle'
+      ],
+      feedback:'merge conserve l\'historique exact avec un commit de fusion. rebase "rejoue" tes commits sur la branche cible pour un historique linéaire et propre. Règle d\'or : ne jamais rebase une branche publique partagée.',
+      content:''
+    },
+    {
+      id:'q10', isQuiz:true,
+      icon:'❓', title:'Question 10 / 10', subtitle:'.gitignore',
+      validationType:'checkbox',
+      validationQuestion:'Que peut-on mettre dans un fichier `.gitignore` ? (2 bonnes réponses)',
+      validationAnswer:['a','c'],
+      validationOptions:[
+        {id:'a', label:'Des noms de fichiers précis (ex: secret.env)'},
+        {id:'b', label:'Des messages de commit à supprimer'},
+        {id:'c', label:'Des patterns glob (ex: *.log, node_modules/)'},
+        {id:'d', label:'Des branches à masquer dans le log'}
+      ],
+      feedback:'`.gitignore` supporte les noms exacts, les patterns glob (`*`, `?`), les dossiers (`/`) et les négations (`!`). Important : un fichier déjà versionné ne sera pas ignoré rétroactivement — il faut le retirer du tracking avec `git rm --cached`.',
+      content:''
+    }
+  ],
+
+  practice: [
+    {
+      id:'p1', icon:'⚙️', title:'Installation & Configuration',
+      steps:[
+        {id:'p1s1', label:'Installer Git depuis `git-scm.com` et vérifier : `git --version`'},
+        {id:'p1s2', label:'Configurer ton nom : `git config --global user.name "Ton Nom"`'},
+        {id:'p1s3', label:'Configurer ton email : `git config --global user.email "ton@email.com"`'},
+        {id:'p1s4', label:'Activer les couleurs : `git config --global color.ui auto`'},
+        {id:'p1s5', label:'Vérifier la config complète : `git config --list`'}
+      ]
+    },
+    {
+      id:'p2', icon:'📁', title:'Premier dépôt local',
+      steps:[
+        {id:'p2s1', label:'Créer et entrer dans un dossier : `mkdir mon-projet && cd mon-projet`'},
+        {id:'p2s2', label:'Initialiser le dépôt : `git init`'},
+        {id:'p2s3', label:'Créer un fichier README.md avec du texte (n\'importe quoi)'},
+        {id:'p2s4', label:'Observer l\'état : `git status` (fichier en rouge = non tracké)'},
+        {id:'p2s5', label:'Stager le fichier : `git add README.md`'},
+        {id:'p2s6', label:'Observer à nouveau : `git status` (fichier en vert = prêt)'},
+        {id:'p2s7', label:'Créer le premier commit : `git commit -m "feat: premier commit"`'},
+        {id:'p2s8', label:'Voir l\'historique compact : `git log --oneline`'}
+      ]
+    },
+    {
+      id:'p3', icon:'🌿', title:'Travailler avec les branches',
+      steps:[
+        {id:'p3s1', label:'Lister les branches existantes : `git branch`'},
+        {id:'p3s2', label:'Créer et basculer : `git checkout -b feature/test`'},
+        {id:'p3s3', label:'Modifier README.md et sauvegarder'},
+        {id:'p3s4', label:'Commiter sur la branche : `git add . && git commit -m "feat: modif test"`'},
+        {id:'p3s5', label:'Revenir sur main : `git checkout main` (ta modif a disparu !)'},
+        {id:'p3s6', label:'Merger : `git merge feature/test` (ta modif revient)'},
+        {id:'p3s7', label:'Nettoyer : `git branch -d feature/test`'}
+      ]
+    },
+    {
+      id:'p4', icon:'🌐', title:'Connecter un dépôt distant',
+      steps:[
+        {id:'p4s1', label:'Créer un repo vide sur GitHub (sans README, sans .gitignore)'},
+        {id:'p4s2', label:'Lier le remote : `git remote add origin https://github.com/user/repo.git`'},
+        {id:'p4s3', label:'Vérifier la liaison : `git remote -v`'},
+        {id:'p4s4', label:'Premier push avec tracking : `git push -u origin main`'},
+        {id:'p4s5', label:'Modifier un fichier → add → commit → `git push` (sans -u)'},
+        {id:'p4s6', label:'Simuler un changement distant et synchroniser : `git pull`'}
+      ]
+    },
+    {
+      id:'p5', icon:'🛠️', title:'Situations du quotidien',
+      steps:[
+        {id:'p5s1', label:'Voir les modifs non commitées : `git diff`'},
+        {id:'p5s2', label:'Annuler les modifs d\'un fichier : `git restore nom-du-fichier`'},
+        {id:'p5s3', label:'Créer `.gitignore` et y ajouter : `node_modules/` et `.env`'},
+        {id:'p5s4', label:'Historique graphique des branches : `git log --oneline --graph --all`'},
+        {id:'p5s5', label:'Mettre de côté des modifs en cours : `git stash`'},
+        {id:'p5s6', label:'Récupérer le stash : `git stash pop`'}
+      ]
+    }
+  ]
+};
+/*__SEED_END__*/
+</script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ─── CONSTANTS ─── */
+const THEMES = [
+  {id:'hive',  e:'🔴', n:'Hive'},
+  {id:'bleu',  e:'🔵', n:'Bleu'},
+  {id:'dracula',e:'🟣',n:'Dracula'},
+  {id:'windows95',e:'🪟',n:'Windows 95'},
+  {id:'terminal',e:'💚',n:'Terminal'},
+  {id:'picsou', e:'🟡',n:'Picsou'},
+  {id:'cyberpunk',e:'🟪',n:'Cyberpunk'},
+  {id:'pro-bleu',e:'🔷',n:'Pro Bleu'},
+];
+const LS_TH  = 'hiveos_tuto_git_theme';
+const LS_DAY = 'hiveos_tuto_git_day';
+const LS_ST  = 'hiveos_tuto_git_state';
+const LS_NP  = 'hiveos_notepad';
+
+const QSTEPS = SEED_DATA.steps.filter(s => s.isQuiz);
+const ALLPR  = SEED_DATA.practice.flatMap(c => c.steps);
+const FIRST_Q = SEED_DATA.steps.findIndex(s => s.isQuiz);
+
+/* ─── MARKDOWN CODE INLINE ─── */
+function mdCode(str) {
+  return (str || '').replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+/* ─── APP ─── */
+function App() {
+  /* ── STATE (all at top) ── */
+  const [theme,          setTheme]          = useState('hive');
+  const [dayMode,        setDayMode]        = useState(true);
+  const [phase,          setPhase]          = useState('learn');
+  const [step,           setStep]           = useState(0);
+  const [qRes,           setQRes]           = useState({});
+  const [qDone,          setQDone]          = useState(false);
+  const [prChk,          setPrChk]          = useState({});
+  const [catOpen,        setCatOpen]        = useState({p1:true});
+  const [tmOpen,         setTmOpen]         = useState(false);
+  const [modal,          setModal]          = useState(null);
+  const [notepad,        setNotepad]        = useState('');
+  const [curAns,         setCurAns]         = useState('');
+  const [curCB,          setCurCB]          = useState([]);
+  const [feedback,       setFeedback]       = useState(null);
+  const [startedLearn,   setStartedLearn]   = useState(false);
+  const [startedPr,      setStartedPr]      = useState(false);
+  const [confetti,       setConfetti]       = useState(false);
+  const [cfPieces,       setCfPieces]       = useState([]);
+  const [saveImp,        setSaveImp]        = useState('');
+  const [saveName,       setSaveName]       = useState('HiveOS_DP_DS_GitDeAZ.html');
+  const [hdrVis,         setHdrVis]         = useState(true);
+
+  /* ── REFS ── */
+  const termRef   = useRef(null);
+  const tmRef     = useRef(null);
+  const scrollRef = useRef(0);
+  const cfTimer   = useRef(null);
+
+  /* ── EFFECTS ── */
+  /* Load on mount */
+  useEffect(() => {
+    try {
+      const baked = window.__BAKED_STATE__;
+      const lsSt  = localStorage.getItem(LS_ST);
+      const st    = baked || (lsSt ? JSON.parse(lsSt) : null);
+      if(st) {
+        if(st.theme)        setTheme(st.theme);
+        if(st.dayMode!=null)setDayMode(st.dayMode);
+        if(st.phase)        setPhase(st.phase);
+        if(st.step!=null)   setStep(st.step);
+        if(st.qRes)         setQRes(st.qRes);
+        if(st.qDone!=null)  setQDone(st.qDone);
+        if(st.prChk)        setPrChk(st.prChk);
+        if(st.catOpen)      setCatOpen(st.catOpen);
+        if(st.startedLearn) setStartedLearn(st.startedLearn);
+        if(st.startedPr)    setStartedPr(st.startedPr);
+      } else {
+        const th = localStorage.getItem(LS_TH);
+        const dy = localStorage.getItem(LS_DAY);
+        if(th) setTheme(th);
+        if(dy!=null) setDayMode(dy==='true');
+      }
+      const np = localStorage.getItem(LS_NP);
+      if(np) setNotepad(np);
+    } catch(e) {}
+  }, []);
+
+  /* Apply theme to body */
+  useEffect(() => {
+    document.body.className = `t-${theme}${dayMode ? ' day' : ''}`;
+  }, [theme, dayMode]);
+
+  /* Persist theme/day */
+  useEffect(() => {
+    localStorage.setItem(LS_TH,  theme);
+    localStorage.setItem(LS_DAY, String(dayMode));
+  }, [theme, dayMode]);
+
+  /* Persist state */
+  useEffect(() => {
+    const st = { theme, dayMode, phase, step, qRes, qDone, prChk, catOpen, startedLearn, startedPr };
+    localStorage.setItem(LS_ST, JSON.stringify(st));
+  }, [theme, dayMode, phase, step, qRes, qDone, prChk, catOpen, startedLearn, startedPr]);
+
+  /* Persist notepad */
+  useEffect(() => {
+    localStorage.setItem(LS_NP, notepad);
+  }, [notepad]);
+
+  /* Scroll → hide/show header */
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      setHdrVis(y <= 10 || y < scrollRef.current);
+      scrollRef.current = y;
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* Focus: terminal input OU card div selon le type d'étape */
+  useEffect(() => {
+    if(!cur) return;
+    if(cur.validationType === 'terminal' && !feedback && termRef.current) {
+      termRef.current.focus();
+    } else if(!feedback) {
+      /* Focus la card pour que les raccourcis clavier (1-4, Enter) fonctionnent */
+      const card = document.querySelector('.card');
+      if(card) card.focus();
+    }
+  }, [step, feedback]);
+
+  /* Close theme menu on outside click */
+  useEffect(() => {
+    if(!tmOpen) return;
+    function h(e) { if(tmRef.current && !tmRef.current.contains(e.target)) setTmOpen(false); }
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [tmOpen]);
+
+  /* ── COMPUTED ── */
+  const cur       = SEED_DATA.steps[step];
+  const isQuiz    = cur && cur.isQuiz;
+  const qCorr     = Object.values(qRes).filter(Boolean).length;
+  const qScore    = QSTEPS.length > 0 ? Math.round(qCorr / QSTEPS.length * 100) : 0;
+  const p2Unlocked = qDone && qScore >= 85;
+  const qNum      = isQuiz ? QSTEPS.findIndex(q => q.id === cur.id) + 1 : 0;
+  const lrnProg   = qDone ? 100 : startedLearn ? Math.round(step / SEED_DATA.steps.length * 100) : 0;
+  const prDone    = ALLPR.filter(s => prChk[s.id]).length;
+  const prProg    = startedPr ? Math.round(prDone / ALLPR.length * 100) : 0;
+
+  /* ── HANDLERS ── */
+  function doBack() {
+    if(step <= 0) return;
+    setCurAns(''); setCurCB([]); setFeedback(null);
+    setStep(s => s - 1);
+  }
+
+  function doRead() {
+    setStartedLearn(true);
+    setCurAns(''); setCurCB([]); setFeedback(null);
+    if(step < SEED_DATA.steps.length - 1) setStep(s => s + 1);
+  }
+
+  function doValidate() {
+    if(!cur) return;
+    let ok = false;
+    if(cur.validationType === 'radio') {
+      ok = curAns === cur.validationAnswer;
+    } else if(cur.validationType === 'checkbox') {
+      const s1 = [...curCB].sort().join(',');
+      const s2 = [...cur.validationAnswer].sort().join(',');
+      ok = s1 === s2;
+    } else if(cur.validationType === 'terminal') {
+      const t = curAns.trim().toLowerCase();
+      const ans = Array.isArray(cur.validationAnswer) ? cur.validationAnswer.map(a => a.toLowerCase()) : [cur.validationAnswer.toLowerCase()];
+      ok = ans.includes(t);
+    }
+    setQRes(prev => ({...prev, [cur.id]: ok}));
+    setFeedback({ok, msg: cur.feedback || (ok ? 'Bonne réponse !' : `La réponse : ${Array.isArray(cur.validationAnswer) ? cur.validationAnswer[0] : cur.validationAnswer}`)});
+  }
+
+  function doNext() {
+    setCurAns(''); setCurCB([]); setFeedback(null);
+    if(step < SEED_DATA.steps.length - 1) setStep(s => s + 1);
+    else setQDone(true);
+  }
+
+  function doRetry() {
+    setQRes({}); setQDone(false);
+    setStep(FIRST_Q);
+    setCurAns(''); setCurCB([]); setFeedback(null);
+  }
+
+  function doTogglePr(id) {
+    setStartedPr(true);
+    setPrChk(prev => {
+      const next = {...prev, [id]: !prev[id]};
+      if(ALLPR.every(s => next[s.id])) trigConfetti();
+      return next;
+    });
+  }
+
+  function trigConfetti() {
+    const COLS = ['#dc241f','#f9a825','#1e824c','#2980b9','#bd93f9','#ff79c6','#50fa7b','#0ff'];
+    const pieces = Array.from({length:80}, (_,i) => ({
+      id: i,
+      l: `${Math.random()*100}%`,
+      c: COLS[Math.floor(Math.random()*COLS.length)],
+      dl: `${Math.random()*2}s`,
+      dr: `${2+Math.random()*3}s`,
+      sz: `${6+Math.random()*6}px`
+    }));
+    setCfPieces(pieces);
+    setConfetti(true);
+    clearTimeout(cfTimer.current);
+    cfTimer.current = setTimeout(() => setConfetti(false), 5000);
+  }
+
+  /* ── KEYBOARD NAV ── */
+  function onCardKey(e) {
+    if(!cur) return;
+    const tag = e.target.tagName;
+    /* Ne pas intercepter les events venant d'un textarea ou d'un bouton */
+    if(tag === 'TEXTAREA' || tag === 'BUTTON') return;
+    const fromInput = tag === 'INPUT';
+
+    /* Enter après feedback → continuer (sauf si focus sur input terminal) */
+    if(feedback && e.key === 'Enter' && !fromInput) {
+      e.preventDefault(); doNext(); return;
+    }
+
+    /* Étape théorie → Enter/Espace = "J'ai bien lu" */
+    if(!feedback && cur.validationType === 'read' && (e.key === 'Enter' || e.key === ' ') && !fromInput) {
+      e.preventDefault(); doRead(); return;
+    }
+
+    /* Radio → chiffres 1-4 = sélection, Enter = valider */
+    if(!feedback && cur.validationType === 'radio' && !fromInput) {
+      const n = parseInt(e.key);
+      if(!isNaN(n) && n >= 1 && n <= (cur.validationOptions||[]).length) {
+        e.preventDefault();
+        setCurAns(cur.validationOptions[n - 1]);
+      }
+      if(e.key === 'Enter' && curAns) { e.preventDefault(); doValidate(); }
+    }
+
+    /* Checkbox → chiffres 1-4 = toggle, Enter = valider */
+    if(!feedback && cur.validationType === 'checkbox' && !fromInput) {
+      const n = parseInt(e.key);
+      if(!isNaN(n) && n >= 1 && n <= (cur.validationOptions||[]).length) {
+        e.preventDefault();
+        const id = cur.validationOptions[n - 1].id;
+        setCurCB(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+      }
+      if(e.key === 'Enter' && curCB.length > 0) { e.preventDefault(); doValidate(); }
+    }
+
+    /* Terminal → si focus sur la card (pas l'input), rediriger le curseur sur l'input */
+    if(!feedback && cur.validationType === 'terminal' && !fromInput) {
+      if(termRef.current && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+        termRef.current.focus();
+        /* Laisser l'événement se propager naturellement vers le nouvel input focused */
+      }
+      if(e.key === 'Enter' && termRef.current) {
+        termRef.current.focus();
+      }
+    }
+  }
+
+  /* ── SAVE / EXPORT ── */
+  function getJSON() {
+    return JSON.stringify({theme,dayMode,phase,step,qRes,qDone,prChk,catOpen,startedLearn,startedPr},null,2);
+  }
+  function doImport(mode) {
+    try {
+      const d = JSON.parse(saveImp);
+      if(mode==='replace') {
+        if(!window.confirm('Remplacer TOUTES les données ?')) return;
+        if(d.theme) setTheme(d.theme);
+        if(d.dayMode!=null) setDayMode(d.dayMode);
+        if(d.phase) setPhase(d.phase);
+        if(d.step!=null) setStep(d.step);
+        if(d.qRes) setQRes(d.qRes);
+        if(d.qDone!=null) setQDone(d.qDone);
+        if(d.prChk) setPrChk(d.prChk);
+        if(d.catOpen) setCatOpen(d.catOpen);
+        if(d.startedLearn) setStartedLearn(d.startedLearn);
+        if(d.startedPr) setStartedPr(d.startedPr);
+      } else {
+        if(d.qRes) setQRes(prev=>({...prev,...d.qRes}));
+        if(d.prChk) setPrChk(prev=>({...prev,...d.prChk}));
+      }
+      setSaveImp('');
+      alert('Import réussi ✓');
+    } catch(e) { alert('JSON invalide.'); }
+  }
+  function doReset() {
+    if(!window.confirm('Remettre à zéro ? Toute la progression sera effacée.')) return;
+    if(!window.confirm('Confirmation finale — vraiment tout effacer ?')) return;
+    setPhase('learn'); setStep(0); setQRes({}); setQDone(false);
+    setPrChk({}); setCatOpen({p1:true}); setStartedLearn(false); setStartedPr(false);
+    setFeedback(null); setCurAns(''); setCurCB([]);
+    localStorage.removeItem(LS_ST);
+    setModal(null);
+  }
+  function doDownload() {
+    const state = {theme,dayMode,phase,step,qRes,qDone,prChk,catOpen,startedLearn,startedPr};
+    let src = document.documentElement.outerHTML;
+    src = src.replace('window.__BAKED_STATE__ = null;', `window.__BAKED_STATE__ = ${JSON.stringify(state)};`);
+    const blob = new Blob([src], {type:'text/html;charset=utf-8'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = saveName || 'HiveOS_DP_DS_GitDeAZ.html'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ────────────────────────────────────────
+     RENDER BLOCKS
+  ──────────────────────────────────────── */
+
+  /* Confetti */
+  const Confetti = confetti ? (
+    <div className="cfc">
+      {cfPieces.map(p => (
+        <div key={p.id} className="cfp" style={{
+          left:p.l, top:'-20px',
+          width:p.sz, height:`calc(${p.sz} * 1.5)`,
+          backgroundColor:p.c,
+          animationDuration:p.dr,
+          animationDelay:p.dl
+        }}/>
+      ))}
+    </div>
+  ) : null;
+
+  /* Header */
+  const Header = (
+    <header className={`hdr${hdrVis?'':' hide'}`}>
+      <div className="logo-w">
+        <div className="logo-t">HiveOS_CL</div>
+        <div className="logo-s">git 101</div>
+      </div>
+      <div className="hdr-r">
+        <button className="sb" title="Bloc-notes" onClick={() => setModal('notepad')}>📝</button>
+        <div className="tm-w" ref={tmRef}>
+          <button className="sb" title="Thème" onClick={() => setTmOpen(v=>!v)}>🎨</button>
+          {tmOpen && (
+            <div className="tm">
+              {THEMES.map(t => (
+                <div key={t.id} className={`ti${theme===t.id?' a':''}`}
+                  onClick={() => { setTheme(t.id); setTmOpen(false); }}>
+                  <span>{t.e}</span><span>{t.n}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="sb" title={dayMode?'Mode nuit':'Mode jour'}
+          onClick={() => setDayMode(v=>!v)}>
+          {dayMode ? '🌙' : '☀️'}
+        </button>
+        <button className="sb" title="Sauvegarde" onClick={() => setModal('save')}>💾</button>
+      </div>
+    </header>
+  );
+
+  /* Notepad modal */
+  const NotepadModal = modal==='notepad' ? (
+    <div className="mbg" onClick={e => { if(e.target.className==='mbg') setModal(null); }}>
+      <div className="mod">
+        <h3>📝 Bloc-notes</h3>
+        <button className="mcl" onClick={() => setModal(null)}>✕</button>
+        <textarea style={{minHeight:'180px'}} value={notepad}
+          onChange={e => setNotepad(e.target.value)} placeholder="Notes libres…"/>
+        <button className="mb" onClick={() => navigator.clipboard.writeText(notepad)}>📋 Copier</button>
+      </div>
+    </div>
+  ) : null;
+
+  /* Save modal */
+  const SaveModal = modal==='save' ? (
+    <div className="mbg" onClick={e => { if(e.target.className==='mbg') setModal(null); }}>
+      <div className="mod">
+        <h3>💾 Sauvegarde</h3>
+        <button className="mcl" onClick={() => setModal(null)}>✕</button>
+
+        <div className="ms">
+          <div className="mst">📤 Exporter</div>
+          <textarea readOnly value={getJSON()} style={{minHeight:'65px'}}/>
+          <button className="mb" onClick={() => navigator.clipboard.writeText(getJSON())}>📋 Copier JSON</button>
+          <button className="mb" onClick={() => {
+            const b=new Blob([getJSON()],{type:'application/json'});
+            const u=URL.createObjectURL(b);
+            const a=document.createElement('a');
+            a.href=u;a.download='hiveos-git.json';a.click();
+            URL.revokeObjectURL(u);
+          }}>💾 .json</button>
+        </div>
+
+        <div className="ms">
+          <div className="mst">📥 Restaurer</div>
+          <textarea value={saveImp} onChange={e=>setSaveImp(e.target.value)} placeholder="Colle ton JSON ici…"/>
+          <button className="mb" onClick={() => doImport('merge')}>🔀 Fusionner</button>
+          <button className="mb d" onClick={() => doImport('replace')}>⚠️ Remplacer tout</button>
+        </div>
+
+        <div className="ms">
+          <div className="mst">📦 Télécharger l'app</div>
+          <input type="text" value={saveName} onChange={e=>setSaveName(e.target.value)}/>
+          <button className="mb p" onClick={doDownload}>⬇️ Télécharger .html</button>
+        </div>
+
+        <div className="ms">
+          <div className="mst">♻️ Remise à zéro</div>
+          <button className="mb d" onClick={doReset}>♻️ Tout effacer</button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  /* Phase tabs + progress */
+  const PhaseBar = (
+    <div>
+      <div className="tabs">
+        <button className={`tab${phase==='learn'?' a':''}`} onClick={() => setPhase('learn')}>
+          🧠 Apprentissage
+        </button>
+        <button
+          className={`tab${phase==='practice'?' a':''}${!p2Unlocked?' lk':''}`}
+          onClick={() => p2Unlocked && setPhase('practice')}>
+          🛠️ Pratique
+          {!p2Unlocked && <span className="lktip">Score ≥ 85% requis pour débloquer</span>}
+        </button>
+      </div>
+
+      {(startedLearn || startedPr) && (
+        <div className="prgs">
+          {startedLearn && (
+            <div className="pr">
+              <span className="prl">Apprentissage</span>
+              <div className="prt"><div className="prf" style={{width:`${lrnProg}%`}}/></div>
+              <span className="prp">{lrnProg}%</span>
+            </div>
+          )}
+          {startedPr && (
+            <div className="pr">
+              <span className="prl">Pratique</span>
+              <div className="prt"><div className="prf" style={{width:`${prProg}%`}}/></div>
+              <span className="prp">{prProg}%</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {phase==='learn' && isQuiz && (
+        <div className="qmeta">
+          Score : <span>{qCorr} / {QSTEPS.length}</span> &nbsp;·&nbsp; Question {qNum} / {QSTEPS.length}
+        </div>
+      )}
+    </div>
+  );
+
+  /* Theory step */
+  function TheoryStep() {
+    const isLastTheory = step === FIRST_Q - 1;
+    return (
+      <div className="card" key={cur.id} tabIndex={0} onKeyDown={onCardKey}>
+        <div className="chd">
+          <div className="ci">{cur.icon}</div>
+          <div>
+            <div className="ct">{cur.title}</div>
+            <div className="cs">{cur.subtitle}</div>
+          </div>
+        </div>
+        <div className="cbdy" dangerouslySetInnerHTML={{__html: cur.content}}/>
+        <div className="nr" style={{justifyContent:'space-between'}}>
+          <button className="btn" disabled={step===0} onClick={doBack}>← Précédent</button>
+          <button className="btn p" onClick={doRead}>
+            {isLastTheory ? '🧠 Démarrer le quiz →' : "J'ai bien lu ✓"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* Quiz step */
+  function QuizStep() {
+    const isLast = step === SEED_DATA.steps.length - 1;
+    const vq = <div className="vq" dangerouslySetInnerHTML={{__html: mdCode(cur.validationQuestion)}}/>;
+
+    /* Validate button disabled logic */
+    let valDis = false;
+    if(!feedback) {
+      if(cur.validationType === 'radio')    valDis = !curAns;
+      if(cur.validationType === 'checkbox') valDis = curCB.length === 0;
+      if(cur.validationType === 'terminal') valDis = !curAns.trim();
+    }
+
+    return (
+      <div className="card" key={cur.id} tabIndex={0} onKeyDown={onCardKey}>
+        <div className="chd">
+          <div className="ci">{cur.icon}</div>
+          <div>
+            <div className="ct">{cur.title}</div>
+            <div className="cs">{cur.subtitle}</div>
+          </div>
+        </div>
+        <div className="vsep">
+          {vq}
+
+          {/* RADIO */}
+          {cur.validationType === 'radio' && (
+            <div className="opts">
+              {cur.validationOptions.map((o,i) => {
+                let cls = 'opt';
+                if(feedback) {
+                  if(o === cur.validationAnswer) cls += ' ok';
+                  else if(o === curAns && !feedback.ok) cls += ' bad';
+                } else if(o === curAns) cls += ' sel';
+                return (
+                  <button key={i} className={cls} disabled={!!feedback}
+                    onClick={() => !feedback && setCurAns(o)}>
+                    <span className="on">{i+1}</span>
+                    <span dangerouslySetInnerHTML={{__html: mdCode(o)}}/>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* CHECKBOX */}
+          {cur.validationType === 'checkbox' && (
+            <div className="opts">
+              {cur.validationOptions.map(o => {
+                const chk = curCB.includes(o.id);
+                let cls = 'cbr';
+                if(feedback) {
+                  if(cur.validationAnswer.includes(o.id)) cls += ' ok';
+                  else if(chk) cls += ' bad';
+                } else if(chk) cls += ' sel';
+                return (
+                  <div key={o.id} className={cls}
+                    onClick={() => {
+                      if(feedback) return;
+                      setCurCB(prev => prev.includes(o.id) ? prev.filter(x=>x!==o.id) : [...prev, o.id]);
+                    }}>
+                    <div className="cbx">{chk && '✓'}</div>
+                    <span dangerouslySetInnerHTML={{__html: mdCode(o.label)}}/>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* TERMINAL */}
+          {cur.validationType === 'terminal' && (
+            <div className="trm">
+              <div className="trml">
+                <span className="trmp">$</span>
+                <input ref={termRef} className="trmi"
+                  value={curAns}
+                  onChange={e => setCurAns(e.target.value)}
+                  onKeyDown={e => { if(e.key==='Enter' && !feedback) { e.preventDefault(); if(!valDis) doValidate(); } }}
+                  disabled={!!feedback}
+                  placeholder="tape ta commande…"
+                  spellCheck={false} autoComplete="off" autoCorrect="off"/>
+              </div>
+            </div>
+          )}
+
+          {/* FEEDBACK */}
+          {feedback && (
+            <div className={`fb ${feedback.ok?'ok':'er'}`}>
+              <span>{feedback.ok ? '✓' : '✗'}</span>
+              <span dangerouslySetInnerHTML={{__html:
+                (feedback.ok ? '' : '<strong>Raté.</strong> ') + mdCode(feedback.msg)
+              }}/>
+            </div>
+          )}
+
+          {/* ACTIONS */}
+          <div className="nr" style={{justifyContent:'space-between'}}>
+            <button className="btn" onClick={doBack}>← Précédent</button>
+            {!feedback ? (
+              <button className="btn p" disabled={valDis} onClick={doValidate}>Valider →</button>
+            ) : (
+              <button className="btn p" onClick={doNext}>
+                {isLast ? 'Voir le score 🏁' : 'Continuer →'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Score screen */
+  function ScoreScreen() {
+    const pass = qScore >= 85;
+    return (
+      <div className="ssc">
+        <div className="snum" style={{color: pass ? 'var(--ok)' : 'var(--danger)'}}>
+          {qScore}%
+        </div>
+        <div className="ssub">{qCorr} / {QSTEPS.length} bonnes réponses</div>
+        <div className={`smsg${pass?' ok':' fail'}`}>
+          {pass
+            ? '🎉 Félicitations ! Phase Pratique débloquée.'
+            : '😬 Score insuffisant (85% requis). Recommence le quiz !'}
+        </div>
+        <div className="nr" style={{justifyContent:'space-between'}}>
+          <button className="btn" onClick={() => {
+            setQDone(false);
+            setStep(SEED_DATA.steps.length - 1);
+            setFeedback(null); setCurAns(''); setCurCB([]);
+          }}>← Revoir le quiz</button>
+          <div style={{display:'flex',gap:'8px'}}>
+            {!pass && <button className="btn p" onClick={doRetry}>🔄 Recommencer</button>}
+            {pass  && <button className="btn p" onClick={() => setPhase('practice')}>🛠️ Démarrer la Pratique →</button>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Learn phase dispatcher — appel direct (pas <Component/>) pour éviter remount */
+  function LearnPhase() {
+    if(qDone) return ScoreScreen();
+    if(!cur) return null;
+    if(cur.isQuiz) return QuizStep();
+    return TheoryStep();
+  }
+
+  /* Practice phase — idem */
+  function PracticePhase() {
+    const allDone = prDone === ALLPR.length && ALLPR.length > 0;
+    return (
+      <div>
+        {allDone && (
+          <div className="fb ok" style={{marginBottom:'14px',justifyContent:'center',fontSize:'.92rem'}}>
+            🎉 Toutes les étapes validées — tu maîtrises Git !
+          </div>
+        )}
+        {SEED_DATA.practice.map(cat => {
+          const done   = cat.steps.filter(s => prChk[s.id]).length;
+          const full   = done === cat.steps.length;
+          const isOpen = catOpen[cat.id];
+          return (
+            <div key={cat.id} className="pcat">
+              <div className="pch"
+                onClick={() => setCatOpen(prev => ({...prev, [cat.id]: !prev[cat.id]}))}>
+                <div className="pct-l">
+                  <span className="pct-ic">{cat.icon}</span>
+                  <span className="pct-ti">{cat.title}</span>
+                  {full && <span className="pct-ok">✓</span>}
+                </div>
+                <div className="pch-r">
+                  <span className="pct-cn">{done}/{cat.steps.length}</span>
+                  <span className={`chev${isOpen?' op':''}`}>▾</span>
+                </div>
+              </div>
+              {isOpen && (
+                <div className="psteps">
+                  {cat.steps.map(s => (
+                    <div key={s.id}
+                      className={`pstep${prChk[s.id]?' dn':''}`}
+                      onClick={() => doTogglePr(s.id)}>
+                      <div className="pcb">{prChk[s.id] && '✓'}</div>
+                      <span dangerouslySetInnerHTML={{__html: mdCode(s.label)}}/>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* ── MAIN RENDER ── */
+  return (
+    <>
+      {Confetti}
+      <div className="bg-ov"/>
+      {Header}
+
+      <main className="page">
+        <h1 style={{
+          fontFamily:"'Syne',sans-serif",fontSize:'1.9rem',fontWeight:800,
+          background:'linear-gradient(90deg,var(--ac),var(--ac2,var(--ac)))',
+          WebkitBackgroundClip:'text',backgroundClip:'text',WebkitTextFillColor:'transparent',
+          marginBottom:'4px',textAlign:'center',lineHeight:1.2
+        }}>
+          Git de A à Z
+        </h1>
+        <p style={{textAlign:'center',color:'var(--tx2)',fontSize:'.82rem',marginBottom:'24px',fontFamily:"'Space Mono',monospace"}}>
+          Comprendre et utiliser Git concrètement
+        </p>
+
+        {PhaseBar}
+
+        {phase === 'learn' ? LearnPhase() : PracticePhase()}
+      </main>
+
+      {NotepadModal}
+      {SaveModal}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+</script>
+</body>
+</html>
