@@ -155,7 +155,7 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 .info-block-label{font-size:.62rem;color:var(--tx2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
 .info-block-val{font-size:.82rem;color:var(--tx);font-weight:600;word-break:break-all}
 .info-block.full{grid-column:1/-1}
-.contact-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.contact-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .historique-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
 .historique-item:last-child{border-bottom:none}
 .historique-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0;margin-top:5px}
@@ -366,6 +366,29 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 /* ===== HEADER CENTER ===== */
 #header-center{flex:0 0 auto;font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);pointer-events:none;white-space:nowrap;padding:0 14px}
 .theme-hiveos #header-center,.theme-hiveos.day #header-center{color:rgba(255,255,255,.9)}
+
+/* ===== SIDEBAR COLLAPSE ===== */
+#sidebar{transition:width .22s ease}
+#sidebar.collapsed{width:52px}
+#sidebar-toggle{width:100%;display:flex;align-items:center;justify-content:flex-end;padding:5px 8px;background:transparent;border:none;color:var(--tx2);cursor:pointer;font-size:.85rem;border-radius:6px;transition:background .2s;flex-shrink:0;margin-bottom:2px}
+#sidebar-toggle:hover{background:var(--bg3);color:var(--tx)}
+#sidebar.collapsed #sidebar-toggle{justify-content:center}
+#sidebar.collapsed .sb-label,#sidebar.collapsed .sb-section{display:none}
+#sidebar.collapsed .sb-item{justify-content:center;padding:10px 6px;position:relative}
+#sidebar.collapsed .sb-badge{position:absolute;top:3px;right:3px;min-width:14px;height:14px;font-size:.5rem;padding:0 3px}
+#sidebar.collapsed .sb-divider{margin:5px 4px}
+#sidebar.collapsed .sb-item::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--bg4);border:1px solid var(--brd);color:var(--tx);font-size:.7rem;padding:4px 10px;border-radius:6px;white-space:nowrap;z-index:999;pointer-events:none;opacity:0;transition:opacity .15s;font-family:'Space Mono',monospace}
+#sidebar.collapsed .sb-item:hover::after{opacity:1}
+
+/* ===== DOMAINES ===== */
+.domaine-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:640px){.domaine-grid{grid-template-columns:repeat(3,1fr)}}
+.domaine-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px 10px;cursor:pointer;transition:border-color .2s,transform .15s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.domaine-card:hover{border-color:var(--ac);transform:translateY(-1px)}
+.domaine-icon{font-size:1.8rem}
+.domaine-label{font-size:.78rem;font-weight:700;font-family:var(--font-h,'Syne',sans-serif);color:var(--tx);line-height:1.3}
+.domaine-count{font-size:.67rem;color:var(--tx2)}
+.domaine-count.has-actifs{color:var(--ac);font-weight:700}
 </style>
 </head>
 
@@ -392,28 +415,33 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
   <!-- SIDEBAR -->
   <div id="content-wrap">
   <nav id="sidebar">
+    <button id="sidebar-toggle" title="Réduire la sidebar">◀</button>
     <div class="sb-section">Navigation</div>
-    <div class="sb-item active" data-view="dashboard">
+    <div class="sb-item active" data-view="dashboard" data-tooltip="Dashboard">
       <span class="sb-icon">🏠</span>
       <span class="sb-label">Dashboard</span>
       <span class="sb-badge hidden" id="sb-badge-dashboard"></span>
     </div>
-    <div class="sb-item" data-view="clients">
+    <div class="sb-item" data-view="clients" data-tooltip="Clients">
       <span class="sb-icon">👥</span>
       <span class="sb-label">Répertoire clients</span>
     </div>
-    <div class="sb-item" data-view="relances">
+    <div class="sb-item" data-view="relances" data-tooltip="Relances">
       <span class="sb-icon">🔔</span>
       <span class="sb-label">Relances</span>
       <span class="sb-badge hidden" id="sb-badge-relances"></span>
     </div>
+    <div class="sb-item" data-view="domaines" data-tooltip="Domaines">
+      <span class="sb-icon">🗂️</span>
+      <span class="sb-label">Domaines</span>
+    </div>
     <hr class="sb-divider">
     <div class="sb-section">Planning</div>
-    <div class="sb-item" data-view="agenda">
+    <div class="sb-item" data-view="agenda" data-tooltip="Rendez-vous">
       <span class="sb-icon">📅</span>
       <span class="sb-label">Rendez-vous</span>
     </div>
-    <div class="sb-item" data-view="taches">
+    <div class="sb-item" data-view="taches" data-tooltip="Tâches">
       <span class="sb-icon">✅</span>
       <span class="sb-label">Tâches</span>
       <span class="sb-badge hidden" id="sb-badge-taches"></span>
@@ -432,6 +460,8 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
     </div>
     <!-- M5 RELANCES -->
     <div id="view-relances" class="view"></div>
+    <!-- M8 DOMAINES -->
+    <div id="view-domaines" class="view"></div>
     <!-- M6 AGENDA -->
     <div id="view-agenda" class="view"></div>
     <!-- M7 TÂCHES -->
@@ -523,6 +553,34 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
   <div id="tasks-float-resize" title="Redimensionner">⤡</div>
 </div>
 
+
+<!-- ===== MODAL: NOUVEAU DOSSIER DOMAINE ===== -->
+<div class="modal-overlay centered hidden" id="modal-nouveau-dossier-domaine">
+  <div class="modal">
+    <button class="modal-close" id="modal-ndd-close">✕</button>
+    <h2 id="modal-ndd-title">Nouveau dossier</h2>
+    <div class="form-row">
+      <label>Client existant</label>
+      <select id="ndd-client-select"><option value="">— Sélectionner un client —</option></select>
+    </div>
+    <div class="form-row">
+      <label>Statut initial</label>
+      <select id="ndd-statut-select"></select>
+    </div>
+    <div class="form-row">
+      <label>Prochaine relance</label>
+      <input type="date" id="ndd-relance-date">
+    </div>
+    <div class="form-row">
+      <label>Notes</label>
+      <textarea id="ndd-notes" placeholder="Notes…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-ndd-cancel">Annuler</button>
+      <button class="btn btn-primary" id="modal-ndd-confirm">Créer le dossier</button>
+    </div>
+  </div>
+</div>
 <!-- ===== MODAL: NOUVEAU/EDIT CLIENT ===== -->
 <div class="modal-overlay hidden" id="modal-client">
   <div class="modal">
@@ -836,7 +894,7 @@ const SEED_DATA={
 
 
 const STATUTS=["Prospection","En cours","En attente de docs","Signé","Suivi actif","Clôturé"];
-const TYPES_SD=["Assurance","Crédit","Patrimoine","Investissement","Prévoyance","Retraite","Autre"];
+const TYPES_SD=["Assurance Vie","Crédit Immobilier","Patrimoine","Investissement","Prévoyance","Retraite","Succession","Optimisation Fiscale","Assurance","Autre"];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'rms',label:'RMS',emoji:'🔷'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Win 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
 const STATUT_COLOR={
@@ -849,7 +907,7 @@ const STATUT_COLOR={
 };
 
 let state={clients:[],rdvs:[],taches:[],params:{profil:"Margaux",objectifRdvHebdo:5}};
-let ui={view:'dashboard',theme:'hiveos',dayMode:false,clientId:null,sdId:null,filterStatut:null,confirmCb:null,rdCb:null,agendaMode:'semaine',agendaDate:'',tachePrio:'normale',tacheFilter:'actives',editRdvId:null};
+let ui={view:'dashboard',theme:'hiveos',dayMode:false,clientId:null,sdId:null,filterStatut:null,confirmCb:null,rdCb:null,agendaMode:'semaine',agendaDate:'',tachePrio:'normale',tacheFilter:'actives',editRdvId:null,domaineType:null};
 
 /* ===== STORAGE ===== */
 const store=window.storage||{
@@ -957,6 +1015,7 @@ function switchView(v){
   else if(v==='relances')renderRelances();
   else if(v==='agenda')renderAgenda();
   else if(v==='taches')renderTaches();
+  else if(v==='domaines'){ui.domaineType=null;renderDomaines();}
   updateBadges();
   $('fab').classList.toggle('hidden',v!=='clients'&&v!=='agenda'&&v!=='taches');
 }
@@ -1234,7 +1293,8 @@ function renderClientPanel(c){
     </div>
 
     <div class="contact-btns">
-      ${c.tel?`<a href="tel:${esc(c.tel)}" class="btn btn-ghost btn-sm" style="text-decoration:none;justify-content:center">📞 Appeler</a>`:`<span></span>`}
+      ${c.tel?`<a href="tel:${esc(c.tel)}" class="btn btn-ghost btn-sm" style="text-decoration:none;justify-content:center">📞 Appeler</a>`:`<button class="btn btn-ghost btn-sm" disabled style="opacity:.4;cursor:default">📞 Appeler</button>`}
+      ${c.mail?`<a href="mailto:${esc(c.mail)}" class="btn btn-ghost btn-sm" style="text-decoration:none;justify-content:center">✉️ Email</a>`:`<button class="btn btn-ghost btn-sm" disabled style="opacity:.4;cursor:default">✉️ Email</button>`}
       <button class="btn btn-primary btn-sm" id="btn-contact-rapide">📝 Contact rapide</button>
     </div>
 
@@ -1761,6 +1821,9 @@ function initEvents(){
   // Save modal
   $('modal-save-close').addEventListener('click',()=>$('modal-save').classList.add('hidden'));
   $('modal-save').addEventListener('click',e=>{if(e.target===$('modal-save'))$('modal-save').classList.add('hidden')});
+  $('modal-ndd-close').addEventListener('click',()=>$('modal-nouveau-dossier-domaine').classList.add('hidden'));
+  $('modal-ndd-cancel').addEventListener('click',()=>$('modal-nouveau-dossier-domaine').classList.add('hidden'));
+  $('modal-nouveau-dossier-domaine').addEventListener('click',e=>{if(e.target===$('modal-nouveau-dossier-domaine'))$('modal-nouveau-dossier-domaine').classList.add('hidden');});
   $('save-copy-json').addEventListener('click',()=>{navigator.clipboard.writeText($('save-json').value);toast('JSON copié !')});
   $('save-dl-json').addEventListener('click',()=>dlJSON());
   $('save-dl-app').addEventListener('click',()=>dlApp());
@@ -1926,6 +1989,144 @@ function _endTuto(){
 
 
 /* ===== TASKS FLOAT WINDOW ===== */
+
+/* ===== DOMAINES ===== */
+const DOMAINES=[
+  {type:"Assurance Vie",icon:"💰"},
+  {type:"Crédit Immobilier",icon:"🏠"},
+  {type:"Patrimoine",icon:"🏛️"},
+  {type:"Investissement",icon:"📈"},
+  {type:"Prévoyance",icon:"🛡️"},
+  {type:"Retraite",icon:"🌅"},
+  {type:"Succession",icon:"📜"},
+  {type:"Optimisation Fiscale",icon:"🧾"},
+  {type:"Assurance",icon:"🔒"},
+  {type:"Autre",icon:"📋"}
+];
+const DOMAINE_DOCS={
+  "Assurance Vie":["CNI / Passeport","Justificatif de domicile","RIB","Formulaire de souscription","Relevés bancaires (3 mois)","Bulletin de salaire ou bilan comptable"],
+  "Crédit Immobilier":["CNI / Passeport","Justificatif de domicile","3 bulletins de salaire","2 avis d'imposition","Relevés bancaires (3 mois)","Compromis de vente","Justificatif apport personnel"],
+  "Patrimoine":["Bilan patrimonial","Déclaration de revenus","Relevés de comptes bancaires","Contrats assurance vie existants","Actes de propriété","Relevés de placements"],
+  "Investissement":["CNI / Passeport","Justificatif de domicile","RIB","Questionnaire investisseur (MIF)","Relevés bancaires (3 mois)","Avis d'imposition"],
+  "Prévoyance":["CNI / Passeport","Questionnaire de santé","Bulletin de salaire ou bilan","Contrats de prévoyance existants","RIB"],
+  "Retraite":["CNI / Passeport","Relevé de carrière CNAV","Bulletins de salaire","Bilan retraite estimatif","Avis d'imposition","RIB"],
+  "Succession":["Acte de décès","Livret de famille","Testament (si existant)","Inventaire des biens","CNI des héritiers","Actes de propriété"],
+  "Optimisation Fiscale":["Avis d'imposition (2 ans)","Déclaration de revenus","Bilan patrimonial","Justificatifs charges déductibles","Relevés de placements"],
+  "Assurance":["CNI / Passeport","Justificatif de domicile","Contrats existants","Relevé d'informations sinistres","Questionnaire santé (si applicable)"],
+  "Autre":["CNI / Passeport","Justificatif de domicile","Documents spécifiques à préciser"]
+};
+
+function renderDomaines(){
+  const el=$('view-domaines');
+  if(ui.domaineType){renderDomaineDetail(ui.domaineType);return;}
+  const items=DOMAINES.map(d=>{
+    const actifs=state.clients.reduce((n,c)=>n+(c.sousDossiers||[]).filter(sd=>sd.type===d.type&&sd.statut!=="Clôturé").length,0);
+    const total=state.clients.reduce((n,c)=>n+(c.sousDossiers||[]).filter(sd=>sd.type===d.type).length,0);
+    return'<div class="domaine-card" data-dtype="'+d.type+'">'+
+      '<span class="domaine-icon">'+d.icon+'</span>'+
+      '<span class="domaine-label">'+esc(d.type)+'</span>'+
+      '<span class="domaine-count'+(actifs>0?' has-actifs':'')+'">'+actifs+' actif'+(actifs!==1?'s':'')+(total>actifs?' · '+total+' total':'')+'</span>'+
+    '</div>';
+  }).join('');
+  el.innerHTML='<div class="section-title">🗂️ Domaines d\'activité</div><div class="domaine-grid">'+items+'</div>';
+  el.querySelectorAll('.domaine-card').forEach(card=>{
+    card.addEventListener('click',()=>{ui.domaineType=card.dataset.dtype;renderDomaines();});
+  });
+}
+
+function renderDomaineDetail(type){
+  const el=$('view-domaines');
+  const dom=DOMAINES.find(d=>d.type===type);
+  if(!dom){ui.domaineType=null;renderDomaines();return;}
+  const dossiers=[];
+  state.clients.forEach(c=>{(c.sousDossiers||[]).forEach(sd=>{if(sd.type===type)dossiers.push({client:c,sd});});});
+  const actifs=dossiers.filter(d=>d.sd.statut!=="Clôturé").length;
+  const relances=dossiers.filter(d=>{const s=relanceStatus(d.sd.relance);return s==="retard"||s==="aujourd-hui";}).length;
+  const signes=dossiers.filter(d=>d.sd.statut==="Signé").length;
+  const docs=DOMAINE_DOCS[type]||["Documents à préciser"];
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'+
+      '<button class="btn btn-ghost btn-sm" id="btn-back-domaine">← Retour</button>'+
+      '<span style="font-size:1.4rem">'+dom.icon+'</span>'+
+      '<span style="font-family:var(--font-h,\'Syne\',sans-serif);font-weight:700;font-size:1rem">'+esc(dom.type)+'</span>'+
+    '</div>'+
+    '<div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">'+
+      '<div class="stat-card"><div class="stat-val">'+actifs+'</div><div class="stat-label">Dossiers actifs</div></div>'+
+      '<div class="stat-card '+(signes>0?'ok':'')+'"><div class="stat-val">'+signes+'</div><div class="stat-label">Signés</div></div>'+
+      '<div class="stat-card '+(relances>0?'urgent':'')+'"><div class="stat-val">'+relances+'</div><div class="stat-label">Relances urgentes</div></div>'+
+    '</div>'+
+    '<div class="section-title">📋 Sous-dossiers ('+dossiers.length+')</div>'+
+    (dossiers.length?dossiers.map(function(x){
+      const rst=relanceStatus(x.sd.relance);
+      return'<div class="sd-row" data-cid="'+x.client.id+'">'+
+        '<div class="sd-left">'+
+          '<div class="sd-type">'+esc(x.client.prenom)+' '+esc(x.client.nom)+'</div>'+
+          '<div class="sd-name"><span class="badge '+(STATUT_COLOR[x.sd.statut]||'badge-gray')+'">'+esc(x.sd.statut)+'</span></div>'+
+          (x.sd.relance?'<div class="sd-relance '+(rst==="retard"?'text-danger':rst==="aujourd-hui"?'text-warn':'text-muted')+'">'+
+            (rst==="retard"?'⚠️':rst==="aujourd-hui"?'🕐':'📅')+' '+esc(fmtDate(x.sd.relance))+'</div>':'')+
+        '</div>'+
+        '<span style="color:var(--tx2);font-size:.9rem">›</span>'+
+      '</div>';
+    }).join(''):'<div class="empty"><span class="empty-icon">'+dom.icon+'</span>Aucun dossier de ce type</div>')+
+    '<div class="section-title mt14">📄 Documents types à demander</div>'+
+    '<div class="card" style="cursor:default">'+
+      docs.map(function(doc,i){return'<div style="display:flex;gap:8px;padding:6px 0;'+(i>0?'border-top:1px solid var(--brd)':'')+';font-size:.78rem;align-items:center"><span style="color:var(--ac);flex-shrink:0">•</span>'+esc(doc)+'</div>';}).join('')+
+    '</div>'+
+    '<div style="margin-top:14px"><button class="btn btn-primary btn-block" id="btn-ndd">＋ Nouveau dossier '+esc(dom.type)+'</button></div>';
+  $('btn-back-domaine').addEventListener('click',function(){ui.domaineType=null;renderDomaines();});
+  el.querySelectorAll('.sd-row[data-cid]').forEach(function(row){
+    row.addEventListener('click',function(){openClient(row.dataset.cid);});
+  });
+  $('btn-ndd').addEventListener('click',function(){openNouveauDossierDomaine(type);});
+}
+
+function openNouveauDossierDomaine(type){
+  const sel=$('ndd-client-select');
+  sel.innerHTML='<option value="">— Sélectionner un client —</option>';
+  state.clients.forEach(function(c){
+    const o=document.createElement('option');
+    o.value=c.id;o.textContent=c.prenom+' '+c.nom;
+    sel.appendChild(o);
+  });
+  $('modal-ndd-title').textContent='Nouveau dossier — '+type;
+  const statSel=$('ndd-statut-select');
+  statSel.innerHTML=STATUTS.map(function(s){return'<option value="'+s+'">'+s+'</option>';}).join('');
+  const d=new Date();d.setDate(d.getDate()+14);
+  $('ndd-relance-date').value=d.toISOString().slice(0,10);
+  $('ndd-notes').value='';
+  $('modal-nouveau-dossier-domaine').classList.remove('hidden');
+  $('modal-ndd-confirm').onclick=function(){
+    const cid=sel.value;
+    if(!cid){toast('Sélectionne un client');return;}
+    const c=getClient(cid);if(!c)return;
+    if(!c.sousDossiers)c.sousDossiers=[];
+    const sd={id:genId(),type:type,statut:$('ndd-statut-select').value,relance:$('ndd-relance-date').value,notes:$('ndd-notes').value,historique:[]};
+    c.sousDossiers.push(sd);
+    persistState();
+    $('modal-nouveau-dossier-domaine').classList.add('hidden');
+    renderDomaineDetail(type);
+    updateBadges();
+    toast('Dossier créé !');
+  };
+}
+
+/* ===== SIDEBAR COLLAPSE ===== */
+function initSidebar(){
+  if(localStorage.getItem('sb-collapsed')==='1')$('sidebar').classList.add('collapsed');
+  updateSidebarToggleIcon();
+  $('sidebar-toggle').addEventListener('click',function(){
+    const collapsed=$('sidebar').classList.toggle('collapsed');
+    localStorage.setItem('sb-collapsed',collapsed?'1':'0');
+    updateSidebarToggleIcon();
+  });
+}
+function updateSidebarToggleIcon(){
+  const btn=$('sidebar-toggle');
+  const collapsed=$('sidebar').classList.contains('collapsed');
+  btn.textContent=collapsed?'▶':'◀';
+  btn.title=collapsed?'Ouvrir la sidebar':'Réduire la sidebar';
+}
+
 function renderTasksFloat(){
   const body=$('tasks-float-body');
   if(!body)return;
@@ -1983,6 +2184,8 @@ loadState();
 applyTheme();
 buildThemeMenu();
 initEvents();
+initSidebar();
+initTasksFloat();
 switchView('dashboard');
 </script>
 </body>
