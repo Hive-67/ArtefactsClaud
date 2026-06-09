@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clone Interface</title>
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --bg-browser: #f1f3f4;
+            --bg-input: #f6f8fa;
+            --border: #d0d7de;
+            --text-main: #1F2328;
+            --text-muted: #656D76;
+            --link: #0969DA;
+            --btn-bg: #f6f8fa;
+            --btn-border: #d0d7de;
+            --green: #1f883d;
+            --green-hover: #1a7f37;
+            --hover-bg: #f3f4f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- BROWSER BAR --- */
+        .browser-bar {
+            background-color: var(--bg-browser);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .browser-icon {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-main);
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .browser-icon:hover { background-color: rgba(0,0,0,0.05); }
+        .url-bar {
+            flex: 1;
+            background-color: #e8eaed;
+            border-radius: 24px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            cursor: text;
+        }
+        .url-text { flex: 1; font-size: 16px; color: var(--text-main); }
+        .tab-count {
+            border: 2px solid var(--text-main);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 4px;
+            cursor: pointer;
+        }
+
+        /* --- GITHUB NAV --- */
+        .github-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .gh-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-main);
+            cursor: pointer;
+        }
+        .nav-text {
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .nav-tools svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-muted);
+            cursor: pointer;
+        }
+        .nav-tools {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+            cursor: pointer;
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout {
+            display: flex;
+            max-width: 1280px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 320px;
+            padding: 24px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-title { font-size: 14px; font-weight: 600; }
+        .btn-green {
+            background-color: var(--green);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .search-input {
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--bg-input);
+            font-size: 14px;
+            color: var(--text-main);
+            cursor: text;
+        }
+        .repo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .repo-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .repo-item:hover { color: var(--link); }
+        .repo-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+        }
+
+        /* --- CONTENT --- */
+        .content {
+            flex: 1;
+            padding: 32px 48px;
+        }
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* --- PROMPT BOX --- */
+        .prompt-box {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+            cursor: text;
+        }
+        .prompt-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            background: transparent;
+        }
+        .prompt-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-outline {
+            border: 1px solid var(--border);
+            background-color: var(--bg-main);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .btn-outline:hover { background-color: var(--hover-bg); }
+
+        /* --- SHORTCUTS --- */
+        .shortcuts {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* --- FEED --- */
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+        .feed-title { font-size: 16px; font-weight: 600; }
+        .feed-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .feed-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .feed-card-header a { color: var(--link); text-decoration: none; }
+        .repo-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .repo-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .repo-desc {
+            font-size: 14px;
+            color: var(--text-main);
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .repo-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #3572A5; /* Python Blue */
+        }
+        .btn-star {
+            border: 1px solid var(--border);
+            background-color: var(--bg-input);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-bottom: 48px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .footer-links a {
+            color: var(--link);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(20px);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--link); }
+        .modal-func { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .modal-ctx { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
+        .modal-close {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        /*__SEED_START__*/
+        const state = {
+            userRepos: [
+                { name: "Hive-67/ArtefactsClaud" },
+                { name: "Hive-67/d3mand" }
+            ],
+            feedItems: [
+                {
+                    author: "mvanhorn",
+                    repo: "last30days-skill",
+                    desc: "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
+                    lang: "Python",
+                    stars: "33.6k",
+                    trending: true
+                },
+                {
+                    author: "RyanCodrai",
+                    repo: "turbovec",
+                    desc: "A vector index built on TurboQuant, written in Rust with Python bindings",
+                    lang: "Python",
+                    stars: "8.3k",
+                    trending: false
+                }
+            ],
+            footerLinks: ["Terms", "Privacy", "Security", "Status", "Community", "Docs", "Contact", "Manage cookies", "Do not share my personal information"]
+        };
+        /*__SEED_END__*/
+
+        // --- SVGs ---
+        const icons = {
+            back: `<svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>`,
+            forward: `<svg viewBox="0 0 24 24"><path d="M12 4l-1.4 1.4L16.2 11H4v2h12.2l-5.6 5.6L12 20l8-8z"/></svg>`,
+            refresh: `<svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`,
+            shield: `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#656D76"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`,
+            translate: `<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#656D76"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>`,
+            plus: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
+            dots: `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+            hamburger: `<svg viewBox="0 0 16 16"><path d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 7.75zM1.75 12h12.5a.75.75 0 010 1.5H1.75a.75.75 0 010-1.5z"/></svg>`,
+            github: `<svg viewBox="0 0 16 16" class="gh-icon"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`,
+            search: `<svg viewBox="0 0 16 16"><path d="M10.68 11.74a6 6 0 01-7.922-8.982 6 6 0 018.982 7.922l3.04 3.04a.749.749 0 01-.326 1.275.749.749 0 01-.734-.215ZM11.5 7a4.499 4.499 0 10-8.997 0A4.499 4.499 0 0011.5 7Z"/></svg>`,
+            repo: `<svg viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 010-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 11-1.072 1.05A2.495 2.495 0 012 11.5Zm10.5-1h-8a1 1 0 00-1 1v6.708A2.486 2.486 0 014.5 9h8ZM5 12.25a.25.25 0 01.25-.25h3.5a.25.25 0 01.25.25v3.25a.25.25 0 01-.4.2l-1.45-1.087a.249.249 0 00-.3 0L5.4 15.7a.25.25 0 01-.4-.2Z"/></svg>`,
+            star: `<svg viewBox="0 0 16 16" style="fill:var(--text-muted)"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Zm0 2.445L6.615 5.5a.75.75 0 0 1-.564.41l-3.097.45 2.24 2.184a.75.75 0 0 1 .216.664l-.528 3.084 2.769-1.456a.75.75 0 0 1 .698 0l2.77 1.456-.53-3.084a.75.75 0 0 1 .216-.664l2.24-2.183-3.096-.45a.75.75 0 0 1-.564-.41L8 2.694Z"/></svg>`,
+            send: `<svg viewBox="0 0 16 16" style="fill:var(--text-muted); width:16px"><path d="M1.593 2.712L14.5 7.62a.75.75 0 0 1 0 1.398L1.593 13.926a.75.75 0 0 1-1.043-.888l1.45-4.493a.75.75 0 0 1 .593-.526l4.63-.585a.25.25 0 0 0 0-.496l-4.63-.585a.75.75 0 0 1-.593-.526L.55 1.905a.75.75 0 0 1 1.043-.888Z"/></svg>`
+        };
+
+        // --- RENDER APP ---
+        function render() {
+            const html = `
+                <div class="browser-bar">
+                    <div class="interactive browser-icon" data-name="Précédent" data-function="Historique arrière" data-context="Navigation navigateur">${icons.back}</div>
+                    <div class="interactive browser-icon" data-name="Suivant" data-function="Historique avant" data-context="Navigation navigateur">${icons.forward}</div>
+                    <div class="interactive browser-icon" data-name="Actualiser" data-function="Recharger la page" data-context="Contrôle navigateur">${icons.refresh}</div>
+                    <div class="interactive url-bar" data-name="Barre d'URL" data-function="Saisie et affichage de l'adresse web" data-context="Interface navigateur principale">
+                        ${icons.shield}
+                        <span class="url-text">github.com</span>
+                        ${icons.translate}
+                    </div>
+                    <div class="interactive browser-icon" data-name="Nouvel onglet" data-function="Ouvrir un onglet vierge" data-context="Gestion des onglets">${icons.plus}</div>
+                    <div class="interactive tab-count" data-name="Liste des onglets" data-function="Afficher tous les onglets ouverts" data-context="Navigation multi-pages">3</div>
+                    <div class="interactive browser-icon" data-name="Menu du navigateur" data-function="Ouvrir les paramètres et options" data-context="Contrôle global navigateur">${icons.dots}</div>
+                </div>
+
+                <header class="github-nav">
+                    <div class="nav-left">
+                        <div class="interactive nav-tools" data-name="Menu latéral GitHub" data-function="Ouvrir le menu de navigation globale" data-context="Accès aux fonctionnalités de compte">
+                            ${icons.hamburger}
+                        </div>
+                        <div class="interactive" data-name="Logo GitHub" data-function="Retour à l'accueil" data-context="Image de marque et raccourci">
+                            ${icons.github}
+                        </div>
+                        <span class="interactive nav-text" data-name="Titre Dashboard" data-function="Indique la page courante" data-context="Localisation dans l'app">Dashboard</span>
+                    </div>
+                    <div class="nav-right">
+                        <div class="interactive nav-tools" data-name="Recherche Globale" data-function="Ouvrir la barre de recherche" data-context="Trouver du code, dépôts ou utilisateurs">
+                            ${icons.search}
+                        </div>
+                        <div class="interactive nav-tools" data-name="Menu Création" data-function="Ajouter un élément (dépôt, orga...)" data-context="Action rapide globale">+</div>
+                        <div class="interactive avatar" data-name="Profil Utilisateur" data-function="Ouvrir les paramètres de compte" data-context="Gestion de la session active"></div>
+                    </div>
+                </header>
+
+                <main class="main-layout">
+                    <aside class="sidebar">
+                        <div class="sidebar-header">
+                            <span class="sidebar-title">Top repositories</span>
+                            <button class="interactive btn-green" data-name="Bouton New" data-function="Créer un nouveau repository" data-context="Création de projet">
+                                ${icons.repo} New
+                            </button>
+                        </div>
+                        <div class="interactive search-input" data-name="Filtre de dépôts" data-function="Rechercher parmi ses dépôts" data-context="Navigation rapide locale">Find a repository...</div>
+                        <div class="repo-list">
+                            ${state.userRepos.map(repo => `
+                                <div class="interactive repo-item" data-name="Dépôt personnel" data-function="Ouvrir le dépôt ${repo.name}" data-context="Accès direct au projet">
+                                    <div class="repo-avatar"></div>
+                                    <span>${repo.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </aside>
+
+                    <section class="content">
+                        <h1 class="page-title">Home</h1>
+                        
+                        <div class="interactive prompt-box" data-name="Zone IA Copilot" data-function="Interagir avec l'assistant GitHub" data-context="Aide à la génération de code ou recherche sémantique">
+                            <input type="text" class="prompt-input" placeholder="Ask anything or type @ to add context" disabled>
+                            <div class="prompt-actions">
+                                <div class="action-group">
+                                    <div class="btn-outline">Ask ▾</div>
+                                    <div class="btn-outline">All repositories ▾</div>
+                                    <div class="btn-outline">+</div>
+                                    <div class="btn-outline">Claude Haiku 4.5 ▾</div>
+                                </div>
+                                ${icons.send}
+                            </div>
+                        </div>
+
+                        <div class="shortcuts">
+                            <div class="interactive btn-outline" data-name="Raccourci Agent" data-function="Lancer un agent IA" data-context="Automatisation de tâches">Agent</div>
+                            <div class="interactive btn-outline" data-name="Créer Issue" data-function="Ouvrir le formulaire d'issue" data-context="Gestion de projet">Create issue</div>
+                            <div class="interactive btn-outline" data-name="Écrire du code" data-function="Ouvrir l'éditeur web" data-context="Développement direct">Write code</div>
+                            <div class="interactive btn-outline" data-name="Actions Git" data-function="Gérer les branches/commits" data-context="Contrôle de version">Git ▾</div>
+                        </div>
+                        
+                        <div class="shortcuts">
+                            <div class="interactive btn-outline" data-name="Pull Requests" data-function="Voir les demandes d'intégration" data-context="Revue de code">Pull requests ▾</div>
+                        </div>
+
+                        <div class="feed-header">
+                            <span class="feed-title">Feed</span>
+                            <div class="action-group">
+                                <div class="interactive btn-outline" data-name="Filtre Feed" data-function="Ajuster l'affichage du fil" data-context="Personnalisation de la veille">Filter</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-list">
+                            ${state.feedItems.map(item => `
+                                <div class="feed-card">
+                                    ${item.trending ? `<div class="feed-card-header interactive" data-name="Indicateur Tendance" data-function="Afficher la catégorie" data-context="Veille technologique">📈 Trending repositories · <a href="#">See more</a></div>` : ''}
+                                    <div class="repo-meta">
+                                        <div class="interactive repo-name" data-name="Nom du Dépôt" data-function="Visiter le repository" data-context="Lien vers le code source">
+                                            <div class="repo-avatar" style="background:#555"></div>
+                                            ${item.author}/${item.repo}
+                                        </div>
+                                        <div class="interactive btn-star" data-name="Bouton Star" data-function="Ajouter le dépôt aux favoris" data-context="Système de notation social GitHub">
+                                            ${icons.star} Star ▾
+                                        </div>
+                                    </div>
+                                    <div class="interactive repo-desc" data-name="Description du Dépôt" data-function="Aperçu du projet" data-context="Information textuelle">
+                                        ${item.desc}
+                                    </div>
+                                    <div class="repo-stats">
+                                        <span class="stat-item"><div class="dot"></div>${item.lang}</span>
+                                        <span class="stat-item">${icons.star} ${item.stars}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <footer class="footer">
+                            <div class="footer-links">
+                                ${state.footerLinks.map(link => `
+                                    <a class="interactive" data-name="Lien Footer: ${link}" data-function="Ouvrir la page d'information" data-context="Navigation légale et support">${link}</a>
+                                `).join('')}
+                            </div>
+                            <div class="interactive footer-logo" data-name="Copyright GitHub" data-function="Information légale" data-context="Pied de page">
+                                ${icons.github} © 2026 GitHub, Inc.
+                            </div>
+                        </footer>
+                    </section>
+                </main>
+
+                <div class="modal-overlay" id="infoModal">
+                    <div class="modal-content">
+                        <div class="modal-title" id="mName">Nom</div>
+                        <div class="modal-func" id="mFunc">Fonction</div>
+                        <div class="modal-ctx" id="mCtx">Contexte</div>
+                        <button class="modal-close" onclick="closeModal()">Fermer</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('app').innerHTML = html;
+            attachEvents();
+        }
+
+        // --- GESTION DES INTERACTIONS ---
+        function attachEvents() {
+            const elements = document.querySelectorAll('.interactive');
+            const modal = document.getElementById('infoModal');
+            
+            elements.forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    document.getElementById('mName').textContent = el.getAttribute('data-name') || "Élément";
+                    document.getElementById('mFunc').textContent = "Fonction : " + (el.getAttribute('data-function') || "Non définie");
+                    document.getElementById('mCtx').textContent = "Rôle global : " + (el.getAttribute('data-context') || "Interface utilisateur");
+                    
+                    modal.classList.add('active');
+                });
+            });
+
+            // Fermer si on clique en dehors
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        window.closeModal = function() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        // Init
+        render();
+    </script>
+</body>
+</html>

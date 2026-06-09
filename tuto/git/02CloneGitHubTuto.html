@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub UI Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables (Inspiré de tes standards de structuration) */
+        :root {
+            --bg-browser: #f0f1f4;
+            --bg-tab-active: #ffffff;
+            --bg-toolbar: #ffffff;
+            --bg-app: #f6f8fa;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --tx-main: #1f2328;
+            --tx-muted: #656d76;
+            --brd: #d0d7de;
+            --ac: #0969da;
+            --hover: #f3f4f6;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font);
+        }
+
+        body {
+            background-color: var(--bg-browser);
+            color: var(--tx-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- BROWSER UI --- */
+        .browser-header {
+            background: #e3e5e8;
+            padding-top: 8px;
+            border-bottom: 1px solid var(--brd);
+        }
+
+        .tabs {
+            display: flex;
+            padding: 0 8px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #eaecf0;
+            border-radius: 8px 8px 0 0;
+            font-size: 13px;
+            color: #444;
+            min-width: 150px;
+            max-width: 200px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab.active {
+            background: var(--bg-tab-active);
+            color: var(--tx-main);
+            font-weight: 500;
+        }
+
+        .tab .close-tab {
+            margin-left: auto;
+            color: #888;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 16px;
+            background: var(--bg-toolbar);
+        }
+
+        .toolbar-icons {
+            display: flex;
+            gap: 16px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .address-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f1f3f4;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 14px;
+            gap: 12px;
+        }
+
+        .address-bar input {
+            border: none;
+            background: transparent;
+            flex: 1;
+            outline: none;
+            color: var(--tx-main);
+        }
+
+        /* --- GITHUB MAIN APP --- */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background: var(--bg-app);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--brd);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--tx-main);
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: var(--hover); }
+        .nav-item.active { background: var(--hover); font-weight: 600; }
+        .nav-item i { color: var(--tx-muted); width: 16px; text-align: center; }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--brd);
+            margin: 8px 16px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--tx-muted);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 12px 24px;
+            gap: 16px;
+            color: var(--tx-muted);
+        }
+
+        .top-nav-icon {
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .content-body {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px;
+        }
+
+        h1.page-title {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        /* AI BOX */
+        .ai-box {
+            background: var(--bg-card);
+            border: 1px solid var(--brd);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .ai-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: var(--tx-muted);
+            margin-bottom: 16px;
+        }
+
+        .ai-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border: 1px solid var(--brd);
+            border-radius: 6px;
+            background: var(--bg-app);
+            color: var(--tx-main);
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn:hover { background: #ebecf0; }
+        
+        .btn-send {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: var(--tx-muted);
+            font-size: 16px;
+        }
+
+        .sub-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        /* FEED SECTION */
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .feed-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .repo-card {
+            background: var(--bg-card);
+            border: 1px solid var(--brd);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .repo-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .repo-title {
+            font-weight: 600;
+            color: var(--tx-main);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .repo-title img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .repo-desc {
+            font-size: 14px;
+            color: var(--tx-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .repo-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--tx-muted);
+            align-items: center;
+        }
+
+        .lang-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #3572A5;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 32px 0;
+            font-size: 12px;
+            color: var(--tx-muted);
+        }
+        .footer a {
+            color: var(--tx-muted);
+            text-decoration: none;
+            margin: 0 4px;
+        }
+
+        /* --- MODAL SYSTEM --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--tx-main);
+        }
+
+        .modal-desc {
+            font-size: 14px;
+            color: var(--tx-muted);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: var(--ac);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .modal-close:hover {
+            background: #005cc5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="browser-header">
+        <div class="tabs">
+            <div class="tab clickable" data-title="Onglet Google" data-desc="Permet de basculer vers le moteur de recherche Google.">
+                <i class="fa-brands fa-google" style="color: #4285F4;"></i> github - Recherche
+                <i class="fa-solid fa-xmark close-tab clickable" data-title="Fermer l'onglet" data-desc="Ferme cet onglet du navigateur."></i>
+            </div>
+            <div class="tab active clickable" data-title="Onglet GitHub (Actif)" data-desc="L'onglet actuellement ouvert, affichant la page d'accueil de GitHub.">
+                <i class="fa-brands fa-github"></i> GitHub
+                <i class="fa-solid fa-xmark close-tab clickable" data-title="Fermer l'onglet" data-desc="Ferme cet onglet du navigateur."></i>
+            </div>
+            <div class="tab clickable" data-title="Onglet Artefacts" data-desc="Permet de basculer vers l'application ArtefactsClaude.">
+                <i class="fa-brands fa-github"></i> ArtefactsClaud
+                <i class="fa-solid fa-xmark close-tab clickable" data-title="Fermer l'onglet" data-desc="Ferme cet onglet du navigateur."></i>
+            </div>
+        </div>
+        <div class="toolbar">
+            <div class="toolbar-icons">
+                <i class="fa-solid fa-arrow-left clickable" data-title="Retour" data-desc="Retourne à la page précédente dans l'historique du navigateur."></i>
+                <i class="fa-solid fa-arrow-right clickable" data-title="Suivant" data-desc="Avance à la page suivante dans l'historique."></i>
+                <i class="fa-solid fa-rotate-right clickable" data-title="Actualiser" data-desc="Recharge la page courante."></i>
+            </div>
+            <div class="address-bar clickable" data-title="Barre d'adresse" data-desc="Affiche l'URL actuelle et permet de saisir une nouvelle adresse web ou recherche.">
+                <i class="fa-solid fa-shield-halved"></i>
+                <input type="text" value="github.com" readonly>
+                <i class="fa-solid fa-language clickable" data-title="Traduire" data-desc="Outil de traduction de la page web."></i>
+            </div>
+            <div class="toolbar-icons">
+                <i class="fa-solid fa-plus clickable" data-title="Nouvel onglet" data-desc="Ouvre un nouvel onglet vierge."></i>
+                <div class="clickable" data-title="Onglets ouverts" data-desc="Affiche la liste des 3 onglets ouverts." style="border: 1px solid #555; border-radius: 4px; padding: 0 4px; font-size: 12px; font-weight: bold;">3</div>
+                <i class="fa-solid fa-ellipsis-vertical clickable" data-title="Menu navigateur" data-desc="Ouvre les paramètres et options du navigateur."></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-brands fa-github fa-2x clickable" data-title="Logo GitHub" data-desc="Retourne à la racine de GitHub."></i>
+                <i class="fa-solid fa-xmark top-nav-icon clickable" data-title="Fermer Menu" data-desc="Réduit ou ferme la barre latérale."></i>
+            </div>
+            
+            <ul class="nav-list">
+                <li class="nav-item active clickable" data-title="Accueil" data-desc="Ton flux d'activité principal."><i class="fa-solid fa-house"></i> Home</li>
+                <li class="nav-item clickable" data-title="Issues" data-desc="Liste tous les tickets (problèmes/tâches) qui te sont assignés."><i class="fa-regular fa-circle-dot"></i> All issues</li>
+                <li class="nav-item clickable" data-title="Pull Requests" data-desc="Affiche les demandes de fusion de code (PR) en cours."><i class="fa-solid fa-code-pull-request"></i> All pull requests</li>
+                <li class="nav-item clickable" data-title="Dépôts" data-desc="Accès rapide à la liste complète de tes dépôts (repositories)."><i class="fa-solid fa-book-bookmark"></i> All repositories</li>
+                <li class="nav-item clickable" data-title="Projets" data-desc="Gestion de tes tableaux Kanban et projets de développement."><i class="fa-solid fa-table-columns"></i> Projects</li>
+                <li class="nav-item clickable" data-title="Discussions" data-desc="Accès aux forums et discussions des communautés."><i class="fa-regular fa-comments"></i> Discussions</li>
+                <li class="nav-item clickable" data-title="Codespaces" data-desc="Environnements de développement cloud intégrés."><i class="fa-solid fa-cloud"></i> Codespaces</li>
+                <li class="nav-item clickable" data-title="Copilot" data-desc="Interface de l'assistant IA de programmation GitHub Copilot."><i class="fa-solid fa-robot"></i> Copilot</li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+            
+            <ul class="nav-list">
+                <li class="nav-item clickable" data-title="Explorer" data-desc="Découvre de nouveaux projets open-source."><i class="fa-solid fa-compass"></i> Explore</li>
+                <li class="nav-item clickable" data-title="Marketplace" data-desc="Boutique d'actions et d'applications pour GitHub."><i class="fa-solid fa-store"></i> Marketplace</li>
+                <li class="nav-item clickable" data-title="MCP Registry" data-desc="Registre des packages MCP."><i class="fa-solid fa-box"></i> MCP registry</li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="section-title">
+                Top repositories
+                <i class="fa-solid fa-magnifying-glass clickable" data-title="Rechercher dépôt" data-desc="Filtrer tes dépôts principaux."></i>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item clickable" data-title="Dépôt ArtefactsClaud" data-desc="Accès rapide au dépôt Hive-67/ArtefactsClaud.">
+                    <img src="https://via.placeholder.com/16/e0e0e0/555555?text=H" style="border-radius:3px;"> Hive-67/ArtefactsClaud
+                </li>
+                <li class="nav-item clickable" data-title="Dépôt d3mand" data-desc="Accès rapide au dépôt Hive-67/d3mand.">
+                    <img src="https://via.placeholder.com/16/e0e0e0/555555?text=H" style="border-radius:3px;"> Hive-67/d3mand
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="top-nav">
+                <i class="fa-solid fa-magnifying-glass top-nav-icon clickable" data-title="Recherche Globale" data-desc="Ouvre la barre de commande pour rechercher du code ou des dépôts."></i>
+                <i class="fa-regular fa-folder top-nav-icon clickable" data-title="Espaces de travail" data-desc="Accès à tes espaces de travail."></i>
+                <i class="fa-solid fa-plus top-nav-icon clickable" data-title="Nouveau" data-desc="Créer un nouveau dépôt, issue ou projet."></i>
+                <i class="fa-regular fa-circle-dot top-nav-icon clickable" data-title="Statut" data-desc="Voir les statuts des systèmes."></i>
+                <i class="fa-solid fa-code-pull-request top-nav-icon clickable" data-title="PR actives" data-desc="Raccourci vers tes Pull Requests."></i>
+                <i class="fa-regular fa-envelope top-nav-icon clickable" data-title="Boîte de réception" data-desc="Tes notifications GitHub."></i>
+                <div class="avatar clickable" data-title="Profil Utilisateur" data-desc="Ouvre le menu de ton compte utilisateur (Hive-67).">H</div>
+            </div>
+
+            <div class="content-body">
+                <h1 class="page-title">Home</h1>
+
+                <div class="ai-box clickable" data-title="Zone de Prompt" data-desc="Permet de discuter avec l'IA ou de lancer des commandes contextuelles.">
+                    <input type="text" class="ai-input" placeholder="Ask anything or type @ to add context" readonly>
+                    <div class="ai-actions">
+                        <button class="btn clickable" data-title="Filtre Ask" data-desc="Sélectionne le mode de requête."><i class="fa-regular fa-comment"></i> Ask <i class="fa-solid fa-chevron-down"></i></button>
+                        <button class="btn clickable" data-title="Contexte : Tous les dépôts" data-desc="Définit le périmètre de recherche sur tous tes dépôts."><i class="fa-solid fa-book-bookmark"></i> All repositories <i class="fa-solid fa-chevron-down"></i></button>
+                        <button class="btn clickable" data-title="Ajouter du contexte" data-desc="Bouton pour joindre des fichiers ou du code au prompt."><i class="fa-solid fa-plus"></i></button>
+                        <button class="btn clickable" style="margin-left:auto;" data-title="Modèle IA" data-desc="Choix du modèle de langage (Claude Haiku 4.5 sélectionné).">Claude Haiku 4.5 <i class="fa-solid fa-chevron-down"></i></button>
+                        <button class="btn-send clickable" data-title="Envoyer" data-desc="Soumet le prompt à l'IA."><i class="fa-regular fa-paper-plane"></i></button>
+                    </div>
+                </div>
+
+                <div class="sub-actions">
+                    <button class="btn clickable" data-title="Action : Agent" data-desc="Déclenche un agent autonome."><i class="fa-solid fa-robot"></i> Agent</button>
+                    <button class="btn clickable" data-title="Action : Créer Issue" data-desc="Ouvre l'interface de création d'un nouveau ticket."><i class="fa-regular fa-circle-dot"></i> Create issue</button>
+                    <button class="btn clickable" data-title="Action : Coder" data-desc="Lance l'assistant de génération de code."><i class="fa-solid fa-file-code"></i> Write code</button>
+                    <button class="btn clickable" data-title="Action : Git" data-desc="Ouvre les commandes Git."><i class="fa-solid fa-code-branch"></i> Git <i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <button class="btn clickable" data-title="Filtre PR" data-desc="Filtre l'affichage pour les requêtes de fusion."><i class="fa-solid fa-code-pull-request"></i> Pull requests <i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+
+                <div class="feed-header">
+                    <span class="feed-title">Feed</span>
+                    <div>
+                        <button class="btn clickable" data-title="Filtres du flux" data-desc="Ouvre le menu pour filtrer les événements de la timeline."><i class="fa-solid fa-filter"></i> Filter</button>
+                        <button class="btn clickable" data-title="Mise en page" data-desc="Change l'affichage du flux."><i class="fa-solid fa-table-columns"></i></button>
+                    </div>
+                </div>
+
+                <div class="repo-card">
+                    <div style="font-size: 12px; color: var(--tx-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-arrow-trend-up"></i> Trending repositories · <a href="#" class="clickable" style="color: var(--ac); text-decoration: none;" data-title="Voir plus de tendances" data-desc="Ouvre la page complète des dépôts en tendance.">See more</a>
+                    </div>
+
+                    <div style="padding-bottom: 16px; border-bottom: 1px solid var(--brd); margin-bottom: 16px;">
+                        <div class="repo-card-header">
+                            <div class="repo-title clickable" data-title="Dépôt mvanhorn" data-desc="Ouvre le dépôt last30days-skill.">
+                                <img src="https://via.placeholder.com/20/ccc/fff?text=M" alt="avatar"> mvanhorn/last30days-skill
+                            </div>
+                            <button class="btn clickable" data-title="Mettre en favori (Star)" data-desc="Ajoute une étoile à ce dépôt pour le soutenir."><i class="fa-regular fa-star"></i> Star <i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                        <div class="repo-desc">
+                            AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary
+                        </div>
+                        <div class="repo-meta">
+                            <span class="clickable" data-title="Langage : Python" data-desc="Filtre tous les projets codés en Python."><span class="lang-color"></span>Python</span>
+                            <span class="clickable" data-title="Nombre d'étoiles" data-desc="Ce projet a reçu 33.6k étoiles par la communauté."><i class="fa-regular fa-star"></i> 33.6k</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="repo-card-header">
+                            <div class="repo-title clickable" data-title="Dépôt RyanCodrai" data-desc="Ouvre le dépôt turbovec.">
+                                <img src="https://via.placeholder.com/20/f9a8d4/fff?text=R" alt="avatar"> RyanCodrai/turbovec
+                            </div>
+                            <button class="btn clickable" data-title="Mettre en favori (Star)" data-desc="Ajoute une étoile à ce dépôt pour le soutenir."><i class="fa-regular fa-star"></i> Star <i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                        <div class="repo-desc">
+                            A vector index built on TurboQuant, written in Rust with Python bindings
+                        </div>
+                        <div class="repo-meta">
+                            <span class="clickable" data-title="Langage : Python" data-desc="Filtre tous les projets codés en Python."><span class="lang-color"></span>Python</span>
+                            <span class="clickable" data-title="Nombre d'étoiles" data-desc="Ce projet a reçu 8.3k étoiles par la communauté."><i class="fa-regular fa-star"></i> 8.3k</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <a href="#" class="clickable" data-title="Conditions" data-desc="Conditions d'utilisation de GitHub.">Terms</a>
+                    <a href="#" class="clickable" data-title="Confidentialité" data-desc="Politique de confidentialité.">Privacy</a>
+                    <a href="#" class="clickable" data-title="Sécurité" data-desc="Centre de sécurité GitHub.">Security</a>
+                    <a href="#" class="clickable" data-title="Statut" data-desc="Statut des serveurs GitHub.">Status</a>
+                    <a href="#" class="clickable" data-title="Communauté" data-desc="Règles de la communauté.">Community</a>
+                    <a href="#" class="clickable" data-title="Documentation" data-desc="Documentation technique.">Docs</a>
+                    <a href="#" class="clickable" data-title="Contact" data-desc="Contacter le support GitHub.">Contact</a>
+                    <br><br>
+                    <i class="fa-brands fa-github"></i> © 2026 GitHub, Inc.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">Titre de l'élément</div>
+            <div class="modal-desc" id="modal-desc">Description de la fonction et du contexte de cet élément dans l'interface.</div>
+            <button class="modal-close" id="close-modal">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        // Logique de la Modale
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('info-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+            const closeBtn = document.getElementById('close-modal');
+
+            // Écouteur sur tous les éléments cliquables
+            document.querySelectorAll('.clickable').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Évite le déclenchement en cascade si des div sont imbriquées
+                    
+                    const title = el.getAttribute('data-title') || 'Élément non défini';
+                    const desc = el.getAttribute('data-desc') || 'Aucune description disponible pour cet élément.';
+                    
+                    modalTitle.textContent = title;
+                    modalDesc.textContent = desc;
+                    
+                    modal.classList.add('active');
+                });
+            });
+
+            // Fermeture via le bouton
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            // Fermeture au clic à l'extérieur de la modale
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
