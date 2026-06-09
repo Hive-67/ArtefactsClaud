@@ -55,7 +55,7 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-item.active{background:var(--bg3);color:var(--ac)}
 
 /* ===== LAYOUT ===== */
-#app{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column}
+#app{flex:1;overflow:hidden;display:flex;flex-direction:column}
 #main{flex:1;overflow:hidden;position:relative}
 .view{display:none;height:100%;overflow-y:auto;padding:16px 16px 80px}
 .view.active{display:block}
@@ -319,6 +319,22 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 #tuto-step-num{font-size:.65rem;color:var(--tx2);text-align:right;margin-bottom:6px}
 /* HiveOS ❓ en noir */
 .theme-hiveos #btn-help,.theme-hiveos.day #btn-help{color:#000!important}
+
+/* ===== SIDEBAR ===== */
+#content-wrap{flex:1;overflow:hidden;display:flex;position:relative}
+#sidebar{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;padding:10px 8px;gap:2px;overflow-y:auto;z-index:50}
+.sb-section{font-size:.58rem;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;padding:12px 10px 4px;font-weight:700;opacity:.7}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--tx2);transition:background .2s,color .2s;position:relative;font-size:.78rem;font-family:'Space Mono',monospace;user-select:none;text-decoration:none}
+.sb-item:hover{background:var(--bg3);color:var(--tx)}
+.sb-item.active{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac);font-weight:700}
+.sb-icon{font-size:1.15rem;flex-shrink:0;width:24px;text-align:center}
+.sb-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-badge{min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font-size:.55rem;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;font-weight:700;flex-shrink:0}
+.sb-badge.hidden{display:none!important}
+.sb-divider{border:none;border-top:1px solid var(--brd);margin:6px 8px}
+/* Responsive */
+@media(max-width:639px){#sidebar{display:none!important}}
+@media(min-width:640px){#bottom-nav{display:none!important}}
 </style>
 </head>
 
@@ -341,6 +357,36 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 
 <!-- APP -->
 <div id="app">
+  <!-- SIDEBAR -->
+  <div id="content-wrap">
+  <nav id="sidebar">
+    <div class="sb-section">Navigation</div>
+    <div class="sb-item active" data-view="dashboard">
+      <span class="sb-icon">🏠</span>
+      <span class="sb-label">Dashboard</span>
+      <span class="sb-badge hidden" id="sb-badge-dashboard"></span>
+    </div>
+    <div class="sb-item" data-view="clients">
+      <span class="sb-icon">👥</span>
+      <span class="sb-label">Répertoire clients</span>
+    </div>
+    <div class="sb-item" data-view="relances">
+      <span class="sb-icon">🔔</span>
+      <span class="sb-label">Relances</span>
+      <span class="sb-badge hidden" id="sb-badge-relances"></span>
+    </div>
+    <hr class="sb-divider">
+    <div class="sb-section">Planning</div>
+    <div class="sb-item" data-view="agenda">
+      <span class="sb-icon">📅</span>
+      <span class="sb-label">Rendez-vous</span>
+    </div>
+    <div class="sb-item" data-view="taches">
+      <span class="sb-icon">✅</span>
+      <span class="sb-label">Tâches</span>
+      <span class="sb-badge hidden" id="sb-badge-taches"></span>
+    </div>
+  </nav>
   <div id="main">
     <!-- M1 DASHBOARD -->
     <div id="view-dashboard" class="view active"></div>
@@ -360,6 +406,7 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
     <div id="view-taches" class="view"></div>
   </div>
 
+  </div><!-- /content-wrap -->
   <!-- BOTTOM NAV -->
   <nav id="bottom-nav">
     <button class="nav-btn active" data-view="dashboard">
@@ -852,6 +899,7 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   $('view-'+v).classList.add('active');
   document.querySelectorAll('#bottom-nav .nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
+  document.querySelectorAll('#sidebar .sb-item').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
   if(v==='dashboard')renderDashboard();
   else if(v==='clients')renderClients();
   else if(v==='relances')renderRelances();
@@ -865,12 +913,11 @@ function updateBadges(){
   const retard=state.clients.reduce((n,c)=>n+(c.sousDossiers||[]).filter(sd=>relanceStatus(sd.relance)==='retard').length,0);
   const aujrd=state.clients.reduce((n,c)=>n+(c.sousDossiers||[]).filter(sd=>relanceStatus(sd.relance)==='aujourd-hui').length,0);
   const total=retard+aujrd;
-  const bd=$('badge-dashboard');const br=$('badge-relances');
-  if(total>0){bd.textContent=total;bd.classList.remove('hidden')}else{bd.classList.add('hidden')}
-  if(total>0){br.textContent=total;br.classList.remove('hidden')}else{br.classList.add('hidden')}
+  function setBadge(id,n){const el=$(id);if(!el)return;if(n>0){el.textContent=n;el.classList.remove('hidden')}else{el.classList.add('hidden')}}
+  setBadge('badge-dashboard',total);setBadge('badge-relances',total);
+  setBadge('sb-badge-dashboard',total);setBadge('sb-badge-relances',total);
   const tHautes=(state.taches||[]).filter(t=>!t.done&&!t.archived&&t.priorite==='haute').length;
-  const bt=$('badge-taches');
-  if(tHautes>0){bt.textContent=tHautes;bt.classList.remove('hidden')}else{bt.classList.add('hidden')}
+  setBadge('badge-taches',tHautes);setBadge('sb-badge-taches',tHautes);
 }
 
 /* ===== M1 DASHBOARD ===== */
@@ -1559,6 +1606,10 @@ function initEvents(){
   $('btn-help').addEventListener('click',startTutorial);
   document.addEventListener('click',e=>{if(!$('theme-wrap').contains(e.target))$('theme-menu').classList.add('hidden')});
 
+  // Sidebar nav
+  document.querySelectorAll('#sidebar .sb-item[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>switchView(btn.dataset.view));
+  });
   // Bottom nav
   document.querySelectorAll('#bottom-nav .nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>switchView(btn.dataset.view));
@@ -1734,12 +1785,12 @@ function initNotepadDrag(){
 
 /* ===== TUTORIAL INTERACTIF ===== */
 const TUTO_STEPS=[
-  {id:'header-logo',title:'Logo RMS Consulting',desc:'Identité visuelle de l'application. Cliquez sur le logo pour revenir au tableau de bord depuis n'importe quelle vue.'},
-  {id:'btn-notepad',title:'📝 Bloc-notes',desc:'Ouvre un bloc-notes flottant. Déplacez-le librement, redimensionnez-le depuis ses bords. Copiez son contenu ou envoyez-le par mail en un clic.'},
-  {id:'btn-theme',title:'🎨 Thèmes',desc:'9 thèmes visuels disponibles : HiveOS, RMS, Dracula, Matrix, Cyberpunk, Spectre… Chaque thème possède un mode jour et nuit.'},
-  {id:'btn-daynight',title:'☀️ / 🌙 Jour / Nuit',desc:'Bascule entre le mode sombre (nuit) et le mode clair (jour). Le réglage est mémorisé automatiquement pour votre prochain accès.'},
-  {id:'btn-save',title:'💾 Sauvegarde',desc:'Exportez vos données en JSON pour les sauvegarder ou les transférer. Importez un fichier existant ou téléchargez l'application complète en local.'},
-  {id:'btn-help',title:'❓ Tutoriel',desc:'Vous y êtes ! Relancez ce guide à tout moment pour redécouvrir les fonctionnalités. L'aide détaillée reste aussi accessible depuis ce bouton.'},
+  {id:"header-logo",  title:"Logo RMS Consulting", desc:"Logo de l’application RMS Consulting. Cliquez pour revenir au tableau de bord depuis n’importe quelle vue."},
+  {id:"btn-notepad",  title:"📝 Bloc-notes",       desc:"Ouvre un bloc-notes flottant. Déplacez-le, redimensionnez-le depuis ses coins. Copiez le contenu ou envoyez-le par mail en un clic."},
+  {id:"btn-theme",    title:"🎨 Thèmes",       desc:"9 thèmes visuels : HiveOS, RMS, Dracula, Matrix, Cyberpunk, Spectre… Chaque thème possède un mode jour et nuit."},
+  {id:"btn-daynight", title:"☀️ / 🌙 Jour / Nuit", desc:"Bascule entre le mode sombre (nuit) et le mode clair (jour). Le réglage est mémorisé automatiquement."},
+  {id:"btn-save",     title:"💾 Sauvegarde",        desc:"Exportez vos données en JSON, importez un fichier existant, ou téléchargez l’application complète en local."},
+  {id:"btn-help",     title:"❓ Tutoriel",          desc:"Vous y êtes ! Relancez ce guide à tout moment pour redécouvrir les fonctionnalités de l’application."},
 ];
 let _tutoStep=0;
 
