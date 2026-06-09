@@ -37,7 +37,7 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 /* ===== HEADER ===== */
 #header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--brd);flex-shrink:0}
 .theme-hiveos #header,.theme-hiveos.day #header{background:linear-gradient(135deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925)}
-#logo{display:flex;align-items:center;gap:8px;font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:1.1rem}
+#logo{display:flex;align-items:center;gap:8px;font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:1.1rem;flex:1}
 #logo-text{background:linear-gradient(90deg,var(--ac),var(--tx));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .theme-hiveos #logo-text,.theme-hiveos.day #logo-text{-webkit-text-fill-color:#fff;background:none}
 #header-btns{display:flex;align-items:center;gap:4px}
@@ -364,7 +364,7 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 
 
 /* ===== HEADER CENTER ===== */
-#header-center{flex:1;text-align:center;font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+#header-center{flex:0 0 auto;font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);pointer-events:none;white-space:nowrap;padding:0 14px}
 .theme-hiveos #header-center,.theme-hiveos.day #header-center{color:rgba(255,255,255,.9)}
 </style>
 </head>
