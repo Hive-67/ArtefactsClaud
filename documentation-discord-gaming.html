@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation — Template Discord Gaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d12;
+    --surface: #13131a;
+    --surface2: #1a1a24;
+    --border: #22222f;
+    --accent: #5865f2;
+    --red-dark: #FF4655;
+    --red-mid: #FF6B6B;
+    --red-light: #FF8E8E;
+    --green: #57F287;
+    --orange: #E67E22;
+    --pink: #EB459E;
+    --gray: #95A5A6;
+    --white: #FFFFFF;
+    --text: #dcdcf0;
+    --muted: #6b6b8a;
+    --text-sm: 0.85rem;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.2rem;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2rem;
+    line-height: 1.3;
+  }
+
+  .nav-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .nav-label {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    background: rgba(88,101,242,0.12);
+    color: var(--accent);
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    padding: 3rem 3.5rem;
+    max-width: 900px;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 1.5rem; }
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 4rem;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+    margin-top: 1.2rem;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: var(--text-sm);
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-blue { background: rgba(88,101,242,0.15); color: var(--accent); border: 1px solid rgba(88,101,242,0.3); }
+  .badge-green { background: rgba(87,242,135,0.1); color: var(--green); border: 1px solid rgba(87,242,135,0.3); }
+  .badge-red { background: rgba(255,70,85,0.1); color: var(--red-dark); border: 1px solid rgba(255,70,85,0.3); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card p { margin-bottom: 0; }
+
+  /* STRUCTURE */
+  .category {
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .category-header {
+    background: var(--surface2);
+    padding: 0.7rem 1.1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+  }
+
+  .category-header.admin { border-left: 3px solid var(--red-dark); color: var(--red-light); }
+  .category-header.community { border-left: 3px solid var(--accent); color: var(--accent); }
+  .category-header.game { border-left: 3px solid var(--green); color: var(--green); }
+  .category-header.util { border-left: 3px solid var(--orange); color: var(--orange); }
+
+  .channel-list {
+    padding: 0.5rem 0;
+  }
+
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    transition: background 0.15s;
+  }
+
+  .channel:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+
+  .channel-icon { font-size: 0.85rem; min-width: 18px; }
+
+  .channel-note {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--border);
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* ROLES TABLE */
+  .roles-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .role-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .role-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    min-width: 14px;
+  }
+
+  .role-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    min-width: 140px;
+  }
+
+  .role-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 80px;
+  }
+
+  .role-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* PERMISSIONS */
+  .perm-level {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .perm-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.1rem;
+    background: var(--surface2);
+  }
+
+  .perm-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    background: rgba(88,101,242,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .perm-title { font-weight: 600; font-size: 0.9rem; }
+  .perm-sub { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+
+  .perm-body {
+    padding: 0.8rem 1.1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 500px) { .perm-body { grid-template-columns: 1fr; } }
+
+  .perm-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .perm-item.yes { color: var(--green); }
+  .perm-item.no { color: var(--muted); text-decoration: line-through; opacity: 0.5; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    font-size: var(--text-sm);
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .callout-info { background: rgba(88,101,242,0.08); border: 1px solid rgba(88,101,242,0.2); }
+  .callout-warn { background: rgba(255,70,85,0.07); border: 1px solid rgba(255,70,85,0.2); }
+  .callout-tip { background: rgba(87,242,135,0.07); border: 1px solid rgba(87,242,135,0.2); }
+
+  .callout-icon { font-size: 1rem; min-width: 20px; }
+  .callout p { margin: 0; color: var(--text); }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* CODE */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">Discord Template</div>
+  <div class="sidebar-title">Gaming Server<br>Documentation</div>
+
+  <div class="nav-section">
+    <div class="nav-label">Introduction</div>
+    <a class="nav-link" href="#intro">À propos</a>
+    <a class="nav-link" href="#avant">Avant de commencer</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Structure</div>
+    <a class="nav-link" href="#architecture">Architecture complète</a>
+    <a class="nav-link" href="#jeux">Section Jeux</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Rôles</div>
+    <a class="nav-link" href="#roles">Tous les rôles</div>
+    <a class="nav-link" href="#gouvernance">Gouvernance</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Permissions</div>
+    <a class="nav-link" href="#permissions">Système de niveaux</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Personnalisation</div>
+    <a class="nav-link" href="#personnaliser">Modifier le template</a>
+    <a class="nav-link" href="#bots">Bots recommandés</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="section" id="intro">
+    <div class="section-tag">v1.0 — Template Gaming</div>
+    <h1>Documentation<br>Officielle</h1>
+    <p class="hero-desc">Template Discord Gaming clé en main, conçu pour les communautés de 500+ membres. Générique, scalable, professionnel.</p>
+    <div class="badge-row">
+      <span class="badge badge-blue">500+ membres</span>
+      <span class="badge badge-green">Multi-jeux</span>
+      <span class="badge badge-red">Clé en main</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎯 Ce que contient ce template</div>
+      <p>Une architecture complète de catégories et salons · Un système de rôles hiérarchisé avec codes couleurs · Un système de permissions par niveaux · Des sections jeux duplicables · Un vocal automatique via Voice Master</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- AVANT DE COMMENCER -->
+  <section class="section" id="avant">
+    <div class="section-tag">Prérequis</div>
+    <h2>Avant de commencer</h2>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <p>Ce template s'installe via un lien Discord officiel. En cliquant dessus, toute la structure se déploie automatiquement dans ton serveur. Tu n'as rien à recréer manuellement.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🤖 Bots à installer avant tout</div>
+      <p><strong>Carl-bot ou MEE6</strong> — pour la validation des règles et l'attribution automatique des rôles.<br>
+      <strong>Voice Master</strong> — pour les vocaux temporaires auto-créés par les membres.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <p>Installe les bots <strong>avant</strong> d'inviter des membres. Ça t'évitera de devoir tout reconfigurer après coup.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ARCHITECTURE -->
+  <section class="section" id="architecture">
+    <div class="section-tag">Structure</div>
+    <h2>Architecture complète</h2>
+    <p>Le serveur est organisé en blocs distincts avec des niveaux d'accès différents.</p>
+
+    <!-- ADMIN -->
+    <h3>🔒 Zone Admin — invisible pour la communauté</h3>
+
+    <div class="category">
+      <div class="category-header admin">📋 Logs</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> logs-messages <span class="channel-note">auto</span></div>
+        <div class="channel"><span class="channel-icon">#</span> logs-modifications <span class="channel-note">auto</span></div>
+        <div class="channel"><span class="channel-icon">#</span> logs-membres <span class="channel-note">auto</span></div>
+        <div class="channel"><span class="channel-icon">#</span> logs-sanctions <span class="channel-note">auto</span></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header admin">👮 Staff</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> staff-bienvenue</div>
+        <div class="channel"><span class="channel-icon">#</span> staff-règles-internes</div>
+        <div class="channel"><span class="channel-icon">#</span> staff-discussion</div>
+        <div class="channel"><span class="channel-icon">🗂</span> staff-gestion <span class="channel-note">forum</span></div>
+        <div class="channel"><span class="channel-icon">#</span> staff-signalements</div>
+        <div class="channel"><span class="channel-icon">#</span> staff-blacklist</div>
+      </div>
+    </div>
+
+    <!-- COMMUNAUTÉ -->
+    <h3>🌍 Zone Communauté — accessible aux membres validés</h3>
+
+    <div class="category">
+      <div class="category-header community">🏠 Accueil</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> bienvenue <span class="channel-note">visible sans rôle</span></div>
+        <div class="channel"><span class="channel-icon">#</span> règles <span class="channel-note">visible sans rôle</span></div>
+        <div class="channel"><span class="channel-icon">#</span> présentation</div>
+        <div class="channel"><span class="channel-icon">#</span> choix-des-rôles</div>
+        <div class="channel"><span class="channel-icon">#</span> nos-réseaux</div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header community">📣 Annonces</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> annonces-générales <span class="channel-note">staff only</span></div>
+        <div class="channel"><span class="channel-icon">#</span> annonces-events <span class="channel-note">staff only</span></div>
+        <div class="channel"><span class="channel-icon">#</span> partenariats <span class="channel-note">staff only</span></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header community">💬 Discussion</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> général</div>
+        <div class="channel"><span class="channel-icon">#</span> gaming-général</div>
+        <div class="channel"><span class="channel-icon">#</span> médias-clips</div>
+        <div class="channel"><span class="channel-icon">#</span> memes-humour</div>
+        <div class="channel"><span class="channel-icon">#</span> off-topic</div>
+      </div>
+    </div>
+
+    <!-- JEUX -->
+    <h3>🎮 Sections Jeux — une par jeu, accès par rôle</h3>
+
+    <div class="category">
+      <div class="category-header game">🎮 [Jeu 1] — Rôle requis</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> jeu1-annonces <span class="channel-note">staff only</span></div>
+        <div class="channel"><span class="channel-icon">#</span> jeu1-discussion</div>
+        <div class="channel"><span class="channel-icon">#</span> jeu1-lfg</div>
+        <div class="channel"><span class="channel-icon">🗂</span> jeu1-forum <span class="channel-note">forum</span></div>
+        <div class="channel"><span class="channel-icon">🔊</span> Vocal Jeu 1</div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header game">🎮 [Jeu 2] — Rôle requis</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> jeu2-annonces <span class="channel-note">staff only</span></div>
+        <div class="channel"><span class="channel-icon">#</span> jeu2-discussion</div>
+        <div class="channel"><span class="channel-icon">#</span> jeu2-lfg</div>
+        <div class="channel"><span class="channel-icon">🗂</span> jeu2-forum <span class="channel-note">forum</span></div>
+        <div class="channel"><span class="channel-icon">🔊</span> Vocal Jeu 2</div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header game">🎮 [Jeu 3] — Rôle requis</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> jeu3-annonces <span class="channel-note">staff only</span></div>
+        <div class="channel"><span class="channel-icon">#</span> jeu3-discussion</div>
+        <div class="channel"><span class="channel-icon">#</span> jeu3-lfg</div>
+        <div class="channel"><span class="channel-icon">🗂</span> jeu3-forum <span class="channel-note">forum</span></div>
+        <div class="channel"><span class="channel-icon">🔊</span> Vocal Jeu 3</div>
+      </div>
+    </div>
+
+    <!-- VOCAL & UTILITAIRES -->
+    <div class="category">
+      <div class="category-header util">🎙️ Vocal Général</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">➕</span> Créer un vocal <span class="channel-note">Voice Master</span></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header util">🛠️ Utilitaires</div>
+      <div class="channel-list">
+        <div class="channel"><span class="channel-icon">#</span> commandes-bots</div>
+        <div class="channel"><span class="channel-icon">#</span> suggestions</div>
+        <div class="channel"><span class="channel-icon">#</span> support</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION JEUX -->
+  <section class="section" id="jeux">
+    <div class="section-tag">Personnalisation</div>
+    <h2>Ajouter / Modifier une section Jeu</h2>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <p>Chaque section jeu est identique dans sa structure. Pour ajouter un nouveau jeu, il suffit de dupliquer une section existante et de renommer les salons et le rôle associé.</p>
+    </div>
+
+    <h3>Structure d'une section jeu</h3>
+    <p>Pour chaque jeu, crée une catégorie avec ces 5 éléments dans l'ordre :</p>
+    <div class="card">
+      <p>📢 <code>nomjeu-annonces</code> — réservé staff uniquement<br>
+      💬 <code>nomjeu-discussion</code> — discussion libre<br>
+      👥 <code>nomjeu-lfg</code> — recherche de groupe / organisation<br>
+      🗂️ <code>nomjeu-forum</code> — type Forum Discord (strats, guides, questions)<br>
+      🔊 <code>Vocal NomJeu</code> — vocal fixe dédié au jeu</p>
+    </div>
+
+    <h3>Créer le rôle associé</h3>
+    <p>Chaque section jeu doit avoir un rôle du même nom. Ce rôle est attribué via <code>#choix-des-rôles</code> et donne accès à toute la section. La couleur du rôle est libre — choisis une couleur en rapport avec l'univers du jeu.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- RÔLES -->
+  <section class="section" id="roles">
+    <div class="section-tag">Rôles</div>
+    <h2>Tous les rôles</h2>
+
+    <h3>🔒 Staff</h3>
+    <div class="roles-grid">
+      <div class="role-row">
+        <div class="role-color" style="background:#FF4655"></div>
+        <div class="role-name">🏛️ Fondateur</div>
+        <div class="role-hex">#FF4655</div>
+        <div class="role-desc">Accès total. Minimum 3, toujours en nombre impair.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#FF6B6B"></div>
+        <div class="role-name">⚙️ Administrateur</div>
+        <div class="role-hex">#FF6B6B</div>
+        <div class="role-desc">Gestion du serveur, bots, membres.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#FF8E8E"></div>
+        <div class="role-name">🛡️ Modérateur</div>
+        <div class="role-hex">#FF8E8E</div>
+        <div class="role-desc">Modération des salons, sanctions.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#FF6B6B"></div>
+        <div class="role-name">📣 Staff</div>
+        <div class="role-hex">#FF6B6B</div>
+        <div class="role-desc">Rôle ping uniquement. Tous les membres staff l'ont.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#57F287"></div>
+        <div class="role-name">🤖 Bot</div>
+        <div class="role-hex">#57F287</div>
+        <div class="role-desc">Attribué automatiquement aux bots.</div>
+      </div>
+    </div>
+
+    <h3>🌍 Communauté</h3>
+    <div class="roles-grid">
+      <div class="role-row">
+        <div class="role-color" style="background:#95A5A6"></div>
+        <div class="role-name">👋 Nouveau</div>
+        <div class="role-hex">#95A5A6</div>
+        <div class="role-desc">Attribué après validation des règles. Accès communauté.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#FFFFFF"></div>
+        <div class="role-name">✅ Membre</div>
+        <div class="role-hex">#FFFFFF</div>
+        <div class="role-desc">Membre confirmé. Attribué manuellement ou via bot.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#E67E22"></div>
+        <div class="role-name">⭐ Membre actif</div>
+        <div class="role-hex">#E67E22</div>
+        <div class="role-desc">Membres les plus actifs. Peut être automatisé via MEE6.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#EB459E"></div>
+        <div class="role-name">💎 VIP</div>
+        <div class="role-hex">#EB459E</div>
+        <div class="role-desc">Rôle spécial, attribué manuellement selon tes critères.</div>
+      </div>
+    </div>
+
+    <h3>🎮 Jeux</h3>
+    <div class="roles-grid">
+      <div class="role-row">
+        <div class="role-color" style="background:#8888ff"></div>
+        <div class="role-name">🎮 [Jeu 1]</div>
+        <div class="role-hex">Couleur libre</div>
+        <div class="role-desc">Débloque la section Jeu 1. Auto via choix-des-rôles.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#8888ff"></div>
+        <div class="role-name">🎮 [Jeu 2]</div>
+        <div class="role-hex">Couleur libre</div>
+        <div class="role-desc">Débloque la section Jeu 2. Auto via choix-des-rôles.</div>
+      </div>
+      <div class="role-row">
+        <div class="role-color" style="background:#8888ff"></div>
+        <div class="role-name">🎮 [Jeu 3]</div>
+        <div class="role-hex">Couleur libre</div>
+        <div class="role-desc">Débloque la section Jeu 3. Auto via choix-des-rôles.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- GOUVERNANCE -->
+  <section class="section" id="gouvernance">
+    <div class="section-tag">Conseil</div>
+    <h2>Gouvernance du serveur</h2>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <p>Cette section contient des conseils issus de l'expérience. Rien n'est obligatoire, mais ces pratiques évitent les conflits à long terme.</p>
+    </div>
+
+    <h3>Le rôle Fondateur</h3>
+    <p>Le rôle Fondateur donne un accès technique total au serveur — gestion des rôles, de la structure, des permissions. Il est là pour intervenir rapidement en cas de crise, sans passer par l'ensemble du staff.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <p><strong>Toujours un nombre impair de Fondateurs — minimum 3.</strong> Un nombre pair crée des égalités qui paralysent les décisions. 3, 5 ou 7 fondateurs maximum pour garder la structure légère.</p>
+    </div>
+
+    <h3>Hiérarchie ≠ pouvoir de décision</h3>
+    <p>Les Fondateurs ont plus de droits techniques que les Modérateurs. Mais sur les décisions collectives — règles, événements, sanctions importantes — tout le staff a le même poids de vote. Personne n'a plus de voix que les autres.</p>
+
+    <h3>Sur le rôle "Propriétaire"</h3>
+    <p>Discord attribue automatiquement un rôle Propriétaire au créateur du serveur. Il n'est pas nécessaire d'en faire un rôle visible avec couleur distincte. Deux options :</p>
+    <div class="card">
+      <p>✅ <strong>Option recommandée</strong> — Le propriétaire prend le rôle Fondateur comme les autres. Il se fond dans le staff sans se mettre en avant.<br><br>
+      ✅ <strong>Option alternative</strong> — Créer un rôle Fondateur discret, sans couleur visible, qui n'attire pas l'attention mais conserve tous les droits techniques.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PERMISSIONS -->
+  <section class="section" id="permissions">
+    <div class="section-tag">Accès</div>
+    <h2>Système de permissions par niveaux</h2>
+    <p>Le serveur fonctionne sur 4 niveaux d'accès progressifs.</p>
+
+    <div class="perm-level">
+      <div class="perm-header">
+        <span class="perm-num">NIVEAU 0</span>
+        <span class="perm-title">Aucun rôle — À l'arrivée</span>
+        <span class="perm-sub">Automatique</span>
+      </div>
+      <div class="perm-body">
+        <div class="perm-item yes">✓ #bienvenue</div>
+        <div class="perm-item yes">✓ #règles</div>
+        <div class="perm-item no">✗ Tout le reste</div>
+      </div>
+    </div>
+
+    <div class="perm-level">
+      <div class="perm-header">
+        <span class="perm-num">NIVEAU 1</span>
+        <span class="perm-title">Rôle Nouveau — Après validation des règles</span>
+        <span class="perm-sub">Via bot automatique</span>
+      </div>
+      <div class="perm-body">
+        <div class="perm-item yes">✓ Zone Accueil complète</div>
+        <div class="perm-item yes">✓ Annonces</div>
+        <div class="perm-item yes">✓ Discussion</div>
+        <div class="perm-item yes">✓ Vocal auto</div>
+        <div class="perm-item yes">✓ Utilitaires</div>
+        <div class="perm-item no">✗ Sections jeux</div>
+        <div class="perm-item no">✗ Zone staff</div>
+      </div>
+    </div>
+
+    <div class="perm-level">
+      <div class="perm-header">
+        <span class="perm-num">NIVEAU 2</span>
+        <span class="perm-title">Rôle Jeu — Choisi dans #choix-des-rôles</span>
+        <span class="perm-sub">Cumulable</span>
+      </div>
+      <div class="perm-body">
+        <div class="perm-item yes">✓ Tout le Niveau 1</div>
+        <div class="perm-item yes">✓ Section(s) jeu(x) choisi(s)</div>
+        <div class="perm-item no">✗ Autres sections jeux</div>
+        <div class="perm-item no">✗ Zone staff</div>
+      </div>
+    </div>
+
+    <div class="perm-level">
+      <div class="perm-header">
+        <span class="perm-num">NIVEAU 3</span>
+        <span class="perm-title">Rôle Staff — Attribué manuellement</span>
+        <span class="perm-sub">Fondateur / Admin / Modo</span>
+      </div>
+      <div class="perm-body">
+        <div class="perm-item yes">✓ Accès total selon grade</div>
+        <div class="perm-item yes">✓ Zone staff</div>
+        <div class="perm-item yes">✓ Logs</div>
+        <div class="perm-item yes">✓ Salons annonces</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PERSONNALISER -->
+  <section class="section" id="personnaliser">
+    <div class="section-tag">Guide</div>
+    <h2>Personnaliser ce template</h2>
+
+    <h3>Renommer les salons</h3>
+    <p>Tous les salons avec <code>[Jeu X]</code> ou <code>jeuX-</code> sont à renommer avec le nom de ton jeu. Exemple : <code>jeu1-discussion</code> → <code>destiny-discussion</code>.</p>
+
+    <h3>Ajouter une section jeu</h3>
+    <p>Duplique une catégorie jeu existante, renomme tous les salons, crée le rôle correspondant et configure les permissions pour que seul ce rôle voit la catégorie.</p>
+
+    <h3>Supprimer une section jeu</h3>
+    <p>Supprime la catégorie entière et le rôle associé. Aucun impact sur le reste du serveur.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <p>Le template est préconfiguré avec 3 sections jeux. Tu peux en avoir autant que tu veux — il n'y a pas de limite côté Discord, mais garde le serveur lisible.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- BOTS -->
+  <section class="section" id="bots">
+    <div class="section-tag">Outils</div>
+    <h2>Bots recommandés</h2>
+
+    <div class="card">
+      <div class="card-title">🤖 Carl-bot <span style="font-size:0.7rem;color:var(--muted);font-weight:400">— Gratuit</span></div>
+      <p>Validation des règles via bouton, attribution automatique des rôles jeux dans <code>#choix-des-rôles</code>, logs avancés, auto-modération.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔊 Voice Master <span style="font-size:0.7rem;color:var(--muted);font-weight:400">— Gratuit</span></div>
+      <p>Vocal temporaire auto-créé quand un membre rejoint <code>➕ Créer un vocal</code>. Le salon disparaît automatiquement quand il est vide. Aucun vocal mort qui traîne.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⭐ MEE6 <span style="font-size:0.7rem;color:var(--muted);font-weight:400">— Gratuit / Premium</span></div>
+      <p>Système de niveaux et d'XP. Permet d'attribuer automatiquement le rôle <code>Membre actif</code> selon l'activité. Optionnel mais bien pour la rétention.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <p>Carl-bot est suffisant pour 95% des besoins. Commence par lui avant d'ajouter d'autres bots.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    links.forEach(l => {
+      l.classList.remove('active');
+      if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

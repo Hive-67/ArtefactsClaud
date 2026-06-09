@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan d'action — Templates Discord</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #5865f2;
+    --accent2: #eb459e;
+    --accent3: #57f287;
+    --text: #e2e2f0;
+    --muted: #6b6b8a;
+    --done: #57f287;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+    background-image: 
+      radial-gradient(ellipse at 20% 10%, rgba(88,101,242,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(235,69,158,0.08) 0%, transparent 50%);
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 1.5rem;
+    background: var(--border);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* PHASES */
+  .phase {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .phase:nth-child(1) { animation-delay: 0.1s; }
+  .phase:nth-child(2) { animation-delay: 0.2s; }
+  .phase:nth-child(3) { animation-delay: 0.3s; }
+  .phase:nth-child(4) { animation-delay: 0.4s; }
+  .phase:nth-child(5) { animation-delay: 0.5s; }
+
+  .phase.active { border-color: var(--accent); }
+  .phase.completed { border-color: var(--accent3); opacity: 0.7; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.3rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .phase-header:hover { background: rgba(255,255,255,0.03); }
+
+  .phase-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 24px;
+  }
+
+  .phase-icon {
+    font-size: 1.2rem;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .phase-title {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .phase-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .phase-arrow {
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+    min-width: 16px;
+  }
+
+  .phase.open .phase-arrow { transform: rotate(90deg); }
+
+  .phase-body {
+    display: none;
+    padding: 0 1.3rem 1.3rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .phase.open .phase-body { display: block; }
+
+  .phase-desc {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 1rem 0 0.75rem;
+    line-height: 1.6;
+  }
+
+  /* TASKS */
+  .tasks { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .task:hover { background: rgba(88,101,242,0.08); border-color: rgba(88,101,242,0.3); }
+  .task.done { opacity: 0.5; }
+  .task.done .task-text { text-decoration: line-through; color: var(--muted); }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    min-width: 18px;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.65rem;
+  }
+
+  .task.done .task-check {
+    background: var(--accent3);
+    border-color: var(--accent3);
+    color: #000;
+  }
+
+  .task-content { flex: 1; }
+
+  .task-text {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .task-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .task-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  .badge-now { background: rgba(88,101,242,0.2); color: var(--accent); }
+  .badge-soon { background: rgba(235,69,158,0.15); color: var(--accent2); }
+  .badge-later { background: rgba(107,107,138,0.15); color: var(--muted); }
+  .badge-key { background: rgba(87,242,135,0.15); color: var(--accent3); }
+
+  /* PRODUCT GRID */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 500px) { .product-grid { grid-template-columns: 1fr; } }
+
+  .product-card {
+    padding: 0.9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .product-card .icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .product-card .name { font-size: 0.85rem; font-weight: 700; }
+  .product-card .detail { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.5; }
+
+  /* RESET */
+  .reset-btn {
+    margin-top: 2.5rem;
+    display: block;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">Projet actif</div>
+    <h1>Templates <span>Discord</span><br>Plan d'action</h1>
+    <p class="subtitle">4 serveurs · Documentation · Prompts IA · Mise en vente</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 tâche complétée</div>
+  </header>
+
+  <div id="phases">
+
+    <!-- PHASE 1 -->
+    <div class="phase" data-phase="1">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">01</span>
+        <span class="phase-icon">🎮</span>
+        <span class="phase-title">Serveur Gaming — Structure</span>
+        <div class="phase-meta">Semaine 1<br>Priorité max</div>
+        <span class="phase-arrow">▶</span>
+      </div>
+      <div class="phase-body">
+        <p class="phase-desc">On construit le serveur gaming de zéro. L'objectif : une structure professionnelle, prête à être exportée comme template Discord clé en main.</p>
+        <div class="tasks">
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Définir les catégories et salons</div>
+              <div class="task-sub">Accueil, règles, annonces, général, vocal, LFG, clips, off-topic…</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Créer les rôles et permissions</div>
+              <div class="task-sub">Admin, modérateur, membre, bot, nouveaux arrivants</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Créer le bot Discord sur le portail développeur</div>
+              <div class="task-sub">discord.com/developers → New Application → Bot → Récupérer le token</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Inviter le bot sur le serveur avec droits admin</div>
+              <div class="task-sub">OAuth2 → URL Generator → Cocher bot + Administrator → Ouvrir le lien</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Lancer le script Python sur Google Colab</div>
+              <div class="task-sub">Coller le token + l'ID serveur → Run → Structure créée automatiquement en 2-3 min</div>
+            </div>
+            <span class="task-badge badge-key">clé</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Soigner l'apparence du serveur</div>
+              <div class="task-sub">Icône, bannière, messages d'accueil formatés</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase" data-phase="2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">02</span>
+        <span class="phase-icon">📦</span>
+        <span class="phase-title">Serveur Gaming — Export & Packaging</span>
+        <div class="phase-meta">Semaine 1-2</div>
+        <span class="phase-arrow">▶</span>
+      </div>
+      <div class="phase-body">
+        <p class="phase-desc">Une fois le serveur prêt, on le package proprement pour la vente. C'est ici que le produit devient vendable.</p>
+        <div class="tasks">
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Générer le lien template Discord</div>
+              <div class="task-sub">Paramètres serveur → Template communautaire → Créer un modèle</div>
+            </div>
+            <span class="task-badge badge-key">clé</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Rédiger la documentation</div>
+              <div class="task-sub">Comment utiliser, modifier les rôles, changer les noms de salons, configurer les bots</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Créer le prompt IA dédié</div>
+              <div class="task-sub">Prompt qui connaît toute la structure du serveur — utilisable sur Claude, ChatGPT, Gemini</div>
+            </div>
+            <span class="task-badge badge-key">clé</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Définir les packs (Basic / Pro)</div>
+              <div class="task-sub">Basic = template seul / Pro = template + doc + prompt IA</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase" data-phase="3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">03</span>
+        <span class="phase-icon">🛒</span>
+        <span class="phase-title">Mise en vente — Gumroad</span>
+        <div class="phase-meta">Semaine 2</div>
+        <span class="phase-arrow">▶</span>
+      </div>
+      <div class="phase-body">
+        <p class="phase-desc">On publie proprement sur Gumroad. Une page qui donne envie d'acheter, pas juste un fichier balancé en ligne.</p>
+        <div class="tasks">
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Nettoyer la page Gumroad existante</div>
+              <div class="task-sub">Supprimer l'ancien produit nul, repartir proprement</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Créer la fiche produit Gaming</div>
+              <div class="task-sub">Titre accrocheur, description claire, screenshots du serveur, prix</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Uploader les fichiers du pack</div>
+              <div class="task-sub">Lien template + PDF doc + fichier prompt</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Fixer les prix des packs</div>
+              <div class="task-sub">Basic ~5€ / Pro ~12-15€ — tester et ajuster</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase" data-phase="4">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">04</span>
+        <span class="phase-icon">📣</span>
+        <span class="phase-title">Promotion — Réseaux & Bunker</span>
+        <div class="phase-meta">Semaine 2-3</div>
+        <span class="phase-arrow">▶</span>
+      </div>
+      <div class="phase-body">
+        <p class="phase-desc">Le produit existe, maintenant il faut que les gens le trouvent. On commence petit avec les ressources qu'on a déjà.</p>
+        <div class="tasks">
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Post de lancement sur le Bunker</div>
+              <div class="task-sub">600 membres = audience gratuite, commence par là</div>
+            </div>
+            <span class="task-badge badge-now">maintenant</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Post réseaux sociaux</div>
+              <div class="task-sub">Contenu prêt à copier-coller — Twitter/X, TikTok, Reddit r/discordapp</div>
+            </div>
+            <span class="task-badge badge-soon">ensuite</span>
+          </button>
+          <button class="task" onclick="toggleTask(this)">
+            <div class="task-check">✓</div>
+            <div class="task-content">
+              <div class="task-text">Courte vidéo de démo du serveur</div>
+              <div class="task-sub">30 secondes qui montrent le rendu — TikTok / YouTube Shorts</div>
+            </div>
+            <span class="task-badge badge-later">plus tard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="phase" data-phase="5">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">05</span>
+        <span class="phase-icon">🗺️</span>
+        <span class="phase-title">Suite — Les 3 autres serveurs</span>
+        <div class="phase-meta">Après le gaming</div>
+        <span class="phase-arrow">▶</span>
+      </div>
+      <div class="phase-body">
+        <p class="phase-desc">Une fois le serveur gaming en vente, on reproduit le même process pour les 3 autres. Le travail dur est déjà fait.</p>
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="icon">💼</div>
+            <div class="name">Professionnel</div>
+            <div class="detail">Équipes, freelances, startups. Salons projet, annonces, ressources.</div>
+          </div>
+          <div class="product-card">
+            <div class="icon">👨‍👩‍👧</div>
+            <div class="name">Famille / Amis</div>
+            <div class="detail">Proche, intime, fun. Salons photos, events, memories.</div>
+          </div>
+          <div class="product-card">
+            <div class="icon">🌐</div>
+            <div class="name">Communautaire</div>
+            <div class="detail">Créateurs, causes, projets collectifs. Structure flexible.</div>
+          </div>
+          <div class="product-card">
+            <div class="icon">🎯</div>
+            <div class="name">Bundle x4</div>
+            <div class="detail">Pack complet des 4 serveurs + 4 prompts. Prix réduit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">↺ Réinitialiser la progression</button>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'discord-plan-progress';
+
+  function saveProgress() {
+    const done = [];
+    document.querySelectorAll('.task').forEach((t, i) => {
+      if (t.classList.contains('done')) done.push(i);
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(done));
+    updateProgress();
+  }
+
+  function loadProgress() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    const done = JSON.parse(saved);
+    const tasks = document.querySelectorAll('.task');
+    done.forEach(i => {
+      if (tasks[i]) tasks[i].classList.add('done');
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.task').length;
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = all ? Math.round((done / all) * 100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `${done} / ${all} tâches complétées — ${pct}%`;
+  }
+
+  function toggleTask(btn) {
+    btn.classList.toggle('done');
+    saveProgress();
+  }
+
+  function togglePhase(header) {
+    const phase = header.parentElement;
+    phase.classList.toggle('open');
+  }
+
+  function resetAll() {
+    if (!confirm('Réinitialiser toute la progression ?')) return;
+    document.querySelectorAll('.task').forEach(t => t.classList.remove('done'));
+    localStorage.removeItem(STORAGE_KEY);
+    updateProgress();
+  }
+
+  // Ouvrir la phase 1 par défaut
+  document.querySelector('.phase').classList.add('open');
+
+  loadProgress();
+</script>
+</body>
+</html>
