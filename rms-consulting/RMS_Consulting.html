@@ -512,8 +512,13 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
   </div>
   <div id="tasks-float-body"></div>
   <div id="tasks-float-add-row">
-    <input type="text" id="tasks-float-input" placeholder="Nouvelle tâche…" autocomplete="off">
-    <button id="tasks-float-add-btn">+ Ajouter</button>
+    <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+      <input type="text" id="tasks-float-input" placeholder="Nouvelle tâche…" autocomplete="off">
+      <select id="tasks-float-client" style="font-size:.72rem;padding:5px 8px;width:100%">
+        <option value="">👤 Lier à un client (optionnel)</option>
+      </select>
+    </div>
+    <button id="tasks-float-add-btn" style="align-self:flex-start">+ Ajouter</button>
   </div>
   <div id="tasks-float-resize" title="Redimensionner">⤡</div>
 </div>
@@ -655,7 +660,7 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 </div>
 
 <!-- ===== MODAL: SAUVEGARDE ===== -->
-<div class="modal-overlay hidden" id="modal-save">
+<div class="modal-overlay centered hidden" id="modal-save">
   <div class="modal">
     <span class="modal-handle"></span>
     <button class="modal-close" id="modal-save-close">✕</button>
@@ -1929,7 +1934,9 @@ function renderTasksFloat(){
   body.innerHTML=actives.map(t=>{
     const cl=t.done?'tf-item tf-done':'tf-item';
     const prio=t.priorite==='haute'?'<span class="tf-prio-haute">URGENT</span>':'';
-    return '<div class="'+cl+'" data-tid="'+t.id+'"><div class="tf-cb'+(t.done?' checked':'') +'" data-check="'+t.id+'"></div><div class="tf-title">'+t.titre+'<br>'+prio+'</div></div>';
+    const client=t.clientId?(state.clients||[]).find(c=>c.id===t.clientId):null;
+    const clientTag=client?'<span style="font-size:.62rem;color:var(--ac);display:block;margin-top:3px">👤 '+esc(client.prenom)+' '+esc(client.nom)+'</span>':'';
+    return '<div class="'+cl+'" data-tid="'+t.id+'"><div class="tf-cb'+(t.done?' checked':'') +'" data-check="'+t.id+'"></div><div class="tf-title">'+esc(t.titre)+clientTag+prio+'</div></div>';
   }).join('');
   body.querySelectorAll('.tf-cb').forEach(cb=>{
     cb.addEventListener('click',()=>{
@@ -1938,9 +1945,22 @@ function renderTasksFloat(){
     });
   });
 }
+function populateTasksFloatClientSelect(){
+  const sel=$('tasks-float-client');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">👤 Lier à un client (optionnel)</option>';
+  (state.clients||[]).forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.id;
+    opt.textContent=c.prenom+' '+c.nom;
+    sel.appendChild(opt);
+  });
+  sel.value=cur;
+}
 function toggleTasksFloat(){
   const tf=$('tasks-float');
-  if(tf.classList.contains('hidden')){tf.classList.remove('hidden');renderTasksFloat();}
+  if(tf.classList.contains('hidden')){tf.classList.remove('hidden');populateTasksFloatClientSelect();renderTasksFloat();}
   else{tf.classList.add('hidden');}
 }
 function initTasksFloat(){
@@ -1949,10 +1969,11 @@ function initTasksFloat(){
   $('tasks-float-close').addEventListener('click',()=>$('tasks-float').classList.add('hidden'));
   $('tasks-float-add-btn').addEventListener('click',()=>{
     const inp=$('tasks-float-input');
+    const sel=$('tasks-float-client');
     const titre=inp.value.trim();
     if(!titre)return;
-    const t={id:'t'+Date.now(),titre,priorite:'normale',clientId:null,done:false,archived:false,createdAt:today()};
-    state.taches.push(t);persistState();inp.value='';renderTasksFloat();updateBadges();toast('Tache ajoutee');
+    const t={id:'t'+Date.now(),titre,priorite:'normale',clientId:sel.value||null,done:false,archived:false,createdAt:today()};
+    state.taches.push(t);persistState();inp.value='';sel.value='';renderTasksFloat();updateBadges();toast('Tache ajoutee');
   });
   $('tasks-float-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('tasks-float-add-btn').click();});
 }
