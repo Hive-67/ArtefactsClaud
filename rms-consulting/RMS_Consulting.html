@@ -2118,8 +2118,8 @@ function _sbExpand(){
 
 const TUTO_STEPS=[
   // ── Phase 1 : En-tête (6 étapes) ─────────────────────────────────────────
-  {id:"logo",           phase:"En-tête",     title:"🐝 Logo HiveOS",
-   desc:"Bienvenue ! Cliquez sur ce logo pour ouvrir la page d'informations HiveOS : fonctionnement local, synchronisation Drive et routine de sauvegarde."},
+  {id:"header-center",  phase:"En-tête",     title:"🐝 Logo HiveOS",
+   desc:"Bienvenue ! Cliquez sur ce bouton pour ouvrir la page d'informations HiveOS : fonctionnement local, synchronisation Drive et routine de sauvegarde."},
   {id:"btn-notepad",    phase:"En-tête",     title:"📝 Note",
    desc:"Ouvre un bloc-notes flottant. Prenez des notes rapides, copiez-les ou envoyez-les directement par e-mail en un clic."},
   {id:"btn-theme",      phase:"En-tête",     title:"🎨 Thème",
@@ -2194,7 +2194,7 @@ function _showTutoStep(){
   let tl,tt;
   if(s.placement==='right'){
     tl=r.right+pad+10;
-    tt=r.top+r.height/2-th/2;
+    tt=r.top+r.height/2-th/2-70;
     tl=Math.min(tl,window.innerWidth-tw-8);
     tt=Math.max(60,Math.min(tt,window.innerHeight-th-20));
   } else {
