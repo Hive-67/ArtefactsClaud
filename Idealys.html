@@ -30,7 +30,7 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-spectre{--bg:#0a0a0f;--bg2:#0f0f16;--bg3:#16161f;--bg4:#1e1e2a;--brd:#2a2a3a;--tx:#e8e8f0;--tx2:#9ba0aa;--ac:#4df0a0;--ok:#4df0a0;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
 .theme-spectre.day{--bg:#f0f7f4;--bg2:#e0eee8;--bg3:#cfddd8;--bg4:#bdd0cb;--brd:#1a6e5040;--tx:#0a1412;--tx2:#2e4a44;--ac:#1a6e50;--ok:#1a6e50;--warn:#8a6000;--danger:#cc0022}
 .theme-matrix{--bg:#050805;--bg2:#081008;--bg3:#0d180d;--bg4:#132013;--brd:#2bd90030;--tx:#2bd900;--tx2:#1e9900;--ac:#2bd900;--ok:#00ff88;--warn:#ffcc00;--danger:#ff3300;--font-h:'Press Start 2P',monospace}
-.theme-matrix.day{--bg:#f1faef;--bg2:#e1f2dc;--bg3:#cce6c5;--bg4:#b2d6aa;--brd:#197a0035;--tx:#10240a;--tx2:#315d24;--ac:#197a00;--ok:#006b38;--warn:#8a6000;--danger:#cc0022}
+.theme-matrix.day{--bg:#0d2a08;--bg2:#122e0c;--bg3:#183d10;--bg4:#1e4c14;--brd:#2bd90030;--tx:#ffffff;--tx2:#a8e890;--ac:#2bd900;--ok:#00ff88;--warn:#ffcc00;--danger:#ff3300}
 
 /* Grilles Spectre/Matrix */
 .theme-spectre::before,.theme-matrix::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(77,240,160,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(77,240,160,.03) 1px,transparent 1px);background-size:40px 40px}
@@ -704,7 +704,9 @@ function persistState(){try{localStorage.setItem('app_data_state',JSON.stringify
 function saveTheme(){try{localStorage.setItem('app-theme',ui.theme);localStorage.setItem('app-day-mode',String(ui.dayMode))}catch(e){}}
 function saveSidebarOrder(){try{localStorage.setItem('sidebar-order',JSON.stringify(ui.sidebarOrder||DEFAULT_NAV_ORDER))}catch(e){}}
 function applySidebarOrder(){
-  const order=ui.sidebarOrder||DEFAULT_NAV_ORDER;
+  const saved=ui.sidebarOrder||[];
+  const order=[...saved,...DEFAULT_NAV_ORDER.filter(v=>!saved.includes(v))];
+  ui.sidebarOrder=order;
   const sb=document.getElementById('sidebar');
   const toggle=document.getElementById('sidebar-toggle');
   order.forEach(view=>{const btn=sb.querySelector(`.nav-btn[data-view="${view}"]`);if(btn)sb.insertBefore(btn,toggle)});
