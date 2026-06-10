@@ -2512,7 +2512,10 @@ function renderRediger(){
     </div>
     <div id="rd-dest-tag" style="margin-top:8px;min-height:32px"></div>
 
-    <div class="section-title mt14">Message</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;margin-bottom:6px">
+      <div class="section-title" style="margin:0">Message</div>
+      <button class="btn btn-ghost btn-sm" id="rd-translate" style="font-size:.72rem;gap:4px">🇬🇧 Traduire en anglais</button>
+    </div>
     <textarea id="rd-body" class="rd-textarea" placeholder="Rédigez votre message ici…">${esc(draft)}</textarea>
     <div style="display:flex;justify-content:flex-end;margin-top:6px">
       <button class="btn btn-ghost btn-sm" id="rd-clear">🗑️ Effacer le brouillon</button>
@@ -2601,6 +2604,29 @@ function renderRediger(){
     rdBody.value='';
     try{store.removeItem('rms_message_draft');}catch(e){}
     toast('Brouillon effacé');
+  });
+
+  // Translate to English
+  $('rd-translate').addEventListener('click',async function(){
+    const txt=rdBody.value.trim();
+    if(!txt){toast('Aucun texte à traduire');return;}
+    const btn=$('rd-translate');
+    btn.disabled=true;
+    btn.textContent='⏳…';
+    try{
+      const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q='+encodeURIComponent(txt);
+      const resp=await fetch(url);
+      const data=await resp.json();
+      const translated=data[0].map(function(x){return x[0];}).join('');
+      rdBody.value=translated;
+      try{store.setItem('rms_message_draft',translated);}catch(e){}
+      toast('Traduit en anglais !');
+    }catch(e){
+      toast('Erreur de traduction — vérifiez votre connexion');
+    }finally{
+      btn.disabled=false;
+      btn.innerHTML='🇬🇧 Traduire en anglais';
+    }
   });
 
   // Save template
