@@ -315,14 +315,13 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 #tuto-tooltip{position:absolute;background:var(--bg2);border:2px solid var(--ac);border-radius:14px;padding:16px 18px;width:270px;z-index:2;box-shadow:0 8px 32px #0009;transition:left .28s ease,top .28s ease}
 #tuto-title{font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);margin-bottom:8px}
 #tuto-desc{font-size:.75rem;color:var(--tx2);line-height:1.55;margin-bottom:14px}
-#tuto-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#tuto-nav{display:flex;align-items:center;gap:8px}
 #tuto-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
 .tuto-dot{width:7px;height:7px;border-radius:50%;background:var(--bg4);transition:all .2s;display:inline-block}
 .tuto-dot.active{background:var(--ac);width:12px;border-radius:4px}
 #tuto-skip{background:transparent;border:none;color:var(--tx2);font-size:.68rem;cursor:pointer;font-family:'Space Mono',monospace;padding:4px;white-space:nowrap}
 #tuto-skip:hover{color:var(--tx)}
-#tuto-next{padding:7px 16px;background:var(--ac);color:#fff;border:none;border-radius:8px;font-family:'Space Mono',monospace;font-size:.72rem;cursor:pointer;font-weight:700;transition:filter .15s;white-space:nowrap}
-#tuto-next:hover{filter:brightness(1.2)}
+#tuto-tap-hint{font-size:.6rem;color:var(--tx2);text-align:center;margin-top:10px;font-family:'Space Mono',monospace;opacity:.65;letter-spacing:.04em}
 #tuto-step-num{font-size:.65rem;color:var(--tx2);text-align:right;margin-bottom:6px}
 /* HiveOS ❓ en noir */
 .theme-hiveos #btn-help,.theme-hiveos.day #btn-help{color:#000!important}
@@ -848,10 +847,10 @@ body.day #header-logo-light{display:inline-block}
     <div id="tuto-title"></div>
     <div id="tuto-desc"></div>
     <div id="tuto-nav">
-      <button id="tuto-skip">Passer</button>
+      <button id="tuto-skip">✕ Quitter</button>
       <div id="tuto-dots"></div>
-      <button id="tuto-next">Suivant →</button>
     </div>
+    <div id="tuto-tap-hint">👆 Appuyer n'importe où pour continuer</div>
   </div>
 </div>
 <!-- ===== MODAL: NOUVEAU RDV ===== -->
@@ -1977,7 +1976,6 @@ function initEvents(){
   // Help
   $('modal-help-close').addEventListener('click',()=>$('modal-help').classList.add('hidden'));
   $('modal-help').addEventListener('click',e=>{if(e.target===$('modal-help'))$('modal-help').classList.add('hidden')});
-  // tuto-next : géré par le listener global (tout clic avance)
   $('tuto-skip').addEventListener('click',function(e){e.stopPropagation();_endTuto();});
   // Avancer tuto sur TOUT clic, touche clavier ou touch
   document.addEventListener('click',function(e){
@@ -2118,8 +2116,8 @@ function _sbExpand(){
 
 const TUTO_STEPS=[
   // ── Phase 1 : En-tête (6 étapes) ─────────────────────────────────────────
-  {id:"header-center",  phase:"En-tête",     title:"🐝 HiveOS",
-   desc:"Cliquez ici pour ouvrir le guide HiveOS : fonctionnement local, synchronisation Drive, routine de sauvegarde et bloc-notes."},
+  {id:"header-center",  phase:"En-tête",     title:"🐝 Logo HiveOS",
+   desc:"Bienvenue ! Cliquez sur ce logo pour ouvrir la page d'informations HiveOS : fonctionnement local, synchronisation Drive et routine de sauvegarde."},
   {id:"btn-notepad",    phase:"En-tête",     title:"📝 Note",
    desc:"Ouvre un bloc-notes flottant. Prenez des notes rapides, copiez-les ou envoyez-les directement par e-mail en un clic."},
   {id:"btn-theme",      phase:"En-tête",     title:"🎨 Thème",
@@ -2188,7 +2186,6 @@ function _showTutoStep(){
   $('tuto-title').textContent=s.title;
   $('tuto-desc').textContent=s.desc;
   $('tuto-step-num').innerHTML='<span style="color:var(--ac);font-weight:700">'+s.phase+'</span> &nbsp;·&nbsp; '+(_tutoStep+1)+' / '+TUTO_STEPS.length;
-  $('tuto-next').textContent=_tutoStep<TUTO_STEPS.length-1?'Suivant →':'✓ Terminer';
   document.querySelectorAll('.tuto-dot').forEach((d,i)=>d.classList.toggle('active',i===_tutoStep));
   const tip=$('tuto-tooltip');
   const tw=270,th=190;
