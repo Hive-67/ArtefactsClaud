@@ -2960,7 +2960,7 @@ function sendCREmail(){
 
   var subject='CR Dashboard — '+now.toLocaleDateString('fr-FR');
   var body=lines.join('\n');
-  var mailto='mailto:rms-consulting@outlook.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  var mailto='mailto:rms-consulting@outlook.fr?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   window.open(mailto,'_self');
   toast('CR ouvert dans votre messagerie !');
 }
