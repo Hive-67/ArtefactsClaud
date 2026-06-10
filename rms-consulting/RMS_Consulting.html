@@ -320,6 +320,24 @@ body.theme-rms:not(.day) #fab{color:#000}
   .wd-num{font-size:1rem}
 }
 
+/* ===== REDIGER ===== */
+.rediger-dest-wrap{position:relative}
+.rediger-dest-results{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--brd);border-radius:0 0 10px 10px;z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 8px 20px #0005}
+.rediger-dest-item{padding:10px 14px;cursor:pointer;font-size:.8rem;border-bottom:1px solid var(--brd);transition:background .15s}
+.rediger-dest-item:last-child{border-bottom:none}
+.rediger-dest-item:hover,.rediger-dest-item:active{background:var(--bg3)}
+.rdi-name{font-weight:700;color:var(--tx)}
+.rdi-mail{font-size:.7rem;color:var(--tx2);margin-top:2px}
+#rd-body{width:100%;min-height:180px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:12px;font-size:.82rem;color:var(--tx);font-family:'Space Mono',monospace;resize:vertical;line-height:1.6;box-sizing:border-box}
+#rd-body:focus{outline:none;border-color:var(--ac)}
+.rediger-hist-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--brd)}
+.rediger-hist-item:last-child{border-bottom:none}
+.rediger-tpl-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--brd)}
+.rediger-tpl-row:last-child{border-bottom:none}
+.rediger-tpl-name{flex:1;font-size:.78rem;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd-textarea{width:100%;min-height:190px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:12px;font-size:.82rem;color:var(--tx);font-family:'Space Mono',monospace;resize:vertical;line-height:1.6;box-sizing:border-box;transition:border-color .2s}
+.rd-textarea:focus{outline:none;border-color:var(--ac)}
+
 /* ===== TUTORIAL ===== */
 #tuto-overlay{position:fixed;inset:0;z-index:2000;pointer-events:auto}
 #tuto-overlay.hidden{display:none!important}
@@ -527,6 +545,10 @@ body.day #header-logo-light{display:inline-block}
       <span class="sb-label">Tâches</span>
       <span class="sb-badge hidden" id="sb-badge-taches"></span>
     </div>
+    <div class="sb-item" data-view="rediger" data-tooltip="Rédiger">
+      <span class="sb-icon">✉️</span>
+      <span class="sb-label">Rédiger</span>
+    </div>
     <hr class="sb-divider">
     <div class="sb-item" data-view="domaines" data-tooltip="Domaines" style="margin-top:auto">
       <span class="sb-icon">🗂️</span>
@@ -552,6 +574,8 @@ body.day #header-logo-light{display:inline-block}
     <div id="view-agenda" class="view"></div>
     <!-- M7 TÂCHES -->
     <div id="view-taches" class="view"></div>
+    <!-- M9 REDIGER -->
+    <div id="view-rediger" class="view"></div>
   </div>
 
   </div><!-- /content-wrap -->
@@ -1102,7 +1126,7 @@ const STATUT_COLOR={
   "Clôturé":"badge-gray"
 };
 
-let state={clients:[],rdvs:[],taches:[],params:{profil:"Margaux",objectifRdvHebdo:5}};
+let state={clients:[],rdvs:[],taches:[],redigerHistorique:[],redigerTemplates:[],params:{profil:"Margaux",objectifRdvHebdo:5}};
 let ui={view:'dashboard',theme:'rms',dayMode:false,clientId:null,sdId:null,filterStatut:null,confirmCb:null,rdCb:null,agendaMode:'semaine',agendaDate:'',tachePrio:'normale',tacheFilter:'actives',editRdvId:null,domaineType:null};
 
 /* ===== STORAGE ===== */
@@ -1128,6 +1152,8 @@ function loadState(){
   }
   if(!state.rdvs)state.rdvs=[];
   if(!state.taches)state.taches=[];
+  if(!state.redigerHistorique)state.redigerHistorique=[];
+  if(!state.redigerTemplates)state.redigerTemplates=[];
   ui.agendaDate=today();
   try{const t=store.getItem('app-theme');const d=store.getItem('app-day-mode');if(t)ui.theme=t;if(d)ui.dayMode=d==='true';}catch(e){}
   try{const n=store.getItem('hiveos_notepad');if(n)$('notepad-ta').value=n;}catch(e){}
@@ -1220,6 +1246,7 @@ function switchView(v){
   else if(v==='agenda')renderAgenda();
   else if(v==='taches')renderTaches();
   else if(v==='domaines'){ui.domaineType=null;renderDomaines();}
+  else if(v==='rediger')renderRediger();
   updateBadges();
   $('fab').classList.toggle('hidden',v!=='clients'&&v!=='agenda'&&v!=='taches');
 }
@@ -2465,6 +2492,173 @@ function initTasksFloat(){
     if(e.key==='Escape'&&!overlay.classList.contains('hidden')){close();e.stopPropagation();}
   });
 })();
+
+/* ===== M9 REDIGER ===== */
+let _redigerDest=null;
+
+function renderRediger(){
+  const el=$('view-rediger');
+  const draft=store.getItem('rms_message_draft')||'';
+  const hist=(state.redigerHistorique||[]).slice().reverse();
+  const tpls=(state.redigerTemplates||[]);
+
+  el.innerHTML=`
+    <div style="font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:1.05rem;margin-bottom:16px">✉️ Rédiger</div>
+
+    <div class="section-title">Destinataire</div>
+    <div class="rediger-dest-wrap">
+      <input type="search" id="rd-search" placeholder="🔍 Rechercher un client…" autocomplete="off" style="background:var(--bg2);font-size:.9rem;width:100%">
+      <div id="rd-results" class="rediger-dest-results" style="display:none"></div>
+    </div>
+    <div id="rd-dest-tag" style="margin-top:8px;min-height:32px"></div>
+
+    <div class="section-title mt14">Message</div>
+    <textarea id="rd-body" class="rd-textarea" placeholder="Rédigez votre message ici…">${esc(draft)}</textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:6px">
+      <button class="btn btn-ghost btn-sm" id="rd-clear">🗑️ Effacer le brouillon</button>
+    </div>
+
+    <div style="margin-top:18px">
+      <button class="btn btn-primary" id="rd-send" style="width:100%;justify-content:center;font-size:.85rem">📨 Ouvrir dans ma messagerie</button>
+    </div>
+
+    <div class="section-title mt14">Templates sauvegardés</div>
+    ${tpls.length===0?`<div style="font-size:.72rem;color:var(--tx2);margin-bottom:6px">Aucun template.</div>`:''}
+    <div id="rd-tpl-list">
+    ${tpls.map(t=>`<div class="rediger-tpl-row">
+      <span class="rediger-tpl-name">📄 ${esc(t.nom)}</span>
+      <button class="btn btn-ghost btn-sm" data-load-tpl="${t.id}" style="font-size:.7rem">Charger</button>
+      <button class="btn btn-ghost btn-sm" data-del-tpl="${t.id}" style="font-size:.7rem;color:var(--danger)">✕</button>
+    </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm" id="rd-save-tpl" style="margin-top:6px">💾 Sauvegarder comme template</button>
+
+    <div class="section-title mt14">Historique des envois (${hist.length})</div>
+    ${hist.length===0?`<div class="empty" style="padding:12px 0"><span class="empty-icon">📋</span>Aucun envoi pour l\'instant</div>`:''}
+    <div>
+    ${hist.map(h=>`<div class="rediger-hist-item">
+      <span style="font-size:1rem;flex-shrink:0">👤</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;color:var(--tx);font-size:.8rem">${esc(h.clientNom)}</div>
+        <div style="color:var(--tx2);font-size:.68rem">${h.clientMail?esc(h.clientMail)+' &nbsp;·&nbsp; ':''} ${esc(fmtDatetime(h.date))}</div>
+      </div>
+    </div>`).join('')}
+    </div>
+  `;
+
+  _redigerDest=null;
+
+  const rdBody=$('rd-body');
+
+  // Draft persistence
+  rdBody.addEventListener('input',function(){
+    try{store.setItem('rms_message_draft',rdBody.value);}catch(e){}
+  });
+
+  // Client search
+  $('rd-search').addEventListener('input',function(){
+    const q=this.value.toLowerCase().trim();
+    const res=$('rd-results');
+    if(!q){res.style.display='none';return;}
+    const matches=state.clients.filter(function(c){
+      const full=(c.prenom+' '+c.nom).toLowerCase();
+      const rev=(c.nom+' '+c.prenom).toLowerCase();
+      return full.includes(q)||rev.includes(q)||(c.mail||'').toLowerCase().includes(q);
+    }).slice(0,6);
+    if(!matches.length){res.style.display='none';return;}
+    res.innerHTML=matches.map(function(c){
+      return '<div class="rediger-dest-item" data-cid="'+c.id+'">'
+        +'<div class="rdi-name">'+esc(c.prenom)+' '+esc(c.nom)+'</div>'
+        +'<div class="rdi-mail">'+(c.mail?esc(c.mail):'Pas d\'email')+'</div>'
+        +'</div>';
+    }).join('');
+    res.style.display='block';
+    res.querySelectorAll('.rediger-dest-item').forEach(function(item){
+      item.addEventListener('click',function(){
+        const c=getClient(item.dataset.cid);
+        if(!c)return;
+        _redigerDest=c;
+        $('rd-search').value='';
+        $('rd-results').style.display='none';
+        $('rd-dest-tag').innerHTML='<div style="display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--ac) 12%,transparent);border:1px solid var(--ac);border-radius:20px;padding:5px 14px;font-size:.78rem">'
+          +'<span>👤 '+esc(c.prenom)+' '+esc(c.nom)+(c.mail?' — '+esc(c.mail):'')+'</span>'
+          +'<button style="background:none;border:none;cursor:pointer;color:var(--tx2);font-size:.9rem;padding:0 2px" id="rd-dest-clear">✕</button>'
+          +'</div>';
+        $('rd-dest-clear').addEventListener('click',function(){_redigerDest=null;$('rd-dest-tag').innerHTML='';});
+      });
+    });
+  });
+
+  // Click outside closes dropdown
+  document.addEventListener('click',function(e){
+    const res=$('rd-results');
+    if(res&&!res.contains(e.target)&&e.target.id!=='rd-search')res.style.display='none';
+  });
+
+  // Clear draft
+  $('rd-clear').addEventListener('click',function(){
+    if(!rdBody.value.trim()){toast('Le brouillon est déjà vide');return;}
+    rdBody.value='';
+    try{store.removeItem('rms_message_draft');}catch(e){}
+    toast('Brouillon effacé');
+  });
+
+  // Save template
+  $('rd-save-tpl').addEventListener('click',function(){
+    const txt=rdBody.value.trim();
+    if(!txt){toast('Rédigez un message avant de sauvegarder');return;}
+    const nom=window.prompt('Nom du template :');
+    if(!nom||!nom.trim())return;
+    if(!state.redigerTemplates)state.redigerTemplates=[];
+    state.redigerTemplates.push({id:genId(),nom:nom.trim(),contenu:txt});
+    persistState();
+    toast('Template sauvegardé !');
+    renderRediger();
+  });
+
+  // Load / delete templates
+  el.querySelectorAll('[data-load-tpl]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      const t=(state.redigerTemplates||[]).find(function(x){return x.id===btn.dataset.loadTpl;});
+      if(!t)return;
+      rdBody.value=t.contenu;
+      try{store.setItem('rms_message_draft',t.contenu);}catch(e){}
+      toast('Template chargé !');
+    });
+  });
+  el.querySelectorAll('[data-del-tpl]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      state.redigerTemplates=(state.redigerTemplates||[]).filter(function(x){return x.id!==btn.dataset.delTpl;});
+      persistState();
+      toast('Template supprimé');
+      renderRediger();
+    });
+  });
+
+  // Send
+  $('rd-send').addEventListener('click',function(){
+    const body=rdBody.value.trim();
+    if(!body){toast('Rédigez un message avant d\'envoyer');return;}
+    if(!_redigerDest){toast('Choisissez un destinataire');return;}
+    if(!_redigerDest.mail){toast('Ce client n\'a pas d\'adresse email');return;}
+    const mailtoUrl='mailto:'+encodeURIComponent(_redigerDest.mail)+'?body='+encodeURIComponent(body);
+    window.open(mailtoUrl,'_self');
+    const entryDate=new Date().toISOString();
+    if(!state.redigerHistorique)state.redigerHistorique=[];
+    state.redigerHistorique.push({id:genId(),clientId:_redigerDest.id,clientNom:_redigerDest.prenom+' '+_redigerDest.nom,clientMail:_redigerDest.mail,date:entryDate});
+    const c=getClient(_redigerDest.id);
+    if(c){
+      if(!c.historique)c.historique=[];
+      c.historique.push({date:entryDate,texte:'Email envoyé : '+body.slice(0,80)+(body.length>80?'...':'')});
+    }
+    persistState();
+    toast('Message ouvert dans la messagerie !');
+    _redigerDest=null;
+    $('rd-dest-tag').innerHTML='';
+    $('rd-search').value='';
+    renderRediger();
+  });
+}
 
 /* ===== INIT ===== */
 loadState();
