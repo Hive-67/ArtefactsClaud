@@ -730,8 +730,12 @@ body.day #header-logo-light{display:inline-block}
       </select>
     </div>
     <div class="form-row">
-      <label>Revenus mensuels estimés (€)</label>
-      <input type="number" id="f-revenus" placeholder="ex: 3500">
+      <label>Revenus bruts mensuels (€)</label>
+      <input type="number" id="f-revenus-brut" placeholder="ex: 4500">
+    </div>
+    <div class="form-row">
+      <label>Revenus nets mensuels (€)</label>
+      <input type="number" id="f-revenus-net" placeholder="ex: 3500">
     </div>
     <div class="form-row">
       <label>Métier</label>
@@ -1423,12 +1427,26 @@ function renderClients(){
       </div>
       <div class="client-right">
         ${retard?'<span class="retard-dot" title="Relance en retard"></span>':''}
+        <button class="btn btn-ghost btn-sm client-del-btn" data-del="${c.id}" style="color:var(--danger);padding:4px 7px;font-size:.8rem" title="Supprimer ce client">🗑️</button>
         <span style="font-size:.6rem;color:var(--tx2)">›</span>
       </div>
     </div>`;
   }).join('');
   el.querySelectorAll('.client-card').forEach(card=>{
     card.addEventListener('click',()=>openClient(card.dataset.id));
+  });
+  el.querySelectorAll('.client-del-btn').forEach(btn=>{
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      const c=getClient(btn.dataset.del);
+      if(!c)return;
+      openConfirm('Supprimer '+c.prenom+' '+c.nom+' ?','Toutes les données de ce client seront effacées de manière irréversible.',function(){
+        state.clients=state.clients.filter(x=>x.id!==btn.dataset.del);
+        persistState();
+        renderClients();
+        toast('Client supprimé');
+      });
+    });
   });
 }
 
@@ -1519,7 +1537,8 @@ function renderClientPanel(c){
       ${c.mail?`<div class="info-block"><div class="info-block-label">Email</div><div class="info-block-val" style="font-size:.72rem">${esc(c.mail)}</div></div>`:''}
       ${c.situation?`<div class="info-block"><div class="info-block-label">Situation</div><div class="info-block-val">${esc(c.situation)}</div></div>`:''}
       ${c.metier?`<div class="info-block"><div class="info-block-label">Métier</div><div class="info-block-val">${esc(c.metier)}</div></div>`:''}
-      ${c.revenus?`<div class="info-block"><div class="info-block-label">Revenus/mois</div><div class="info-block-val">${Number(c.revenus).toLocaleString('fr-FR')} €</div></div>`:''}
+      ${c.revenusBrut?`<div class="info-block"><div class="info-block-label">Revenus bruts</div><div class="info-block-val">${Number(c.revenusBrut).toLocaleString('fr-FR')} €</div></div>`:(c.revenus?`<div class="info-block"><div class="info-block-label">Revenus bruts</div><div class="info-block-val">${Number(c.revenus).toLocaleString('fr-FR')} €</div></div>`:'')}
+      ${c.revenusNet?`<div class="info-block"><div class="info-block-label">Revenus nets</div><div class="info-block-val">${Number(c.revenusNet).toLocaleString('fr-FR')} €</div></div>`:''}
       ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Date de naissance</div><div class="info-block-val">${new Date(c.dateNaissance).toLocaleDateString('fr-FR')}</div></div>`:''}
       ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Âge</div><div class="info-block-val">${calcAge(c.dateNaissance)} ans</div></div>`:''}
       ${c.adresse?`<div class="info-block full"><div class="info-block-label">Adresse</div><div class="info-block-val" style="font-size:.78rem;font-weight:400;white-space:pre-line">${esc(c.adresse)}</div></div>`:''}
@@ -1663,7 +1682,8 @@ function openModalClient(id){
   $('f-mail').value=c?c.mail:'';
   $('f-datenaissance').value=c?c.dateNaissance||'':'';
   $('f-situation').value=c?c.situation:'';
-  $('f-revenus').value=c?c.revenus:'';
+  $('f-revenus-brut').value=c?c.revenusBrut||(c.revenus||''):'';
+  $('f-revenus-net').value=c?c.revenusNet||'':'';
   $('f-metier').value=c?c.metier||'':'';
   $('f-adresse').value=c?c.adresse||'':'';
   $('f-source').value=c?c.source:'';
@@ -1680,13 +1700,13 @@ function saveClient(){
   if(!prenom||!nom){toast('Prénom et nom requis');return;}
   if(id){
     const c=getClient(id);
-    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
+    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenusBrut:$('f-revenus-brut').value?Number($('f-revenus-brut').value):null,revenusNet:$('f-revenus-net').value?Number($('f-revenus-net').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
     persistState();
     $('panel-client-title').textContent=c.prenom+' '+c.nom;
     renderClientPanel(c);
     toast('Client modifié !');
   } else {
-    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
+    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenusBrut:$('f-revenus-brut').value?Number($('f-revenus-brut').value):null,revenusNet:$('f-revenus-net').value?Number($('f-revenus-net').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
     state.clients.push(c);
     persistState();
     toast('Client créé !');
@@ -2061,10 +2081,8 @@ function initEvents(){
 
   // Save modal
   $('modal-save-close').addEventListener('click',()=>$('modal-save').classList.add('hidden'));
-  $('modal-save').addEventListener('click',e=>{if(e.target===$('modal-save'))$('modal-save').classList.add('hidden')});
   $('modal-ndd-close').addEventListener('click',()=>$('modal-nouveau-dossier-domaine').classList.add('hidden'));
   $('modal-ndd-cancel').addEventListener('click',()=>$('modal-nouveau-dossier-domaine').classList.add('hidden'));
-  $('modal-nouveau-dossier-domaine').addEventListener('click',e=>{if(e.target===$('modal-nouveau-dossier-domaine'))$('modal-nouveau-dossier-domaine').classList.add('hidden');});
   $('save-copy-json').addEventListener('click',()=>{navigator.clipboard.writeText($('save-json').value);toast('JSON copié !')});
   $('save-dl-json').addEventListener('click',()=>dlJSON());
   $('save-dl-app').addEventListener('click',()=>dlApp());
@@ -2084,22 +2102,16 @@ function initEvents(){
   $('confirm-cancel').addEventListener('click',()=>{ui.confirmCb=null;$('modal-confirm').classList.add('hidden')});
   $('confirm-ok').addEventListener('click',()=>{if(ui.confirmCb)ui.confirmCb();ui.confirmCb=null;$('modal-confirm').classList.add('hidden')});
 
-  // Close panels on overlay tap (client panel)
-  $('modal-client').addEventListener('click',e=>{if(e.target===$('modal-client'))$('modal-client').classList.add('hidden')});
-  $('modal-sd').addEventListener('click',e=>{if(e.target===$('modal-sd'))$('modal-sd').classList.add('hidden')});
-  $('modal-contact').addEventListener('click',e=>{if(e.target===$('modal-contact'))$('modal-contact').classList.add('hidden')});
 
   // RDV modal
   $('modal-rdv-close').addEventListener('click',()=>$('modal-rdv').classList.add('hidden'));
   $('modal-rdv-cancel').addEventListener('click',()=>$('modal-rdv').classList.add('hidden'));
   $('modal-rdv-save').addEventListener('click',saveRdv);
-  $('modal-rdv').addEventListener('click',e=>{if(e.target===$('modal-rdv'))$('modal-rdv').classList.add('hidden')});
 
   // Tache modal
   $('modal-tache-close').addEventListener('click',()=>$('modal-tache').classList.add('hidden'));
   $('modal-tache-cancel').addEventListener('click',()=>$('modal-tache').classList.add('hidden'));
   $('modal-tache-save').addEventListener('click',saveTache);
-  $('modal-tache').addEventListener('click',e=>{if(e.target===$('modal-tache'))$('modal-tache').classList.add('hidden')});
   document.querySelectorAll('#modal-tache [data-p]').forEach(btn=>{
     btn.addEventListener('click',()=>{ui.tachePrio=btn.dataset.p;document.querySelectorAll('#modal-tache [data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===ui.tachePrio))});
   });
