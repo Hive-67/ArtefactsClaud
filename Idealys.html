@@ -128,6 +128,9 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 /* ===== DASHBOARD ===== */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
 .stat-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.stat-card[data-filter]{cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.stat-card[data-filter]:hover{border-color:var(--ac)}
+.stat-card.active{border-color:var(--ac)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 25%,transparent)}
 .stat-val{font-size:2rem;font-weight:700;color:var(--ac);font-family:var(--font-h,'Syne',sans-serif)}
 .stat-label{font-size:.72rem;color:var(--tx2)}
 .dash-section{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px}
@@ -753,7 +756,7 @@ let ui={
   ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
-  tourStep:0,sidebarOrder:null,filterTag:null
+  tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null
 };
 const DEFAULT_NAV_ORDER=['dashboard','idees','projets','ruche','kanban','liste','prompts'];
 
@@ -833,13 +836,40 @@ function renderDashboard(){
       </div>
     </div>`:''}
     <div class="dash-grid">
-      <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-label">Idées totales</div></div>
-      <div class="stat-card"><div class="stat-val" style="color:var(--ac)">${projCount}</div><div class="stat-label">📁 Projets</div></div>
-      <div class="stat-card"><div class="stat-val" style="color:var(--warn)">${byS.in_progress||0}</div><div class="stat-label">🔥 En cours</div></div>
-      <div class="stat-card"><div class="stat-val" style="color:#ffb86c">${byS.paused||0}</div><div class="stat-label">⏸️ En pause</div></div>
-      <div class="stat-card"><div class="stat-val" style="color:var(--ok)">${byS.done||0}</div><div class="stat-label">✅ Terminées</div></div>
+      <div class="stat-card${ui.dashFilter==='all'?' active':''}" data-filter="all"><div class="stat-val">${total}</div><div class="stat-label">Idées totales</div></div>
+      <div class="stat-card${ui.dashFilter==='project'?' active':''}" data-filter="project"><div class="stat-val" style="color:var(--ac)">${projCount}</div><div class="stat-label">📁 Projets</div></div>
+      <div class="stat-card${ui.dashFilter==='in_progress'?' active':''}" data-filter="in_progress"><div class="stat-val" style="color:var(--warn)">${byS.in_progress||0}</div><div class="stat-label">🔥 En cours</div></div>
+      <div class="stat-card${ui.dashFilter==='paused'?' active':''}" data-filter="paused"><div class="stat-val" style="color:#ffb86c">${byS.paused||0}</div><div class="stat-label">⏸️ En pause</div></div>
+      <div class="stat-card${ui.dashFilter==='done'?' active':''}" data-filter="done"><div class="stat-val" style="color:var(--ok)">${byS.done||0}</div><div class="stat-label">✅ Terminées</div></div>
       <div class="stat-card"><div class="stat-val">${pct}%</div><div class="stat-label">Progression</div><div class="progress-bar mt8"><div class="progress-fill" style="width:${pct}%"></div></div></div>
     </div>
+    ${(()=>{
+      if(!ui.dashFilter)return'';
+      let items=[];
+      if(ui.dashFilter==='all')items=state.ideas;
+      else if(ui.dashFilter==='project')items=state.ideas.filter(i=>i.type==='project');
+      else items=state.ideas.filter(i=>i.status===ui.dashFilter);
+      const labels={'all':'Toutes les idées','project':'📁 Projets','in_progress':'🔥 En cours','paused':'⏸️ En pause','done':'✅ Terminées'};
+      if(!items.length)return`<div class="dash-section"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">${labels[ui.dashFilter]}</h3><button class="btn btn-sm btn-ghost" id="dash-flt-close">✕</button></div><p style="font-size:.78rem;color:var(--tx2);font-style:italic">Aucun élément.</p></div>`;
+      return`<div class="dash-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="margin:0">${labels[ui.dashFilter]} <span style="font-size:.72rem;color:var(--tx2);font-weight:400">(${items.length})</span></h3>
+          <button class="btn btn-sm btn-ghost" id="dash-flt-close">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          ${items.map(i=>{const st=STATUSES.find(s=>s.id===i.status)||STATUSES[0];const pr=PRIORITIES.find(p=>p.id===i.priority)||PRIORITIES[1];const isProj=i.type==='project';const tasks=i.steps||[];const done=isProj?tasks.reduce((a,t)=>(t.done?1:0)+a+(t.subtasks||[]).filter(s=>s.done).length,0):tasks.filter(s=>s.done).length;const tot=isProj?tasks.reduce((a,t)=>a+1+(t.subtasks||[]).length,0):tasks.length;return`<div class="idea-mini dash-flt-item" data-id="${i.id}" style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;flex-direction:column;align-items:flex-start;gap:5px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:7px;width:100%">
+              <span style="width:9px;height:9px;border-radius:50%;background:${i.color||st.color};flex-shrink:0"></span>
+              <span style="flex:1;font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.title)}</span>
+              ${isProj?'<span class="project-pill">proj</span>':''}
+              <span style="font-size:.72rem">${pr.emoji}</span>
+            </div>
+            ${tot?`<div style="width:100%"><div class="progress-bar"><div class="progress-fill" style="width:${Math.round(done/tot*100)}%;background:${i.color||st.color}"></div></div><div style="font-size:.62rem;color:var(--tx2);margin-top:2px;text-align:right">${done}/${tot}</div></div>`:''}
+            ${i.description?`<div style="font-size:.72rem;color:var(--tx2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${esc(i.description)}</div>`:''}
+          </div>`}).join('')}
+        </div>
+      </div>`;
+    })()}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-wrap:wrap">
       <div class="dash-section">
         <h3>Par statut</h3>
@@ -881,6 +911,9 @@ function renderDashboard(){
           <button class="idea-card-btn done-del" data-id="${i.id}" title="Supprimer">🗑️</button>
         </div>`).join('')}
     </div>`;
+  el.querySelectorAll('.stat-card[data-filter]').forEach(card=>card.addEventListener('click',()=>{ui.dashFilter=ui.dashFilter===card.dataset.filter?null:card.dataset.filter;renderDashboard()}));
+  el.querySelectorAll('.dash-flt-item').forEach(item=>item.addEventListener('click',()=>openIdeaModal(item.dataset.id)));
+  const fltClose=el.querySelector('#dash-flt-close');if(fltClose)fltClose.addEventListener('click',()=>{ui.dashFilter=null;renderDashboard()});
   el.querySelectorAll('.idea-mini[data-id]').forEach(el2=>el2.addEventListener('click',()=>openIdeaModal(el2.dataset.id)));
   el.querySelector('#dash-add-btn').addEventListener('click',()=>openIdeaModal());
   el.querySelectorAll('.tag-dash-chip').forEach(chip=>chip.addEventListener('click',()=>{ui.filterTag=chip.dataset.tag;switchView('projets')}));
