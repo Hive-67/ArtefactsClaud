@@ -362,6 +362,12 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .proj-sub-add input:focus,.proj-add-task input:focus{border-color:var(--ac)}
 .proj-add-task input{font-size:.8rem;padding:7px 12px;border-radius:8px}
 .proj-gauges{margin-bottom:10px}
+.rush-section-title{font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.85rem;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.rush-count{background:var(--bg3);color:var(--tx2);font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.rush-empty{font-size:.78rem;color:var(--tx2);font-style:italic;margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:8px}
+.rush-ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:12px}
+.rush-idea-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px;transition:border-color .2s}
+.rush-idea-card:hover{border-color:var(--ac)}
 
 /* ===== CONFIRM ===== */
 #confirm-modal .modal{max-width:380px}
@@ -1736,7 +1742,7 @@ function transformToProject(id){
   idea.steps=(idea.steps||[]).map(s=>({...s,subtasks:s.subtasks||[]}));
   idea.updatedAt=new Date().toISOString();persistState();
   toast('📁 Transformé en projet !');
-  switchView('projets');
+  if(ui.view==='projets')renderProjets();else switchView('projets');
 }
 
 function toggleTask(ideaId,taskId){
@@ -1767,36 +1773,76 @@ function projTaskHTML(ideaId,task){
   </div>`;
 }
 
+function rushIdeaCardHTML(idea){
+  const st=STATUSES.find(s=>s.id===idea.status)||STATUSES[0];
+  const pr=PRIORITIES.find(p=>p.id===idea.priority)||PRIORITIES[0];
+  return`<div class="rush-idea-card" data-id="${idea.id}">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+      <span class="proj-status-dot" style="background:${st.color}" title="${st.label}"></span>
+      <span style="flex:1;font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(idea.title)}</span>
+      <span style="font-size:.75rem">${pr.emoji}</span>
+    </div>
+    ${idea.scores?`<div style="margin-top:6px">${gaugeMiniHTML(idea.scores)}</div>`:''}
+    <div style="display:flex;gap:4px;margin-top:8px;justify-content:flex-end">
+      <button class="idea-card-btn ri-edit" data-id="${idea.id}" title="Modifier">✏️</button>
+      <button class="btn btn-sm btn-primary ri-toproj" data-id="${idea.id}" title="Transformer en projet">📁 → Projet</button>
+      <button class="idea-card-btn ri-del" data-id="${idea.id}" title="Supprimer">🗑️</button>
+    </div>
+  </div>`;
+}
+
 function renderProjets(){
   const el=document.getElementById('view-projets');
+  const ideas=state.ideas.filter(i=>i.type!=='project');
   const projects=state.ideas.filter(i=>i.type==='project');
-  if(!projects.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📁</div><p>Aucun projet pour l'instant.</p><p style="font-size:.75rem;color:var(--tx2);margin-top:6px">Transforme une idée en projet depuis l'onglet 💡 Idées.</p></div>`;
-    return;
+
+  let html='';
+
+  // Section Idées
+  html+=`<div class="rush-section-title">💡 Idées <span class="rush-count">${ideas.length}</span></div>`;
+  if(!ideas.length){
+    html+=`<p class="rush-empty">Aucune idée. Capture-en une depuis l'onglet 💡 ou le bouton rapide.</p>`;
+  }else{
+    html+=`<div class="rush-ideas-grid">${ideas.map(rushIdeaCardHTML).join('')}</div>`;
   }
-  el.innerHTML=projects.map(proj=>{
-    const tasks=proj.steps||[];
-    const done=tasks.reduce((a,t)=>(t.done?1:0)+a+(t.subtasks||[]).filter(s=>s.done).length,0);
-    const total=tasks.reduce((a,t)=>a+1+(t.subtasks||[]).length,0);
-    const pct=total?Math.round(done/total*100):0;
-    const st=STATUSES.find(s=>s.id===proj.status)||STATUSES[0];
-    return`<div class="proj-card" data-id="${proj.id}">
-      <div class="proj-card-header">
-        <span class="proj-status-dot" style="background:${st.color}" title="${st.label}"></span>
-        <span class="proj-title">${esc(proj.title)}</span>
-        <button class="idea-card-btn pc-edit" data-id="${proj.id}" title="Modifier">✏️</button>
-        <button class="idea-card-btn pc-del" data-id="${proj.id}" title="Supprimer">🗑️</button>
-      </div>
-      ${proj.description?`<p class="proj-desc">${esc(proj.description)}</p>`:''}
-      ${proj.scores?`<div class="proj-gauges">${gaugeMiniHTML(proj.scores)}</div>`:''}
-      ${total>0?`<div class="proj-progress-bar"><div style="width:${pct}%;background:var(--ac)"></div></div><div class="proj-progress-lbl">${done} / ${total}${pct===100?' ✅':''}</div>`:''}
-      <div class="proj-tasks">${tasks.map(t=>projTaskHTML(proj.id,t)).join('')}</div>
-      <div class="proj-add-task">
-        <input type="text" class="pt-input" placeholder="+ Ajouter une tâche…" data-idea="${proj.id}" id="pti-${proj.id}">
-        <button class="btn btn-sm btn-primary pt-add-btn" data-idea="${proj.id}">Ajouter</button>
-      </div>
-    </div>`;
-  }).join('');
+
+  // Section Projets
+  html+=`<div class="rush-section-title" style="margin-top:28px">📁 Projets <span class="rush-count">${projects.length}</span></div>`;
+  if(!projects.length){
+    html+=`<p class="rush-empty">Aucun projet. Transforme une idée en projet avec le bouton 📁 → Projet.</p>`;
+  }else{
+    html+=projects.map(proj=>{
+      const tasks=proj.steps||[];
+      const done=tasks.reduce((a,t)=>(t.done?1:0)+a+(t.subtasks||[]).filter(s=>s.done).length,0);
+      const total=tasks.reduce((a,t)=>a+1+(t.subtasks||[]).length,0);
+      const pct=total?Math.round(done/total*100):0;
+      const st=STATUSES.find(s=>s.id===proj.status)||STATUSES[0];
+      return`<div class="proj-card" data-id="${proj.id}">
+        <div class="proj-card-header">
+          <span class="proj-status-dot" style="background:${st.color}" title="${st.label}"></span>
+          <span class="proj-title">${esc(proj.title)}</span>
+          <button class="idea-card-btn pc-edit" data-id="${proj.id}" title="Modifier">✏️</button>
+          <button class="idea-card-btn pc-del" data-id="${proj.id}" title="Supprimer">🗑️</button>
+        </div>
+        ${proj.description?`<p class="proj-desc">${esc(proj.description)}</p>`:''}
+        ${proj.scores?`<div class="proj-gauges">${gaugeMiniHTML(proj.scores)}</div>`:''}
+        ${total>0?`<div class="proj-progress-bar"><div style="width:${pct}%;background:var(--ac)"></div></div><div class="proj-progress-lbl">${done} / ${total}${pct===100?' ✅':''}</div>`:''}
+        <div class="proj-tasks">${tasks.map(t=>projTaskHTML(proj.id,t)).join('')}</div>
+        <div class="proj-add-task">
+          <input type="text" class="pt-input" placeholder="+ Ajouter une tâche…" data-idea="${proj.id}" id="pti-${proj.id}">
+          <button class="btn btn-sm btn-primary pt-add-btn" data-idea="${proj.id}">Ajouter</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  el.innerHTML=html;
+
+  // Listeners idées
+  el.querySelectorAll('.ri-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(b.dataset.id)));
+  el.querySelectorAll('.ri-toproj').forEach(b=>b.addEventListener('click',()=>transformToProject(b.dataset.id)));
+  el.querySelectorAll('.ri-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer l\'idée ?','Cette action est irréversible.',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderProjets()})));
+  // Listeners projets
   el.querySelectorAll('.pc-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(b.dataset.id)));
   el.querySelectorAll('.pc-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer le projet ?','Cette action est irréversible.',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderProjets()})));
   el.querySelectorAll('.pt-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('pti-'+b.dataset.idea);const t=inp.value.trim();if(!t)return;addTask(b.dataset.idea,t);inp.value='';renderProjets()}));
