@@ -45,9 +45,39 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-terminal .nav-btn.active,.theme-terminal.day .nav-btn.active,
 .theme-picsou .nav-btn.active,.theme-picsou.day .nav-btn.active,
 .theme-spectre .nav-btn.active{color:#000}
-.theme-spectre .btn-primary,.theme-spectre.day .btn-primary{color:#000}
+.theme-spectre .btn-primary,.theme-spectre.day .btn-primary,
+.theme-matrix .btn-primary,.theme-matrix.day .btn-primary,
+.theme-terminal .btn-primary,
+.theme-picsou .btn-primary{color:#000}
 .theme-matrix .ruche-toolbar .btn.active,.theme-terminal .ruche-toolbar .btn.active,
 .theme-picsou .ruche-toolbar .btn.active,.theme-spectre .ruche-toolbar .btn.active{color:#000}
+/* Boutons icône et Kanban edit sur accent clair */
+.theme-matrix .kanban-edit-btn:hover,.theme-matrix.day .kanban-edit-btn:hover,
+.theme-terminal .kanban-edit-btn:hover,
+.theme-picsou .kanban-edit-btn:hover,
+.theme-spectre .kanban-edit-btn:hover,
+.theme-matrix .idea-card-btn:hover,.theme-matrix.day .idea-card-btn:hover,
+.theme-terminal .idea-card-btn:hover,
+.theme-picsou .idea-card-btn:hover,
+.theme-spectre .idea-card-btn:hover{color:#000}
+/* Chips de tag actifs : texte noir sur accent clair */
+.theme-matrix .tag-filter-chip.active,.theme-matrix.day .tag-filter-chip.active,
+.theme-terminal .tag-filter-chip.active,
+.theme-picsou .tag-filter-chip.active,
+.theme-spectre .tag-filter-chip.active,
+.theme-matrix .tag-dash-chip:hover,.theme-matrix.day .tag-dash-chip:hover,
+.theme-terminal .tag-dash-chip:hover,
+.theme-picsou .tag-dash-chip:hover,
+.theme-spectre .tag-dash-chip:hover,
+.theme-matrix .tag-chip.clickable:focus,.theme-matrix.day .tag-chip.clickable:focus,
+.theme-picsou .tag-chip.clickable:focus,
+.theme-spectre .tag-chip.clickable:focus{color:#000}
+/* Badges de priorité en mode jour : lisibilité */
+.theme-hiveos.day .priority-badge,.theme-problue.day .priority-badge,.theme-bleu.day .priority-badge,
+.theme-dracula.day .priority-badge,.theme-terminal.day .priority-badge,
+.theme-picsou.day .priority-badge,.theme-cyberpunk.day .priority-badge,
+.theme-spectre.day .priority-badge,.theme-matrix.day .priority-badge,
+.theme-windows95.day .priority-badge{color:inherit}
 
 /* ===== HEADER ===== */
 #header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--brd);flex-shrink:0;transition:transform .3s}
