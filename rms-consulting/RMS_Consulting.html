@@ -17,7 +17,7 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 /* ===== THEMES ===== */
 .theme-hiveos{--bg:#111;--bg2:#1c1c1c;--bg3:#262626;--bg4:#303030;--brd:#7d206f44;--tx:#f5f5f5;--tx2:#b8a7b5;--ac:#7d206f;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
 .theme-hiveos.day{--bg:#fff7fb;--bg2:#f8eaf2;--bg3:#efd7e6;--bg4:#e4c3d7;--brd:#7d206f33;--tx:#180812;--tx2:#5f4057;--ac:#9a145f;--ok:#197a00;--warn:#8a6000;--danger:#cc0022}
-.theme-rms{--bg:#050d16;--bg2:#091828;--bg3:#0d2236;--bg4:#152e4a;--brd:#00b4d840;--tx:#ffffff;--tx2:#5aa8cc;--ac:#00b4d8;--ok:#2ed573;--warn:#ffa502;--danger:#ff6b81;--font-h:'Syne',sans-serif}
+.theme-rms{--bg:#050d16;--bg2:#091828;--bg3:#0d2236;--bg4:#152e4a;--brd:#00b4d840;--tx:#ffffff;--tx2:#b8c0c8;--ac:#00b4d8;--ok:#2ed573;--warn:#ffa502;--danger:#ff6b81;--font-h:'Syne',sans-serif}
 .theme-rms.day{--bg:#f0f9ff;--bg2:#daf2fc;--bg3:#b0e4f8;--bg4:#82d4f5;--brd:#00b4d840;--tx:#021624;--tx2:#065a7e;--ac:#0094b4;--ok:#1a6e48;--warn:#9a6400;--danger:#b62025}
 .theme-dracula{--bg:#282a36;--bg2:#21222c;--bg3:#44475a;--bg4:#6272a4;--brd:#44475a;--tx:#f8f8f2;--tx2:#b8bdd9;--ac:#ff79c6;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
 .theme-dracula.day{--bg:#fff5fb;--bg2:#f4e8f2;--bg3:#e8d7e6;--bg4:#d7c1d2;--brd:#b58aa8;--tx:#21121d;--tx2:#65485c;--ac:#9a0060;--ok:#197a00;--warn:#8a6000;--danger:#cc0022}
@@ -706,6 +706,14 @@ body.day #header-logo-light{display:inline-block}
     <div class="form-row">
       <label>Revenus mensuels estimés (€)</label>
       <input type="number" id="f-revenus" placeholder="ex: 3500">
+    </div>
+    <div class="form-row">
+      <label>Métier</label>
+      <input type="text" id="f-metier" placeholder="ex : Médecin, Ingénieur, Retraité…">
+    </div>
+    <div class="form-row">
+      <label>Adresse postale</label>
+      <textarea id="f-adresse" placeholder="Rue, code postal, ville…" rows="2"></textarea>
     </div>
     <div class="form-row">
       <label>Recommandé par (parrain)</label>
@@ -1481,9 +1489,11 @@ function renderClientPanel(c){
       ${c.tel?`<div class="info-block"><div class="info-block-label">Téléphone</div><div class="info-block-val">${esc(c.tel)}</div></div>`:''}
       ${c.mail?`<div class="info-block"><div class="info-block-label">Email</div><div class="info-block-val" style="font-size:.72rem">${esc(c.mail)}</div></div>`:''}
       ${c.situation?`<div class="info-block"><div class="info-block-label">Situation</div><div class="info-block-val">${esc(c.situation)}</div></div>`:''}
+      ${c.metier?`<div class="info-block"><div class="info-block-label">Métier</div><div class="info-block-val">${esc(c.metier)}</div></div>`:''}
       ${c.revenus?`<div class="info-block"><div class="info-block-label">Revenus/mois</div><div class="info-block-val">${Number(c.revenus).toLocaleString('fr-FR')} €</div></div>`:''}
       ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Date de naissance</div><div class="info-block-val">${new Date(c.dateNaissance).toLocaleDateString('fr-FR')}</div></div>`:''}
       ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Âge</div><div class="info-block-val">${calcAge(c.dateNaissance)} ans</div></div>`:''}
+      ${c.adresse?`<div class="info-block full"><div class="info-block-label">Adresse</div><div class="info-block-val" style="font-size:.78rem;font-weight:400;white-space:pre-line">${esc(c.adresse)}</div></div>`:''}
       ${c.source?`<div class="info-block"><div class="info-block-label">Recommandé par</div><div class="info-block-val">${esc(c.source)}</div></div>`:''}
       ${c.objectifs?`<div class="info-block full"><div class="info-block-label">Objectifs</div><div class="info-block-val" style="font-size:.78rem;font-weight:400;line-height:1.5">${esc(c.objectifs)}</div></div>`:''}
     </div>
@@ -1625,6 +1635,8 @@ function openModalClient(id){
   $('f-datenaissance').value=c?c.dateNaissance||'':'';
   $('f-situation').value=c?c.situation:'';
   $('f-revenus').value=c?c.revenus:'';
+  $('f-metier').value=c?c.metier||'':'';
+  $('f-adresse').value=c?c.adresse||'':'';
   $('f-source').value=c?c.source:'';
   $('f-objectifs').value=c?c.objectifs:'';
   $('modal-client').dataset.editId=id||'';
@@ -1639,13 +1651,13 @@ function saveClient(){
   if(!prenom||!nom){toast('Prénom et nom requis');return;}
   if(id){
     const c=getClient(id);
-    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
+    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
     persistState();
     $('panel-client-title').textContent=c.prenom+' '+c.nom;
     renderClientPanel(c);
     toast('Client modifié !');
   } else {
-    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
+    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
     state.clients.push(c);
     persistState();
     toast('Client créé !');
