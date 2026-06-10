@@ -376,6 +376,19 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .tag-filter-clear{font-size:.68rem;padding:3px 9px;border-radius:10px;background:transparent;color:var(--danger);border:1px solid var(--danger);cursor:pointer;transition:all .15s}
 .tag-filter-clear:hover{background:var(--danger);color:#fff}
 .tag-chip.clickable{cursor:pointer;transition:opacity .15s}.tag-chip.clickable:hover{opacity:.75}
+/* ===== PROMPTS VIEW ===== */
+.prompt-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px;margin-bottom:14px;transition:border-color .2s}
+.prompt-card:hover{border-color:var(--ac)}
+.prompt-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.prompt-card-title{flex:1;font-weight:700;font-size:.88rem}
+.prompt-card-body{font-size:.78rem;color:var(--tx2);line-height:1.6;white-space:pre-wrap;background:var(--bg3);border-radius:8px;padding:12px;max-height:180px;overflow-y:auto;margin-bottom:10px}
+.prompt-form{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px;margin-bottom:20px}
+.prompt-form input,.prompt-form textarea{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:8px 12px;font-size:.82rem;color:var(--tx);font-family:inherit;box-sizing:border-box;resize:vertical}
+.prompt-form input{margin-bottom:8px}.prompt-form textarea{min-height:100px;margin-bottom:10px}
+.prompt-form input:focus,.prompt-form textarea:focus{outline:none;border-color:var(--ac)}
+/* tags inline input for ideas */
+.ic-tags-wrap{display:flex;flex-wrap:wrap;gap:4px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:5px 8px;cursor:text;min-height:34px;align-items:center}
+.ic-tags-wrap input{background:transparent;border:none;color:var(--tx);font-family:inherit;font-size:.78rem;min-width:80px;flex:1;padding:2px 4px;outline:none}
 .done-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg3);margin-bottom:6px}
 .done-item-title{flex:1;font-size:.8rem;color:var(--tx2);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -427,12 +440,14 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
     <button class="nav-btn" data-view="ruche"><span class="nav-icon">🐝</span><span class="nav-label">Ruche</span></button>
     <button class="nav-btn" data-view="kanban"><span class="nav-icon">📋</span><span class="nav-label">Kanban</span></button>
     <button class="nav-btn" data-view="liste"><span class="nav-icon">📑</span><span class="nav-label">Liste</span></button>
+    <button class="nav-btn" data-view="prompts"><span class="nav-icon">🤖</span><span class="nav-label">Prompts</span></button>
     <button class="nav-btn" id="sidebar-toggle" style="margin-top:auto"><span class="nav-icon">◀</span><span class="nav-label">Réduire</span></button>
   </nav>
   <main id="main">
     <div id="view-dashboard" class="view active"></div>
     <div id="view-idees" class="view" style="padding:0;flex-direction:column"></div>
     <div id="view-projets" class="view" style="overflow-y:auto;padding:24px;flex-direction:column;gap:0"></div>
+    <div id="view-prompts" class="view" style="overflow-y:auto;padding:24px;flex-direction:column;gap:0"></div>
     <div id="view-ruche" class="view">
       <div id="ruche-container">
         <div class="ruche-toolbar">
@@ -683,14 +698,14 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 
 <script>
 /*__SEED_START__*/
-const SEED_DATA={ideas:[],categories:[],mapPositions:{}};
+const SEED_DATA={ideas:[],categories:[],mapPositions:{},prompts:[]};
 /*__SEED_END__*/
 
 const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Archivées',emoji:'🗃️',color:'#8892a4'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
-let state={ideas:[],categories:[],mapPositions:{}};
+let state={ideas:[],categories:[],mapPositions:{},prompts:[]};
 let ui={
   view:'dashboard',theme:'hiveos',dayMode:false,
   editingId:null,selectedId:null,
@@ -700,7 +715,7 @@ let ui={
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
   tourStep:0,sidebarOrder:null,filterTag:null
 };
-const DEFAULT_NAV_ORDER=['dashboard','idees','projets','ruche','kanban','liste'];
+const DEFAULT_NAV_ORDER=['dashboard','idees','projets','ruche','kanban','liste','prompts'];
 
 /* ===== PERSISTENCE ===== */
 function genId(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)}
@@ -749,6 +764,7 @@ function switchView(v){
   if(v==='dashboard')renderDashboard();
   else if(v==='idees')renderIdees();
   else if(v==='projets')renderProjets();
+  else if(v==='prompts')renderPrompts();
   else if(v==='ruche')renderRuche();
   else if(v==='kanban')renderKanban();
   else if(v==='liste')renderListe();
@@ -1437,7 +1453,7 @@ function refreshView(){
 }
 
 /* ===== SAVE/EXPORT/IMPORT ===== */
-function getExport(){return{ideas:state.ideas,categories:state.categories,mapPositions:state.mapPositions}}
+function getExport(){return{ideas:state.ideas,categories:state.categories,mapPositions:state.mapPositions,prompts:state.prompts||[]}}
 function openSaveModal(){document.getElementById('save-json').value=JSON.stringify(getExport(),null,2);document.getElementById('save-modal').classList.remove('hidden')}
 function downloadJson(){const b=new Blob([JSON.stringify(getExport(),null,2)],{type:'application/json'});dl(b,'idealys-backup.json')}
 function copyToClipboard(text,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>toast(msg)).catch(()=>{legacyCopy(text);toast(msg)})}else{legacyCopy(text);toast(msg)}}
@@ -1447,7 +1463,7 @@ function restoreJson(replace){
   try{
     const parsed=JSON.parse(document.getElementById('restore-json').value.trim());
     if(!parsed.ideas)throw new Error('Format invalide');
-    if(replace){state.ideas=parsed.ideas;state.categories=parsed.categories||[];state.mapPositions=parsed.mapPositions||{}}
+    if(replace){state.ideas=parsed.ideas;state.categories=parsed.categories||[];state.mapPositions=parsed.mapPositions||{};state.prompts=parsed.prompts||[]}
     else{parsed.ideas.forEach(i=>{if(!state.ideas.find(e=>e.id===i.id))state.ideas.push(i)});(parsed.categories||[]).forEach(c=>{if(!state.categories.includes(c))state.categories.push(c)});Object.assign(state.mapPositions,parsed.mapPositions||{})}
     persistState();document.getElementById('restore-json').value='';document.getElementById('save-modal').classList.add('hidden');toast('Données restaurées !');refreshView();
   }catch(err){toast('JSON invalide : '+err.message,'danger')}
@@ -1461,7 +1477,7 @@ function downloadApp(){
 }
 function factoryReset(){
   confirm2('Remise à zéro usine ?','Toutes les données seront effacées. Le bloc-notes sera conservé.',()=>{
-    state={ideas:[],categories:[],mapPositions:{}};
+    state={ideas:[],categories:[],mapPositions:{},prompts:[]};
     persistState();ui.theme='hiveos';ui.dayMode=false;applyTheme();
     document.getElementById('save-modal').classList.add('hidden');switchView('dashboard');toast('Remise à zéro effectuée');
   });
@@ -1651,6 +1667,52 @@ function saveQuickIdea(){
   if(ui.view==='idees')renderIdees();else refreshView();
 }
 
+/* ===== SYSTEM PROMPTS ===== */
+function renderPrompts(){
+  if(!state.prompts)state.prompts=[];
+  const el=document.getElementById('view-prompts');
+  el.innerHTML=`
+    <div class="prompt-form">
+      <h3 style="margin:0 0 12px;font-family:var(--font-h,'Syne',sans-serif);font-size:.88rem">🤖 Nouveau prompt système</h3>
+      <input type="text" id="pp-title" placeholder="Nom du prompt *">
+      <textarea id="pp-body" placeholder="Contenu du prompt…" rows="5"></textarea>
+      <div style="display:flex;justify-content:flex-end;gap:6px">
+        <button class="btn btn-primary btn-sm" id="pp-save">💾 Enregistrer</button>
+      </div>
+    </div>
+    ${state.prompts.length===0?`<div class="empty-state"><div class="empty-icon">🤖</div><p>Aucun prompt enregistré.</p></div>`
+    :state.prompts.map(p=>`<div class="prompt-card" data-id="${p.id}">
+      <div class="prompt-card-header">
+        <span class="prompt-card-title">${esc(p.title)}</span>
+        <button class="idea-card-btn pp-copy" data-id="${p.id}" title="Copier">📋</button>
+        <button class="idea-card-btn pp-edit" data-id="${p.id}" title="Modifier">✏️</button>
+        <button class="idea-card-btn pp-del" data-id="${p.id}" title="Supprimer">🗑️</button>
+      </div>
+      <div class="prompt-card-body">${esc(p.content)}</div>
+    </div>`).join('')}`;
+  el.querySelector('#pp-save').addEventListener('click',()=>{
+    const t=el.querySelector('#pp-title').value.trim();
+    const b=el.querySelector('#pp-body').value.trim();
+    if(!t){el.querySelector('#pp-title').focus();return}
+    state.prompts.push({id:genId(),title:t,content:b,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+    persistState();el.querySelector('#pp-title').value='';el.querySelector('#pp-body').value='';
+    toast('🤖 Prompt enregistré !');renderPrompts();
+  });
+  el.querySelectorAll('.pp-copy').forEach(b=>b.addEventListener('click',()=>{
+    const p=state.prompts.find(x=>x.id===b.dataset.id);
+    if(p)copyToClipboard(p.content,'Prompt copié !');
+  }));
+  el.querySelectorAll('.pp-edit').forEach(b=>b.addEventListener('click',()=>{
+    const p=state.prompts.find(x=>x.id===b.dataset.id);if(!p)return;
+    el.querySelector('#pp-title').value=p.title;
+    el.querySelector('#pp-body').value=p.content;
+    state.prompts=state.prompts.filter(x=>x.id!==b.dataset.id);
+    persistState();renderPrompts();
+    el.querySelector('#pp-title').focus();
+  }));
+  el.querySelectorAll('.pp-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ce prompt ?','Action irréversible.',()=>{state.prompts=state.prompts.filter(x=>x.id!==b.dataset.id);persistState();renderPrompts()})));
+}
+
 /* ===== TAG FILTER ===== */
 function allTags(){const s=new Set();state.ideas.forEach(i=>(i.tags||[]).forEach(t=>s.add(t)));return[...s].sort()}
 function tagFilterBarHTML(){
@@ -1674,7 +1736,7 @@ function renderIdees(){
       <div class="idees-form">
         <div style="display:grid;grid-template-columns:1fr;gap:8px">
           <input type="text" id="ic-title" placeholder="Titre de l'idée *">
-          <textarea id="ic-expl" placeholder="Explication…" rows="2"></textarea>
+          <textarea id="ic-expl" placeholder="Explication… (optionnel)" rows="2"></textarea>
         </div>
         <div class="idees-gauges">
           <div class="idees-gauge-row">
@@ -1682,21 +1744,11 @@ function renderIdees(){
             <div class="range-wrap"><input type="range" id="ic-feas" min="0" max="100" value="50" step="5"><span class="range-val" id="ic-feas-lbl">50%</span></div>
           </div>
           <div class="idees-gauge-row">
-            <label>Difficulté</label>
-            <div class="radio-group" id="ic-diff" style="gap:5px">
-              <div class="radio-opt" data-val="low" style="font-size:.72rem;padding:4px 9px">🟢 Faible</div>
-              <div class="radio-opt selected" data-val="medium" style="font-size:.72rem;padding:4px 9px">🟡 Moyenne</div>
-              <div class="radio-opt" data-val="high" style="font-size:.72rem;padding:4px 9px">🔴 Élevée</div>
-            </div>
-          </div>
-          <div class="idees-gauge-row">
-            <label>Temps</label>
-            <div class="gauge-dots" id="ic-time">${[1,2,3,4,5].map(v=>`<span class="gauge-dot${v<=3?' filled':''}" data-v="${v}" data-gtype="time"></span>`).join('')}</div>
-            <label style="margin-left:10px;width:48px">Argent</label>
-            <div class="gauge-dots" id="ic-money">${[1,2,3,4,5].map(v=>`<span class="gauge-dot${v<=2?' filled':''}" data-v="${v}" data-gtype="money"></span>`).join('')}</div>
+            <label>Tags</label>
+            <div class="ic-tags-wrap" id="ic-tags-wrap"><input type="text" id="ic-tags-input" placeholder="Tag + Entrée…"></div>
           </div>
         </div>
-        <button class="btn btn-primary" id="ic-submit" style="align-self:flex-end">💡 Capturer cette idée</button>
+        <button class="btn btn-primary" id="ic-submit" style="align-self:flex-end">💡 Capturer</button>
       </div>
     </div>
     <div class="idees-list-wrap">
@@ -1711,19 +1763,18 @@ function renderIdees(){
     </div>`;
 
   // Form state
-  let icScores={feasibility:50,difficulty:'medium',timeRatio:3,moneyRatio:2};
-  el.querySelector('#ic-feas').addEventListener('input',ev=>{icScores.feasibility=+ev.target.value;el.querySelector('#ic-feas-lbl').textContent=ev.target.value+'%'});
-  el.querySelectorAll('#ic-diff .radio-opt').forEach(opt=>opt.addEventListener('click',()=>{icScores.difficulty=opt.dataset.val;el.querySelectorAll('#ic-diff .radio-opt').forEach(o=>o.classList.toggle('selected',o.dataset.val===icScores.difficulty))}));
-  el.querySelectorAll('[data-gtype]').forEach(dot=>dot.addEventListener('click',()=>{
-    const g=dot.dataset.gtype,v=+dot.dataset.v;
-    icScores[g==='time'?'timeRatio':'moneyRatio']=v;
-    el.querySelectorAll(`[data-gtype="${g}"]`).forEach(d=>d.classList.toggle('filled',+d.dataset.v<=v));
-  }));
+  let icFeas=50,icTags=[];
+  el.querySelector('#ic-feas').addEventListener('input',ev=>{icFeas=+ev.target.value;el.querySelector('#ic-feas-lbl').textContent=ev.target.value+'%'});
+  // Tags inline
+  const tagsWrap=el.querySelector('#ic-tags-wrap'),tagsInp=el.querySelector('#ic-tags-input');
+  function renderIcTags(){[...tagsWrap.children].forEach(c=>{if(c!==tagsInp)c.remove()});icTags.forEach((t,i)=>{const chip=document.createElement('span');chip.className='tag-chip-rm';chip.innerHTML=`${esc(t)}<button data-i="${i}">✕</button>`;chip.querySelector('button').addEventListener('click',ev=>{ev.preventDefault();icTags.splice(i,1);renderIcTags()});tagsWrap.insertBefore(chip,tagsInp)})}
+  tagsInp.addEventListener('keydown',ev=>{if(ev.key!=='Enter'&&ev.key!==',')return;ev.preventDefault();const v=tagsInp.value.trim().replace(/,$/,'');if(v&&!icTags.includes(v)){icTags.push(v);tagsInp.value='';renderIcTags()}});
+  tagsWrap.addEventListener('click',()=>tagsInp.focus());
   el.querySelector('#ic-submit').addEventListener('click',()=>{
     const inp=el.querySelector('#ic-title');const title=inp.value.trim();
     if(!title){inp.focus();inp.style.borderColor='var(--danger)';setTimeout(()=>{inp.style.borderColor=''},1200);return}
-    createIdea({title,description:el.querySelector('#ic-expl').value.trim(),status:'backlog',connections:[],scores:{...icScores}});
-    inp.value='';el.querySelector('#ic-expl').value='';
+    createIdea({title,description:el.querySelector('#ic-expl').value.trim(),tags:[...icTags],status:'backlog',connections:[],scores:{feasibility:icFeas}});
+    inp.value='';el.querySelector('#ic-expl').value='';icTags=[];renderIcTags();
     toast('💡 Idée capturée !');renderIdees();
   });
   el.querySelector('#ic-title').addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.ctrlKey){ev.preventDefault();el.querySelector('#ic-submit').click()}});
@@ -1742,46 +1793,24 @@ function renderIdees(){
 }
 
 function ideaCardHTML(idea){
-  const s=idea.scores||{};
-  const feas=s.feasibility??0;
-  const diff=s.difficulty||'medium';
-  const time=s.timeRatio||0,money=s.moneyRatio||0;
-  const diffLbl={low:'Faible',medium:'Moyenne',high:'Élevée'};
-  const pr=PRIORITIES.find(p=>p.id===idea.priority)||PRIORITIES[1];
-  const st=STATUSES.find(x=>x.id===idea.status)||STATUSES[0];
-  const q=(idea.title+' '+(idea.description||'')).toLowerCase();
+  const feas=(idea.scores||{}).feasibility??50;
+  const q=(idea.title+' '+(idea.description||'')+' '+(idea.tags||[]).join(' ')).toLowerCase();
   return`<div class="idea-card" data-q="${esc(q)}">
     <div class="idea-card-head">
       <div class="idea-card-title">${esc(idea.title)}</div>
       <div class="idea-card-btns">
         <button class="idea-card-btn ic-edit" data-id="${idea.id}" title="Modifier">✏️</button>
-        <button class="idea-card-btn ic-toproj" data-id="${idea.id}" title="Transformer en projet">📁</button>
+        <button class="idea-card-btn ic-toproj" data-id="${idea.id}" title="→ Projet">📁</button>
         <button class="idea-card-btn ic-del" data-id="${idea.id}" title="Supprimer">🗑️</button>
       </div>
     </div>
     ${idea.description?`<div class="idea-card-desc">${esc(idea.description)}</div>`:''}
-    <div class="idea-scores">
-      <div class="score-row">
-        <span class="score-lbl">Faisabilité</span>
-        <div class="feas-bar"><div class="feas-fill" style="width:${feas}%"></div></div>
-        <span class="feas-val">${feas}%</span>
-      </div>
-      <div class="score-row">
-        <span class="score-lbl">Difficulté</span>
-        <span class="diff-pill diff-${diff}">${diffLbl[diff]}</span>
-      </div>
-      <div class="score-row">
-        <span class="score-lbl">⏱ Temps</span>
-        <div class="gauge-mini">${[1,2,3,4,5].map(i=>`<span class="gauge-mini-dot${i<=time?' on':''}"></span>`).join('')}</div>
-        <span class="score-lbl" style="margin-left:8px">💰 Argent</span>
-        <div class="gauge-mini">${[1,2,3,4,5].map(i=>`<span class="gauge-mini-dot${i<=money?' on':''}"></span>`).join('')}</div>
-      </div>
+    <div class="score-row" style="margin:8px 0">
+      <span class="score-lbl">Faisabilité</span>
+      <div class="feas-bar"><div class="feas-fill" style="width:${feas}%"></div></div>
+      <span class="feas-val">${feas}%</span>
     </div>
-    <div class="idea-card-foot">
-      <span class="priority-badge p-${idea.priority}">${pr.emoji}</span>
-      <span class="idea-mini-badge">${st.emoji}</span>
-      ${(idea.tags||[]).slice(0,2).map(t=>`<span class="tag-chip clickable" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}
-    </div>
+    ${(idea.tags||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(idea.tags||[]).map(t=>`<span class="tag-chip clickable" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}</div>`:''}
   </div>`;
 }
 
@@ -1791,8 +1820,8 @@ function transformToProject(id){
   idea.type='project';
   idea.steps=(idea.steps||[]).map(s=>({...s,subtasks:s.subtasks||[]}));
   idea.updatedAt=new Date().toISOString();persistState();
-  toast('📁 Transformé en projet !');
-  if(ui.view==='projets')renderProjets();else switchView('projets');
+  toast('📁 Transformé en projet — complète les détails');
+  openIdeaModal(id);
 }
 
 function toggleTask(ideaId,taskId){
