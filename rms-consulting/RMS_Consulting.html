@@ -320,6 +320,13 @@ body.theme-rms:not(.day) #fab{color:#000}
   .wd-num{font-size:1rem}
 }
 
+/* ===== POINTEUSE ===== */
+.pointeuse-session-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--brd);font-size:.72rem}
+.pointeuse-session-row:last-child{border-bottom:none}
+.pt-badge{padding:2px 8px;border-radius:8px;font-size:.6rem;font-weight:700}
+.pt-badge.en-cours{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.pt-badge.done{background:var(--bg3);color:var(--tx2)}
+
 /* ===== REDIGER ===== */
 .rediger-dest-wrap{position:relative}
 .rediger-dest-results{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--brd);border-radius:0 0 10px 10px;z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 8px 20px #0005}
@@ -610,6 +617,24 @@ body.day #header-logo-light{display:inline-block}
 <!-- FAB (add client) -->
 <button id="fab" title="Nouveau client">＋</button>
 
+<!-- ===== POINTEUSE ===== -->
+<div class="modal-overlay centered hidden" id="modal-pointeuse">
+  <div class="modal" style="max-width:360px">
+    <button class="modal-close" id="pointeuse-close">✕</button>
+    <h2 style="text-align:center">⏱️ Pointeuse</h2>
+    <div id="pointeuse-clock" style="font-family:'Space Mono',monospace;font-size:2.2rem;font-weight:700;text-align:center;color:var(--ac);letter-spacing:.08em;margin:10px 0 4px">00:00:00</div>
+    <div id="pointeuse-date" style="text-align:center;font-size:.7rem;color:var(--tx2);margin-bottom:14px"></div>
+    <div id="pointeuse-session-label" style="text-align:center;font-size:.75rem;color:var(--tx2);min-height:20px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button class="btn btn-primary" id="pointeuse-entree" style="flex:1;justify-content:center;font-size:.85rem">▶ Entrée</button>
+      <button class="btn btn-ghost" id="pointeuse-sortie" style="flex:1;justify-content:center;font-size:.85rem" disabled>■ Sortie</button>
+    </div>
+    <div class="section-title">Aujourd'hui</div>
+    <div id="pointeuse-today-total" style="font-size:.78rem;color:var(--ac);font-weight:700;margin-bottom:8px"></div>
+    <div id="pointeuse-history" style="max-height:160px;overflow-y:auto"></div>
+  </div>
+</div>
+
 <!-- ===== PANEL: FICHE CLIENT ===== -->
 <div class="panel" id="panel-client">
   <div class="panel-header">
@@ -851,10 +876,14 @@ body.day #header-logo-light{display:inline-block}
     <h2>💾 Sauvegarde</h2>
     <div class="save-section">
       <h4>📤 Export JSON</h4>
+      <div class="form-row" style="margin-bottom:8px">
+        <label style="font-size:.72rem">Nom du fichier</label>
+        <input type="text" id="save-filename-input" placeholder="RMS_Consulting_sauvegarde" style="font-size:.8rem">
+      </div>
       <textarea id="save-json" readonly></textarea>
       <div class="save-actions">
         <button class="btn btn-ghost btn-sm" id="save-copy-json">📋 Copier</button>
-        <button class="btn btn-ghost btn-sm" id="save-dl-json">⬇️ .json</button>
+        <button class="btn btn-ghost btn-sm" id="save-dl-json">⬇️ Télécharger .json</button>
         <button class="btn btn-ghost btn-sm" id="save-dl-app">⬇️ .html</button>
       </div>
     </div>
@@ -1386,6 +1415,7 @@ function renderDashboard(){
       <button class="btn btn-primary btn-block" id="dash-btn-nouveau">＋ Nouveau client</button>
       <button class="btn btn-ghost btn-block" id="dash-btn-clients">👥 Clients</button>
     </div>
+    <button class="btn btn-ghost btn-block" id="dash-btn-cr" style="margin-top:8px;justify-content:center;gap:6px">📧 Envoyer le CR par mail</button>
   `;
 
   el.querySelectorAll('.relance-card[data-cid]').forEach(card=>{
@@ -1402,6 +1432,7 @@ function renderDashboard(){
   });
   el.querySelector('#dash-btn-nouveau').addEventListener('click',()=>openModalClient());
   el.querySelector('#dash-btn-clients').addEventListener('click',()=>switchView('clients'));
+  el.querySelector('#dash-btn-cr').addEventListener('click',sendCREmail);
 }
 
 function greet(){
@@ -2180,12 +2211,25 @@ function openConfirm(title,msg,cb){
 function openSaveModal(){
   $('save-json').value=JSON.stringify(state,null,2);
   $('restore-json').value='';
+  $('save-filename-input').value='RMS_Consulting_'+today();
   $('modal-save').classList.remove('hidden');
 }
 
-function dlJSON(){
-  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='RMS_Consulting_'+today()+'.json';a.click();
+async function dlJSON(){
+  const name=($('save-filename-input').value.trim()||'RMS_Consulting_'+today()).replace(/\.json$/,'');
+  const filename=name+'.json';
+  const data=JSON.stringify(state,null,2);
+  if(window.showSaveFilePicker){
+    try{
+      const fh=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Fichier JSON',accept:{'application/json':['.json']}}]});
+      const w=await fh.createWritable();
+      await w.write(data);await w.close();
+      toast('Fichier sauvegardé : '+filename);return;
+    }catch(e){if(e.name==='AbortError')return;}
+  }
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  toast('Téléchargement : '+filename);
 }
 
 function dlApp(){
@@ -2751,6 +2795,171 @@ function renderRediger(){
   });
 }
 
+/* ===== POINTEUSE ===== */
+var _ptClockInterval=null;
+var _ptSessionInterval=null;
+
+function ptLoad(){
+  try{return JSON.parse(store.getItem('rms_timetracker')||'{"sessions":[],"currentStart":null}');}catch(e){return{sessions:[],currentStart:null};}
+}
+function ptSave(d){try{store.setItem('rms_timetracker',JSON.stringify(d));}catch(e){}}
+
+function ptFmtDuration(ms){
+  var s=Math.floor(ms/1000);
+  var h=Math.floor(s/3600);var m=Math.floor((s%3600)/60);var sc=s%60;
+  return (h?h+'h ':'')+String(m).padStart(2,'0')+'m '+String(sc).padStart(2,'0')+'s';
+}
+
+function ptUpdateClock(){
+  var now=new Date();
+  $('pointeuse-clock').textContent=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  $('pointeuse-date').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+}
+
+function ptRender(){
+  var d=ptLoad();
+  var todayStr=today();
+  var todaySessions=d.sessions.filter(function(s){return s.start.slice(0,10)===todayStr;});
+  var totalMs=todaySessions.reduce(function(acc,s){return acc+(s.duration||0);},0);
+  if(d.currentStart){
+    totalMs+=Date.now()-new Date(d.currentStart).getTime();
+  }
+  $('pointeuse-today-total').textContent=totalMs>0?'Total : '+ptFmtDuration(totalMs):'Aucune session aujourd\'hui';
+
+  var html=todaySessions.slice().reverse().map(function(s){
+    var dur=s.duration?ptFmtDuration(s.duration):'—';
+    var t=new Date(s.start).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    var t2=s.end?new Date(s.end).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'…';
+    return '<div class="pointeuse-session-row"><span>'+t+' → '+t2+'</span><span>'+dur+'</span><span class="pt-badge done">✓</span></div>';
+  }).join('');
+  $('pointeuse-history').innerHTML=html||'<div style="font-size:.72rem;color:var(--tx2)">Aucune session.</div>';
+
+  var active=!!d.currentStart;
+  $('pointeuse-entree').disabled=active;
+  $('pointeuse-sortie').disabled=!active;
+  if(active){
+    var startMs=new Date(d.currentStart).getTime();
+    if(_ptSessionInterval)clearInterval(_ptSessionInterval);
+    _ptSessionInterval=setInterval(function(){
+      var el=$('pointeuse-session-label');if(!el)return;
+      el.textContent='En cours : '+ptFmtDuration(Date.now()-startMs);
+      var td=ptLoad();var tSess=td.sessions.filter(function(s){return s.start.slice(0,10)===todayStr;});
+      var tot=tSess.reduce(function(a,s){return a+(s.duration||0);},0)+(Date.now()-new Date(td.currentStart||Date.now()).getTime());
+      var telEl=$('pointeuse-today-total');if(telEl)telEl.textContent='Total : '+ptFmtDuration(tot);
+    },1000);
+  }else{
+    if(_ptSessionInterval){clearInterval(_ptSessionInterval);_ptSessionInterval=null;}
+    $('pointeuse-session-label').textContent='';
+  }
+}
+
+function openPointeuse(){
+  $('modal-pointeuse').classList.remove('hidden');
+  ptRender();
+  if(_ptClockInterval)clearInterval(_ptClockInterval);
+  ptUpdateClock();
+  _ptClockInterval=setInterval(ptUpdateClock,1000);
+}
+function closePointeuse(){
+  $('modal-pointeuse').classList.add('hidden');
+  if(_ptClockInterval){clearInterval(_ptClockInterval);_ptClockInterval=null;}
+  if(_ptSessionInterval){clearInterval(_ptSessionInterval);_ptSessionInterval=null;}
+}
+
+function initPointeuse(){
+  $('pointeuse-close').addEventListener('click',closePointeuse);
+  $('pointeuse-entree').addEventListener('click',function(){
+    var d=ptLoad();if(d.currentStart)return;
+    d.currentStart=new Date().toISOString();
+    ptSave(d);ptRender();toast('Entrée enregistrée');
+  });
+  $('pointeuse-sortie').addEventListener('click',function(){
+    var d=ptLoad();if(!d.currentStart)return;
+    var start=d.currentStart;var end=new Date().toISOString();
+    var dur=new Date(end)-new Date(start);
+    d.sessions.push({id:genId(),start:start,end:end,duration:dur});
+    d.currentStart=null;ptSave(d);ptRender();
+    toast('Sortie : '+ptFmtDuration(dur));
+  });
+  // Ctrl+C shortcut (when no text selected and no input focused)
+  document.addEventListener('keydown',function(e){
+    if(e.ctrlKey&&!e.shiftKey&&!e.altKey&&e.key==='c'){
+      var focused=document.activeElement;
+      var isInput=focused&&(focused.tagName==='INPUT'||focused.tagName==='TEXTAREA'||focused.isContentEditable);
+      if(!isInput&&!window.getSelection().toString()){
+        e.preventDefault();
+        if($('modal-pointeuse').classList.contains('hidden'))openPointeuse();
+        else closePointeuse();
+      }
+    }
+  });
+}
+
+/* ===== CR EMAIL ===== */
+function sendCREmail(){
+  var now=new Date();
+  var dateLabel=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var timeLabel=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  var retards=[];var ajds=[];
+  state.clients.forEach(function(c){
+    (c.sousDossiers||[]).forEach(function(sd){
+      var st=relanceStatus(sd.relance);
+      if(st==='retard')retards.push({c:c,sd:sd});
+      if(st==='aujourd-hui')ajds.push({c:c,sd:sd});
+    });
+  });
+  var rdvJour=(state.rdvs||[]).filter(function(r){return r.date===today2();}).sort(function(a,b){return(a.heure||'').localeCompare(b.heure||'');});
+  var tachesHautes=(state.taches||[]).filter(function(t){return !t.done&&!t.archived&&t.priorite==='haute';});
+  var birthdays=getBirthdayAlerts();
+  var nbClients=state.clients.length;
+  var signes=state.clients.reduce(function(n,c){return n+(c.sousDossiers||[]).filter(function(sd){return sd.statut==='Signé'||sd.statut==='Suivi actif';}).length;},0);
+
+  var lines=[];
+  lines.push('COMPTE RENDU — '+dateLabel+' à '+timeLabel);
+  lines.push('═══════════════════════════════════════');
+  lines.push('');
+  lines.push('📊 INDICATEURS CLÉS');
+  lines.push('  • Clients : '+nbClients);
+  lines.push('  • Dossiers actifs / signés : '+signes);
+  lines.push('  • Relances en retard : '+retards.length);
+  lines.push('  • Relances aujourd\'hui : '+ajds.length);
+  lines.push('');
+  if(retards.length){
+    lines.push('🚨 RELANCES EN RETARD ('+retards.length+')');
+    retards.forEach(function(x){lines.push('  ⚠ '+x.c.prenom+' '+x.c.nom+' — '+x.sd.type+' ('+x.sd.statut+') — Relance : '+fmtDate(x.sd.relance));});
+    lines.push('');
+  }
+  if(ajds.length){
+    lines.push('🕐 À RELANCER AUJOURD\'HUI ('+ajds.length+')');
+    ajds.forEach(function(x){lines.push('  • '+x.c.prenom+' '+x.c.nom+' — '+x.sd.type);});
+    lines.push('');
+  }
+  if(rdvJour.length){
+    lines.push('📅 RDV DU JOUR ('+rdvJour.length+')');
+    rdvJour.forEach(function(r){var c=r.clientId?getClient(r.clientId):null;lines.push('  '+( r.heure||'--:--')+' — '+r.titre+(c?' ('+c.prenom+' '+c.nom+')':''));});
+    lines.push('');
+  }
+  if(tachesHautes.length){
+    lines.push('✅ TÂCHES URGENTES ('+tachesHautes.length+')');
+    tachesHautes.forEach(function(t){var c=t.clientId?getClient(t.clientId):null;lines.push('  • '+t.titre+(c?' — '+c.prenom+' '+c.nom:''));});
+    lines.push('');
+  }
+  if(birthdays.length){
+    lines.push('🎂 ANNIVERSAIRES (7 jours)');
+    birthdays.forEach(function(b){lines.push('  • '+b.c.prenom+' '+b.c.nom+' — '+(b.days===0?'Aujourd\'hui !':b.days===1?'Demain':'Dans '+b.days+' jours')+' ('+b.age+' ans)');});
+    lines.push('');
+  }
+  lines.push('───────────────────────────────────────');
+  lines.push('Généré automatiquement par RMS Consulting CRM');
+
+  var subject='CR Dashboard — '+now.toLocaleDateString('fr-FR');
+  var body=lines.join('\n');
+  var mailto='mailto:rms-consulting@outlook.fr?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  window.open(mailto,'_self');
+  toast('CR ouvert dans votre messagerie !');
+}
+
 /* ===== INIT ===== */
 loadState();
 applyTheme();
@@ -2758,6 +2967,7 @@ buildThemeMenu();
 initEvents();
 initSidebar();
 initTasksFloat();
+initPointeuse();
 switchView('dashboard');
 </script>
 
