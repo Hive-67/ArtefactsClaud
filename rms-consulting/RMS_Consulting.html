@@ -35,6 +35,8 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-spectre.day{--bg:#f0f7f4;--bg2:#e0eee8;--bg3:#cfddd8;--bg4:#bdd0cb;--brd:#1a6e5040;--tx:#0a1412;--tx2:#2e4a44;--ac:#1a6e50;--ok:#1a6e50;--warn:#8a6000;--danger:#cc0022}
 /* Spectre grid background */
 body.theme-spectre .view,body.theme-spectre .panel{background-color:var(--bg);background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);background-size:36px 36px}
+/* Spectre : FAB text noir pour contraste sur fond vert */
+body.theme-spectre #fab{color:#000}
 /* ===== WIN95 AUTHENTIC RETRO OVERRIDES ===== */
 body.theme-win95{font-family:'Courier New',monospace}
 body.theme-win95 .btn,body.theme-win95 .hbtn{border-radius:0;border:2px solid;border-color:#dfdfdf #808080 #808080 #dfdfdf}
@@ -2116,7 +2118,7 @@ function _sbExpand(){
 
 const TUTO_STEPS=[
   // ── Phase 1 : En-tête (6 étapes) ─────────────────────────────────────────
-  {id:"header-center",  phase:"En-tête",     title:"🐝 Logo HiveOS",
+  {id:"logo",           phase:"En-tête",     title:"🐝 Logo HiveOS",
    desc:"Bienvenue ! Cliquez sur ce logo pour ouvrir la page d'informations HiveOS : fonctionnement local, synchronisation Drive et routine de sauvegarde."},
   {id:"btn-notepad",    phase:"En-tête",     title:"📝 Note",
    desc:"Ouvre un bloc-notes flottant. Prenez des notes rapides, copiez-les ou envoyez-les directement par e-mail en un clic."},
@@ -2150,7 +2152,7 @@ const TUTO_STEPS=[
    before:_sbExpand},
   {sel:"[data-view='domaines']",  phase:"Sections", title:"🗂️ Domaines",
    desc:"10 domaines métier (Assurance Vie, Crédit Immobilier…) avec la liste des pièces justificatives requises pour chacun.",
-   before:_sbExpand},
+   before:_sbExpand, placement:'right'},
 ];
 let _tutoStep=0;
 
@@ -2189,11 +2191,19 @@ function _showTutoStep(){
   document.querySelectorAll('.tuto-dot').forEach((d,i)=>d.classList.toggle('active',i===_tutoStep));
   const tip=$('tuto-tooltip');
   const tw=270,th=190;
-  let tl=r.left+r.width/2-tw/2;
-  let tt=r.bottom+pad+14;
-  tl=Math.max(8,Math.min(tl,window.innerWidth-tw-8));
-  if(tt+th>window.innerHeight-20){tt=r.top-th-14;}
-  if(tt<60){tt=60;}
+  let tl,tt;
+  if(s.placement==='right'){
+    tl=r.right+pad+10;
+    tt=r.top+r.height/2-th/2;
+    tl=Math.min(tl,window.innerWidth-tw-8);
+    tt=Math.max(60,Math.min(tt,window.innerHeight-th-20));
+  } else {
+    tl=r.left+r.width/2-tw/2;
+    tt=r.bottom+pad+14;
+    tl=Math.max(8,Math.min(tl,window.innerWidth-tw-8));
+    if(tt+th>window.innerHeight-20){tt=r.top-th-14;}
+    if(tt<60){tt=60;}
+  }
   tip.style.left=tl+'px';
   tip.style.top=tt+'px';
 }
@@ -2407,6 +2417,7 @@ function initTasksFloat(){
   function open(){overlay.classList.remove('hidden');}
   function close(){overlay.classList.add('hidden');}
   $('header-center').addEventListener('click',open);
+  $('logo').addEventListener('click',open);
   $('hi-close-btn').addEventListener('click',close);
   overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
   document.addEventListener('keydown',function(e){
