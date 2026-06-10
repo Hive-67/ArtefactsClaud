@@ -711,7 +711,7 @@ body.day #header-logo-light{display:inline-block}
     </div>
     <div class="form-row">
       <label>Email</label>
-      <input type="email" id="f-mail" placeholder="email@exemple.fr">
+      <input type="email" id="f-mail" placeholder="email@exemple.fr" style="text-transform:lowercase" oninput="this.value=this.value.toLowerCase()">
     </div>
     <div class="form-row">
       <label>Date de naissance</label>
@@ -1266,6 +1266,22 @@ function updateBadges(){
   setBadge('badge-taches',tHautes);setBadge('sb-badge-taches',tHautes);
 }
 
+function getBirthdayAlerts(){
+  const now=new Date();
+  const res=[];
+  state.clients.forEach(function(c){
+    if(!c.dateNaissance)return;
+    const b=new Date(c.dateNaissance);
+    for(let i=0;i<=7;i++){
+      const d=new Date(now);d.setDate(d.getDate()+i);
+      if(b.getMonth()===d.getMonth()&&b.getDate()===d.getDate()){
+        res.push({c,days:i,age:d.getFullYear()-b.getFullYear()});break;
+      }
+    }
+  });
+  return res.sort(function(a,b){return a.days-b.days;});
+}
+
 /* ===== M1 DASHBOARD ===== */
 function renderDashboard(){
   const el=$('view-dashboard');
@@ -1289,14 +1305,12 @@ function renderDashboard(){
     return n+(c.sousDossiers||[]).filter(sd=>sd.statut==='Signé'||sd.statut==='Suivi actif').length;
   },0);
   const urgTotal=retards.length+ajds.length;
+  const birthdays=getBirthdayAlerts();
 
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:1.1rem">${greet()}</div>
-        <div style="font-size:.7rem;color:var(--tx2)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</div>
-      </div>
-      <div style="font-size:1.8rem">${ui.theme==='hiveos'||ui.theme==='rms'?'📊':'📊'}</div>
+      <div style="font-size:.78rem;color:var(--tx2)">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</div>
+      <div style="font-size:1.8rem">📊</div>
     </div>
 
     <div class="stat-grid">
@@ -1317,6 +1331,17 @@ function renderDashboard(){
         <div class="stat-label">✅ Dossiers actifs</div>
       </div>
     </div>
+
+    ${birthdays.length?`
+    <div class="section-title">🎂 Anniversaires (7 jours)</div>
+    ${birthdays.map(function(b){return `<div style="display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--warn) 10%,transparent);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);border-radius:10px;padding:10px 14px;margin-bottom:7px">
+      <span style="font-size:1.1rem">${b.days===0?'🎉':'🎂'}</span>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:.83rem">${esc(b.c.prenom)} ${esc(b.c.nom)}</div>
+        <div style="font-size:.68rem;color:var(--tx2)">${b.days===0?'Aujourd\'hui !':b.days===1?'Demain':'Dans '+b.days+' jours'} &nbsp;·&nbsp; ${b.age} ans</div>
+      </div>
+    </div>`;}).join('')}
+    `:''}
 
     ${urgTotal>0?`
     <div class="section-title">🚨 Urgent — ${urgTotal} relance${urgTotal>1?'s':''}</div>
@@ -1441,9 +1466,16 @@ function renderClients(){
       const c=getClient(btn.dataset.del);
       if(!c)return;
       openConfirm('Supprimer '+c.prenom+' '+c.nom+' ?','Toutes les données de ce client seront effacées de manière irréversible.',function(){
-        state.clients=state.clients.filter(x=>x.id!==btn.dataset.del);
+        const delId=btn.dataset.del;
+        state.clients=state.clients.filter(x=>x.id!==delId);
+        state.rdvs=(state.rdvs||[]).filter(r=>r.clientId!==delId);
+        state.taches=(state.taches||[]).map(t=>t.clientId===delId?Object.assign({},t,{clientId:''}):t);
         persistState();
+        if(ui.clientId===delId){$('panel-client').classList.remove('open');ui.clientId=null;}
         renderClients();
+        updateBadges();
+        if(ui.view==='dashboard')renderDashboard();
+        else if(ui.view==='relances')renderRelances();
         toast('Client supprimé');
       });
     });
@@ -1571,6 +1603,8 @@ function renderClientPanel(c){
     </div>
     <button class="btn btn-ghost btn-block mt8" id="btn-new-sd">＋ Nouveau sous-dossier</button>
 
+    ${(function(){const ts=(state.taches||[]).filter(function(t){return !t.archived&&t.clientId===c.id;});return ts.length?`<div class="section-title mt14">Tâches liées (${ts.length})</div><div style="margin-bottom:8px">${ts.map(function(t){return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--brd)"><div class="tache-cb${t.done?' checked':''}" data-done-client-t="${t.id}" style="cursor:pointer"></div><span style="flex:1;font-size:.78rem;${t.done?'text-decoration:line-through;color:var(--tx2)':''}">${esc(t.titre)}</span><span class="${t.priorite==='haute'?'priority-haute':'priority-normale'}">${t.priorite==='haute'?'🔴':''}</span></div>`;}).join('')}</div>`:''})()}
+
     <div class="section-title mt14">Historique (${(c.historique||[]).length})</div>
     ${!(c.historique&&c.historique.length)?`<div class="empty" style="padding:12px 0"><span class="empty-icon">📋</span>Aucun historique</div>`:''}
     <div>
@@ -1584,6 +1618,13 @@ function renderClientPanel(c){
       </div>`).join('')}
     </div>
   `;
+
+  el.querySelectorAll('[data-done-client-t]').forEach(function(cb){
+    cb.addEventListener('click',function(){
+      const t=state.taches.find(function(x){return x.id===cb.dataset.doneClientT;});
+      if(t){t.done=!t.done;persistState();renderClientPanel(c);updateBadges();}
+    });
+  });
 
   el.querySelector('#btn-contact-rapide').addEventListener('click',()=>{
     $('contact-note').value='';
@@ -1698,6 +1739,8 @@ function saveClient(){
   const prenom=$('f-prenom').value.trim();
   const nom=$('f-nom').value.trim();
   if(!prenom||!nom){toast('Prénom et nom requis');return;}
+  const mailVal=$('f-mail').value.trim().toLowerCase();
+  if(mailVal&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mailVal)){toast('Adresse email invalide');$('f-mail').focus();return;}
   if(id){
     const c=getClient(id);
     Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,metier:$('f-metier').value.trim(),adresse:$('f-adresse').value.trim(),revenusBrut:$('f-revenus-brut').value?Number($('f-revenus-brut').value):null,revenusNet:$('f-revenus-net').value?Number($('f-revenus-net').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
@@ -1923,8 +1966,7 @@ function renderTaches(){
           </div>
         </div>
         <div class="tache-actions">
-          ${t.done?`<button class="tache-del" data-arch-t="${t.id}" title="Archiver">🗃️</button>`:''}
-          <button class="tache-del" data-del-t="${t.id}" title="Supprimer">🗑️</button>
+          ${t.done?`<button class="tache-del" data-arch-t="${t.id}" title="Archiver">🗃️</button><button class="btn btn-ghost btn-sm" data-del-t="${t.id}" style="color:var(--danger);font-size:.7rem;padding:3px 7px">🗑️ Supprimer</button>`:`<button class="tache-del" data-del-t="${t.id}" title="Supprimer">🗑️</button>`}
         </div>
       </div>`;
     });
@@ -2618,11 +2660,21 @@ function renderRediger(){
     toast('Brouillon effacé');
   });
 
-  // Translate to English
+  // Translate toggle EN <-> FR
+  var _rdOrigFr=null;
   $('rd-translate').addEventListener('click',async function(){
+    const btn=$('rd-translate');
+    // If already translated → restore French
+    if(_rdOrigFr!==null){
+      rdBody.value=_rdOrigFr;
+      try{store.setItem('rms_message_draft',_rdOrigFr);}catch(e){}
+      _rdOrigFr=null;
+      btn.innerHTML='🇬🇧 Traduire en anglais';
+      toast('Texte original restauré !');
+      return;
+    }
     const txt=rdBody.value.trim();
     if(!txt){toast('Aucun texte à traduire');return;}
-    const btn=$('rd-translate');
     btn.disabled=true;
     btn.textContent='⏳…';
     try{
@@ -2630,6 +2682,7 @@ function renderRediger(){
       const resp=await fetch(url);
       const data=await resp.json();
       const translated=data[0].map(function(x){return x[0];}).join('');
+      _rdOrigFr=txt;
       rdBody.value=translated;
       try{store.setItem('rms_message_draft',translated);}catch(e){}
       toast('Traduit en anglais !');
@@ -2637,7 +2690,7 @@ function renderRediger(){
       toast('Erreur de traduction — vérifiez votre connexion');
     }finally{
       btn.disabled=false;
-      btn.innerHTML='🇬🇧 Traduire en anglais';
+      btn.innerHTML=_rdOrigFr!==null?'🇫🇷 Retour en français':'🇬🇧 Traduire en anglais';
     }
   });
 
