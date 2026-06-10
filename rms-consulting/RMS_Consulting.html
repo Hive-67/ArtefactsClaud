@@ -896,6 +896,94 @@ body.day #header-logo-light{display:inline-block}
   </div>
 </div>
 
+<!-- ===== HIVEOS INFO PAGE ===== -->
+<div id="modal-hiveos-info" class="hidden">
+  <div class="hi-panel">
+
+    <div class="hi-header">
+      <button class="hi-close-btn" id="hi-close-btn" title="Fermer">✕</button>
+      <div class="hi-header-row">
+        <span class="hi-bee">🐝</span>
+        <div>
+          <div class="hi-brand">HiveOS</div>
+          <div class="hi-tagline">Guide d'utilisation · RMS Consulting CRM</div>
+        </div>
+      </div>
+      <div class="hi-handle"></div>
+    </div>
+
+    <div class="hi-body">
+
+      <!-- 🔒 Local -->
+      <div class="hi-card">
+        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#434343,#000)">🔒</div>
+        <div class="hi-card-body">
+          <div class="hi-card-title">100 % Local <span class="hi-badge">OFFLINE</span></div>
+          <div class="hi-text">Le programme fonctionne <strong>directement sur votre appareil</strong> (tablette, ordinateur ou téléphone), sans internet ni serveur. Vos données ne quittent jamais votre machine.</div>
+        </div>
+      </div>
+
+      <!-- 📁 Drive -->
+      <div class="hi-card">
+        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#4facfe,#00c6ff)">📁</div>
+        <div class="hi-card-body">
+          <div class="hi-card-title">Le Drive Partagé <span class="hi-badge">IMPORTANT</span></div>
+          <div class="hi-text">Pour échanger vos données, utilisez un espace de partage <strong>auquel vous avez accès toutes les deux</strong>. Créez-y deux sous-dossiers&nbsp;:</div>
+          <div class="hi-tree">
+            <div class="hi-tree-root">☁️ Drive partagé</div>
+            <div class="hi-tree-branch">
+              <div class="hi-tree-item accent">📂 Julie</div>
+              <div class="hi-tree-item accent">📂 Margaux</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔄 Routine -->
+      <div class="hi-card">
+        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#f093fb,#f5576c)">🔄</div>
+        <div class="hi-card-body">
+          <div class="hi-card-title">La routine quotidienne</div>
+          <div class="hi-steps">
+            <div class="hi-step">
+              <div class="hi-step-num">1</div>
+              <div class="hi-step-body">
+                <strong>Votre sauvegarde</strong> — Après chaque utilisation, cliquez sur la <strong>💾 disquette</strong>. Téléchargez votre fichier <strong>.json</strong> et placez-le dans <strong>votre</strong> dossier sur le Drive.
+              </div>
+            </div>
+            <div class="hi-step">
+              <div class="hi-step-num">2</div>
+              <div class="hi-step-body">
+                <strong>La synchronisation</strong> (en fin de journée) — Allez dans le dossier de votre collègue, ouvrez son dernier <strong>.json</strong>. Copiez tout le texte. Dans l'app : <strong>💾 Sauvegarde › Import JSON</strong>, collez et cliquez <strong>Importer</strong>.
+                <div class="hi-tip">✨ <strong>Fusion automatique</strong> — Le programme intègre automatiquement les nouveautés de votre collègue sans écraser les vôtres&nbsp;!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📝 Bloc-notes -->
+      <div class="hi-card">
+        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">📝</div>
+        <div class="hi-card-body">
+          <div class="hi-card-title">Bloc-notes · Retours &amp; idées</div>
+          <div class="hi-text">Notez ici vos idées, bugs ou questions. Deux boutons en bas de la fenêtre&nbsp;:</div>
+          <div class="hi-btns-row">
+            <span class="hi-btn-pill">📋 Copier — copie proprement votre note</span>
+            <span class="hi-btn-pill">✉️ Email — envoie directement à Quentin</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="hi-footer">
+      🐝 HiveOS &nbsp;·&nbsp; RMS Consulting CRM &nbsp;·&nbsp; Fait avec ♥ pour Margaux &amp; Julie
+    </div>
+
+  </div>
+</div>
+
 <script>
 /*__SEED_START__*/
 const SEED_DATA={
@@ -2264,92 +2352,5 @@ initTasksFloat();
 switchView('dashboard');
 </script>
 
-<!-- ===== HIVEOS INFO PAGE ===== -->
-<div id="modal-hiveos-info" class="hidden">
-  <div class="hi-panel">
-
-    <div class="hi-header">
-      <button class="hi-close-btn" id="hi-close-btn" title="Fermer">✕</button>
-      <div class="hi-header-row">
-        <span class="hi-bee">🐝</span>
-        <div>
-          <div class="hi-brand">HiveOS</div>
-          <div class="hi-tagline">Guide d'utilisation · RMS Consulting CRM</div>
-        </div>
-      </div>
-      <div class="hi-handle"></div>
-    </div>
-
-    <div class="hi-body">
-
-      <!-- 🔒 Local -->
-      <div class="hi-card">
-        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#434343,#000)">🔒</div>
-        <div class="hi-card-body">
-          <div class="hi-card-title">100 % Local <span class="hi-badge">OFFLINE</span></div>
-          <div class="hi-text">Le programme fonctionne <strong>directement sur votre appareil</strong> (tablette, ordinateur ou téléphone), sans internet ni serveur. Vos données ne quittent jamais votre machine.</div>
-        </div>
-      </div>
-
-      <!-- 📁 Drive -->
-      <div class="hi-card">
-        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#4facfe,#00c6ff)">📁</div>
-        <div class="hi-card-body">
-          <div class="hi-card-title">Le Drive Partagé <span class="hi-badge">IMPORTANT</span></div>
-          <div class="hi-text">Pour échanger vos données, utilisez un espace de partage <strong>auquel vous avez accès toutes les deux</strong>. Créez-y deux sous-dossiers&nbsp;:</div>
-          <div class="hi-tree">
-            <div class="hi-tree-root">☁️ Drive partagé</div>
-            <div class="hi-tree-branch">
-              <div class="hi-tree-item accent">📂 Julie</div>
-              <div class="hi-tree-item accent">📂 Margaux</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🔄 Routine -->
-      <div class="hi-card">
-        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#f093fb,#f5576c)">🔄</div>
-        <div class="hi-card-body">
-          <div class="hi-card-title">La routine quotidienne</div>
-          <div class="hi-steps">
-            <div class="hi-step">
-              <div class="hi-step-num">1</div>
-              <div class="hi-step-body">
-                <strong>Votre sauvegarde</strong> — Après chaque utilisation, cliquez sur la <strong>💾 disquette</strong>. Téléchargez votre fichier <strong>.json</strong> et placez-le dans <strong>votre</strong> dossier sur le Drive.
-              </div>
-            </div>
-            <div class="hi-step">
-              <div class="hi-step-num">2</div>
-              <div class="hi-step-body">
-                <strong>La synchronisation</strong> (en fin de journée) — Allez dans le dossier de votre collègue, ouvrez son dernier <strong>.json</strong>. Copiez tout le texte. Dans l'app : <strong>💾 Sauvegarde › Import JSON</strong>, collez et cliquez <strong>Importer</strong>.
-                <div class="hi-tip">✨ <strong>Fusion automatique</strong> — Le programme intègre automatiquement les nouveautés de votre collègue sans écraser les vôtres&nbsp;!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 📝 Bloc-notes -->
-      <div class="hi-card">
-        <div class="hi-icon-wrap" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">📝</div>
-        <div class="hi-card-body">
-          <div class="hi-card-title">Bloc-notes · Retours &amp; idées</div>
-          <div class="hi-text">Notez ici vos idées, bugs ou questions. Deux boutons en bas de la fenêtre&nbsp;:</div>
-          <div class="hi-btns-row">
-            <span class="hi-btn-pill">📋 Copier — copie proprement votre note</span>
-            <span class="hi-btn-pill">✉️ Email — envoie directement à Quentin</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="hi-footer">
-      🐝 HiveOS &nbsp;·&nbsp; RMS Consulting CRM &nbsp;·&nbsp; Fait avec ♥ pour Margaux &amp; Julie
-    </div>
-
-  </div>
-</div>
 </body>
 </html>
