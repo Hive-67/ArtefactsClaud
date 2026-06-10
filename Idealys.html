@@ -867,14 +867,20 @@ function drawRuche(){
     ng.addEventListener('mousedown',ev=>{
       if(ev.button!==0)return;
       ev.stopPropagation();
-      if(ui.ruche.connectMode){
-        handleConnect(id,ng);return;
-      }
+      if(ui.ruche.connectMode){handleConnect(id,ng);return}
       const pos=getPos(id);
       ui.ruche.dragging=id;
       ui.ruche.dragNodeStart={mx:ev.clientX,my:ev.clientY,ox:pos.x,oy:pos.y};
     });
     ng.addEventListener('click',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode)selectIdea(id)});
+    ng.addEventListener('touchstart',ev=>{
+      ev.stopPropagation();
+      if(ev.touches.length!==1)return;
+      const t=ev.touches[0];
+      if(ui.ruche.connectMode){handleConnect(id,ng);return}
+      const pos=getPos(id);
+      ui.ruche._touchPending={id,mx:t.clientX,my:t.clientY,ox:pos.x,oy:pos.y};
+    },{passive:true});
   });
 }
 
@@ -1045,6 +1051,62 @@ function initRucheEvents(){
   window.addEventListener('mouseup',()=>{
     if(ui.ruche.dragging){persistState();ui.ruche.dragging=null;ui.ruche.dragNodeStart=null}
     ui.ruche.panning=false;container.classList.remove('panning');ui.ruche.panStart=null;
+  });
+
+  // ── Touch support ──
+  function pinchDist(ev){const a=ev.touches[0],b=ev.touches[1];return Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY)}
+
+  svg.addEventListener('touchstart',ev=>{
+    if(ev.touches.length===1){
+      const t=ev.touches[0],tg=ev.target;
+      if(tg===svg||tg.id==='ruche-g'||tg.id==='ruche-edges'||tg.id==='ruche-nodes'){
+        ui.ruche.panning=true;
+        ui.ruche.panStart={mx:t.clientX,my:t.clientY,tx:ui.ruche.tx,ty:ui.ruche.ty};
+        container.classList.add('panning');
+      }
+    } else if(ev.touches.length===2){
+      ui.ruche.panning=false;
+      ui.ruche._pinch0=pinchDist(ev);
+      ui.ruche._pinchScale=ui.ruche.scale;
+    }
+  },{passive:true});
+
+  window.addEventListener('touchmove',ev=>{
+    if(ev.touches.length===2&&ui.ruche._pinch0){
+      const f=pinchDist(ev)/ui.ruche._pinch0;
+      ui.ruche.scale=Math.min(3,Math.max(.2,ui.ruche._pinchScale*f));
+      applyRucheTransform();
+      ev.preventDefault();return;
+    }
+    if(ev.touches.length!==1)return;
+    const t=ev.touches[0];
+    if(ui.ruche._touchPending&&!ui.ruche.dragging){
+      const p=ui.ruche._touchPending;
+      if(Math.hypot(t.clientX-p.mx,t.clientY-p.my)>6){
+        ui.ruche.dragging=p.id;
+        ui.ruche.dragNodeStart={mx:p.mx,my:p.my,ox:p.ox,oy:p.oy};
+        ui.ruche._touchPending=null;
+      }
+    }
+    if(ui.ruche.panning&&!ui.ruche.dragging){
+      ui.ruche.tx=ui.ruche.panStart.tx+(t.clientX-ui.ruche.panStart.mx);
+      ui.ruche.ty=ui.ruche.panStart.ty+(t.clientY-ui.ruche.panStart.my);
+      applyRucheTransform();ev.preventDefault();
+    }
+    if(ui.ruche.dragging){
+      const ds=ui.ruche.dragNodeStart;
+      const dx=(t.clientX-ds.mx)/ui.ruche.scale,dy=(t.clientY-ds.my)/ui.ruche.scale;
+      state.mapPositions[ui.ruche.dragging]={x:ds.ox+dx,y:ds.oy+dy};
+      const ng=document.querySelector(`.ruche-node-g[data-id="${ui.ruche.dragging}"]`);
+      if(ng){const p=state.mapPositions[ui.ruche.dragging];ng.setAttribute('transform',`translate(${p.x},${p.y})`)}
+      redrawEdges();ev.preventDefault();
+    }
+  },{passive:false});
+
+  window.addEventListener('touchend',()=>{
+    if(ui.ruche._touchPending){selectIdea(ui.ruche._touchPending.id);ui.ruche._touchPending=null}
+    if(ui.ruche.dragging){persistState();ui.ruche.dragging=null;ui.ruche.dragNodeStart=null}
+    ui.ruche.panning=false;container.classList.remove('panning');ui.ruche.panStart=null;ui.ruche._pinch0=null;
   });
   svg.addEventListener('wheel',ev=>{
     ev.preventDefault();
