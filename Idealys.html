@@ -368,6 +368,8 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .rush-ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:12px}
 .rush-idea-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px;transition:border-color .2s}
 .rush-idea-card:hover{border-color:var(--ac)}
+.done-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:var(--bg3);margin-bottom:6px}
+.done-item-title{flex:1;font-size:.8rem;color:var(--tx2);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ===== CONFIRM ===== */
 #confirm-modal .modal{max-width:380px}
@@ -609,7 +611,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
       <div class="radio-group" id="f-status">
         <div class="radio-opt selected" data-val="backlog">💡 Idées</div>
         <div class="radio-opt" data-val="in_progress">🔥 En cours</div>
-        <div class="radio-opt" data-val="review">👀 En revue</div>
+        <div class="radio-opt" data-val="paused">⏸️ En pause</div>
         <div class="radio-opt" data-val="done">✅ Terminée</div>
         <div class="radio-opt" data-val="archived">🗃️ Archivée</div>
       </div>
@@ -676,7 +678,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 const SEED_DATA={ideas:[{id:"id1",title:"Chaîne YouTube IA & Code",description:"Partager mes expériences avec l'IA, le code et les projets HiveOS en vidéos accessibles.",category:"Contenu",priority:"high",status:"in_progress",tags:["youtube","ia","tutoriels"],color:"#c21758",steps:[{id:"s1",title:"Définir le concept et le nom",done:true,order:0},{id:"s2",title:"Créer l'identité visuelle",done:true,order:1},{id:"s3",title:"Tourner le pilote",done:false,order:2},{id:"s4",title:"Mettre en ligne et promouvoir",done:false,order:3}],connections:["id2","id3"],notes:"",createdAt:"2024-01-10T10:00:00Z",updatedAt:"2024-01-20T14:30:00Z",dueDate:"2024-03-01"},{id:"id2",title:"Bot Discord IA pour le serveur",description:"Un bot intelligent qui répond aux questions des membres et automatise la modération.",category:"Tech",priority:"medium",status:"backlog",tags:["discord","bot","ia"],color:"#5865f2",steps:[{id:"s5",title:"Choisir la stack technique",done:false,order:0},{id:"s6",title:"Développer les commandes de base",done:false,order:1},{id:"s7",title:"Intégrer Claude API",done:false,order:2}],connections:["id1"],notes:"",createdAt:"2024-01-12T09:00:00Z",updatedAt:"2024-01-12T09:00:00Z",dueDate:null},{id:"id3",title:"HiveOS v2 — Refonte complète",description:"Nouvelle version du framework HiveOS avec de nouveaux thèmes, composants améliorés et meilleure DX.",category:"Tech",priority:"critical",status:"in_progress",tags:["hiveos","framework","design"],color:"#7d206f",steps:[{id:"s8",title:"Audit de l'existant",done:true,order:0},{id:"s9",title:"Nouveaux thèmes v2",done:false,order:1},{id:"s10",title:"Documentation complète",done:false,order:2},{id:"s11",title:"Mise en ligne",done:false,order:3}],connections:["id1","id4"],notes:"",createdAt:"2024-01-05T08:00:00Z",updatedAt:"2024-01-22T16:00:00Z",dueDate:"2024-04-01"},{id:"id4",title:"Pack templates Discord gaming",description:"Série de templates Discord prêts à l'emploi pour les communautés gaming.",category:"Business",priority:"medium",status:"done",tags:["discord","templates","gaming"],color:"#50fa7b",steps:[{id:"s12",title:"Concevoir les templates",done:true,order:0},{id:"s13",title:"Créer les visuels",done:true,order:1},{id:"s14",title:"Publier et vendre",done:true,order:2}],connections:["id3"],notes:"",createdAt:"2024-01-01T10:00:00Z",updatedAt:"2024-01-18T12:00:00Z",dueDate:null},{id:"id5",title:"Newsletter hebdomadaire tech",description:"Une newsletter pour partager les meilleurs outils IA et tips de la semaine.",category:"Contenu",priority:"low",status:"backlog",tags:["newsletter","contenu","ia"],color:"#ffb86c",steps:[{id:"s15",title:"Choisir la plateforme",done:false,order:0},{id:"s16",title:"Rédiger le premier numéro",done:false,order:1}],connections:[],notes:"",createdAt:"2024-01-20T11:00:00Z",updatedAt:"2024-01-20T11:00:00Z",dueDate:null}],categories:["Contenu","Tech","Discord","Business","Personnel"],mapPositions:{id1:{x:500,y:300},id2:{x:280,y:180},id3:{x:720,y:200},id4:{x:800,y:380},id5:{x:300,y:420}}};
 /*__SEED_END__*/
 
-const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'review',label:'En revue',emoji:'👀',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Archivées',emoji:'🗃️',color:'#8892a4'}];
+const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Archivées',emoji:'🗃️',color:'#8892a4'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
@@ -763,6 +765,7 @@ function renderDashboard(){
       <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-label">Idées totales</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--ac)">${projCount}</div><div class="stat-label">📁 Projets</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--warn)">${byS.in_progress||0}</div><div class="stat-label">🔥 En cours</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:#ffb86c">${byS.paused||0}</div><div class="stat-label">⏸️ En pause</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--ok)">${byS.done||0}</div><div class="stat-label">✅ Terminées</div></div>
       <div class="stat-card"><div class="stat-val">${pct}%</div><div class="stat-label">Progression</div><div class="progress-bar mt8"><div class="progress-fill" style="width:${pct}%"></div></div></div>
     </div>
@@ -786,9 +789,25 @@ function renderDashboard(){
         <input type="text" id="quick-title" placeholder="Titre de la nouvelle idée…">
         <button class="btn btn-primary" id="quick-add-go">Ajouter</button>
       </div>
+    </div>
+    <div class="dash-section" id="dash-done-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">✅ Terminées (${byS.done||0})</h3>
+        ${(byS.done||0)>0?`<button class="btn btn-sm" id="dash-clear-done" style="border-color:var(--danger);color:var(--danger)">🗑️ Tout supprimer</button>`:''}
+      </div>
+      ${(byS.done||0)===0?`<p style="font-size:.78rem;color:var(--tx2);font-style:italic">Aucune idée terminée pour l'instant.</p>`
+      :state.ideas.filter(i=>i.status==='done').map(i=>`
+        <div class="done-item" data-id="${i.id}">
+          <span class="done-item-title">${esc(i.title)}</span>
+          <span style="font-size:.72rem;color:var(--tx2)">${i.type==='project'?'📁':''}</span>
+          <button class="idea-card-btn done-del" data-id="${i.id}" title="Supprimer">🗑️</button>
+        </div>`).join('')}
     </div>`;
   el.querySelectorAll('.idea-mini[data-id]').forEach(el2=>el2.addEventListener('click',()=>openIdeaModal(el2.dataset.id)));
   el.querySelector('#dash-add-btn').addEventListener('click',()=>openIdeaModal());
+  el.querySelectorAll('.done-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ?','Supprimer cette idée terminée ?',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderDashboard()})));
+  const clearDone=el.querySelector('#dash-clear-done');
+  if(clearDone)clearDone.addEventListener('click',()=>confirm2('Tout supprimer ?','Supprimer toutes les idées terminées ?',()=>{state.ideas=state.ideas.filter(i=>i.status!=='done');persistState();renderDashboard()}));
   const qgo=el.querySelector('#quick-add-go');
   qgo.addEventListener('click',()=>{
     const inp=document.getElementById('quick-title');
