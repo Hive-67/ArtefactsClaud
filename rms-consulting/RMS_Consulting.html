@@ -541,6 +541,10 @@ body.day #header-logo-light{display:inline-block}
       <span class="sb-label">Relances</span>
       <span class="sb-badge hidden" id="sb-badge-relances"></span>
     </div>
+    <div class="sb-item sb-action" id="sb-send-cr" data-tooltip="Envoyer CR par mail" style="border:1px solid color-mix(in srgb,var(--ac) 28%,transparent);margin-top:4px">
+      <span class="sb-icon">📧</span>
+      <span class="sb-label">Envoyer CR</span>
+    </div>
     <hr class="sb-divider">
     <div class="sb-section">Planning</div>
     <div class="sb-item" data-view="agenda" data-tooltip="Rendez-vous">
@@ -2060,6 +2064,7 @@ function initEvents(){
       else switchView(btn.dataset.view);
     });
   });
+  $('sb-send-cr').addEventListener('click',function(){sendCREmail();});
   // Bottom nav
   document.querySelectorAll('#bottom-nav .nav-btn').forEach(btn=>{
     btn.addEventListener('click',()=>switchView(btn.dataset.view));
@@ -2955,7 +2960,7 @@ function sendCREmail(){
 
   var subject='CR Dashboard — '+now.toLocaleDateString('fr-FR');
   var body=lines.join('\n');
-  var mailto='mailto:rms-consulting@outlook.fr?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  var mailto='mailto:rms-consulting@outlook.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   window.open(mailto,'_self');
   toast('CR ouvert dans votre messagerie !');
 }
