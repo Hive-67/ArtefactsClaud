@@ -642,7 +642,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
         <div class="radio-opt" data-val="in_progress">🔥 En cours</div>
         <div class="radio-opt" data-val="paused">⏸️ En pause</div>
         <div class="radio-opt" data-val="done">✅ Terminée</div>
-        <div class="radio-opt" data-val="archived">🗃️ Archivée</div>
+        <div class="radio-opt" data-val="archived">🔄 Amélioration</div>
       </div>
     </div>
     <div class="form-row">
@@ -707,7 +707,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 const SEED_DATA={ideas:[],categories:[],mapPositions:{},prompts:[]};
 /*__SEED_END__*/
 
-const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Archivées',emoji:'🗃️',color:'#8892a4'}];
+const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Amélioration continue',emoji:'🔄',color:'#8892a4'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
@@ -820,12 +820,19 @@ function renderDashboard(){
         ${recent.length?recent.map(i=>{const st=STATUSES.find(s=>s.id===i.status)||STATUSES[0];return`<div class="idea-mini" data-id="${i.id}"><span class="idea-mini-dot" style="background:${i.color||st.color}"></span><span class="idea-mini-title">${esc(i.title)}</span><span class="idea-mini-badge">${st.emoji}</span></div>`}).join(''):'<div class="empty-state"><div class="empty-icon">💡</div>Aucune idée encore</div>'}
       </div>
     </div>
-    <div class="dash-section">
-      <h3>Ajout rapide</h3>
-      <div class="quick-add">
-        <input type="text" id="quick-title" placeholder="Titre de la nouvelle idée…">
-        <button class="btn btn-primary" id="quick-add-go">Ajouter</button>
+    <div class="dash-section" id="dash-amelio-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">🔄 Amélioration continue (${byS.archived||0})</h3>
+        <button class="btn btn-sm btn-ghost" id="dash-amelio-add" style="font-size:.7rem">＋ Ajouter</button>
       </div>
+      ${(byS.archived||0)===0
+        ?`<p style="font-size:.78rem;color:var(--tx2);font-style:italic">Aucun élément en amélioration continue.</p>`
+        :state.ideas.filter(i=>i.status==='archived').map(i=>{const pr=PRIORITIES.find(p=>p.id===i.priority)||PRIORITIES[1];return`<div class="idea-mini amelio-item" data-id="${i.id}" style="border-color:var(--brd)">
+          <span class="idea-mini-dot" style="background:${i.color||'#8892a4'}"></span>
+          <span class="idea-mini-title">${esc(i.title)}${i.type==='project'?'<span class="project-pill">proj</span>':''}</span>
+          <span class="idea-mini-badge">${pr.emoji}</span>
+          <button class="idea-card-btn amelio-edit" data-id="${i.id}" title="Modifier">✏️</button>
+        </div>`}).join('')}
     </div>
     <div class="dash-section" id="dash-done-section">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -846,14 +853,9 @@ function renderDashboard(){
   el.querySelectorAll('.done-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ?','Supprimer cette idée terminée ?',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderDashboard()})));
   const clearDone=el.querySelector('#dash-clear-done');
   if(clearDone)clearDone.addEventListener('click',()=>confirm2('Tout supprimer ?','Supprimer toutes les idées terminées ?',()=>{state.ideas=state.ideas.filter(i=>i.status!=='done');persistState();renderDashboard()}));
-  const qgo=el.querySelector('#quick-add-go');
-  qgo.addEventListener('click',()=>{
-    const inp=document.getElementById('quick-title');
-    const t=inp.value.trim();
-    if(!t){inp.focus();inp.style.borderColor='var(--danger)';setTimeout(()=>{inp.style.borderColor=''},1200);return}
-    createIdea({title:t});inp.value='';toast('Idée ajoutée !');renderDashboard();
-  });
-  el.querySelector('#quick-title').addEventListener('keydown',ev=>{if(ev.key==='Enter')qgo.click()});
+  el.querySelector('#dash-amelio-add').addEventListener('click',()=>openIdeaModal(null,null,'archived'));
+  el.querySelectorAll('.amelio-item').forEach(el2=>el2.addEventListener('click',ev=>{if(!ev.target.closest('button'))openIdeaModal(el2.dataset.id)}));
+  el.querySelectorAll('.amelio-edit').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();openIdeaModal(b.dataset.id)}));
 }
 
 /* ===== RUCHE — MIND MAP ===== */
