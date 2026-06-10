@@ -209,6 +209,8 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 /* ===== MODALS ===== */
 .modal-overlay{position:fixed;inset:0;background:#0009;z-index:800;display:flex;align-items:flex-end;justify-content:center}
 .modal-overlay.centered{align-items:center}
+#modal-client{align-items:flex-start;padding-top:16px}
+#modal-client .modal{border-radius:14px}
 .modal-overlay.hidden{display:none!important}
 .modal{background:var(--bg2);border:1px solid var(--brd);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative}
 .modal-overlay.centered .modal{border-radius:14px;max-height:88vh}
@@ -680,6 +682,10 @@ body.day #header-logo-light{display:inline-block}
       <input type="email" id="f-mail" placeholder="email@exemple.fr">
     </div>
     <div class="form-row">
+      <label>Date de naissance</label>
+      <input type="date" id="f-datenaissance">
+    </div>
+    <div class="form-row">
       <label>Situation familiale</label>
       <select id="f-situation">
         <option value="">— choisir —</option>
@@ -1133,6 +1139,14 @@ function fmtDatetime(iso){
   return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 }
 
+function calcAge(dateStr){
+  if(!dateStr)return null;
+  const b=new Date(dateStr);const n=new Date();
+  let age=n.getFullYear()-b.getFullYear();
+  if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))age--;
+  return age;
+}
+
 function relanceStatus(dateStr){
   if(!dateStr)return null;
   const t=today();
@@ -1462,6 +1476,8 @@ function renderClientPanel(c){
       ${c.mail?`<div class="info-block"><div class="info-block-label">Email</div><div class="info-block-val" style="font-size:.72rem">${esc(c.mail)}</div></div>`:''}
       ${c.situation?`<div class="info-block"><div class="info-block-label">Situation</div><div class="info-block-val">${esc(c.situation)}</div></div>`:''}
       ${c.revenus?`<div class="info-block"><div class="info-block-label">Revenus/mois</div><div class="info-block-val">${Number(c.revenus).toLocaleString('fr-FR')} €</div></div>`:''}
+      ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Date de naissance</div><div class="info-block-val">${new Date(c.dateNaissance).toLocaleDateString('fr-FR')}</div></div>`:''}
+      ${c.dateNaissance?`<div class="info-block"><div class="info-block-label">Âge</div><div class="info-block-val">${calcAge(c.dateNaissance)} ans</div></div>`:''}
       ${c.source?`<div class="info-block"><div class="info-block-label">Recommandé par</div><div class="info-block-val">${esc(c.source)}</div></div>`:''}
       ${c.objectifs?`<div class="info-block full"><div class="info-block-label">Objectifs</div><div class="info-block-val" style="font-size:.78rem;font-weight:400;line-height:1.5">${esc(c.objectifs)}</div></div>`:''}
     </div>
@@ -1600,6 +1616,7 @@ function openModalClient(id){
   $('f-nom').value=c?c.nom:'';
   $('f-tel').value=c?c.tel:'';
   $('f-mail').value=c?c.mail:'';
+  $('f-datenaissance').value=c?c.dateNaissance||'':'';
   $('f-situation').value=c?c.situation:'';
   $('f-revenus').value=c?c.revenus:'';
   $('f-source').value=c?c.source:'';
@@ -1616,13 +1633,13 @@ function saveClient(){
   if(!prenom||!nom){toast('Prénom et nom requis');return;}
   if(id){
     const c=getClient(id);
-    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
+    Object.assign(c,{prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim()});
     persistState();
     $('panel-client-title').textContent=c.prenom+' '+c.nom;
     renderClientPanel(c);
     toast('Client modifié !');
   } else {
-    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
+    const c={id:genId(),prenom,nom,tel:$('f-tel').value.trim(),mail:$('f-mail').value.trim(),dateNaissance:$('f-datenaissance').value||null,situation:$('f-situation').value,revenus:$('f-revenus').value?Number($('f-revenus').value):null,source:$('f-source').value.trim(),objectifs:$('f-objectifs').value.trim(),createdAt:new Date().toISOString(),historique:[],sousDossiers:[]};
     state.clients.push(c);
     persistState();
     toast('Client créé !');
@@ -1678,6 +1695,10 @@ function renderAgenda(){
     <div class="agenda-toggle">
       <button class="${isWeek?'active':''}" id="agt-sem">Semaine</button>
       <button class="${!isWeek?'active':''}" id="agt-jour">Jour</button>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.72rem;color:var(--tx2);line-height:1.5">
+      <span style="font-size:1rem;flex-shrink:0">💡</span>
+      <span>Si utile, je peux connecter cet agenda à celui de <strong style="color:var(--tx)">Margaux</strong> — mais un agenda intégré n'est pas forcément le meilleur outil pour ce type de suivi.</span>
     </div>`;
 
   if(isWeek){
@@ -1889,7 +1910,7 @@ function initEvents(){
   $('btn-theme').addEventListener('click',()=>{buildThemeMenu();$('theme-menu').classList.toggle('hidden')});
   $('btn-daynight').addEventListener('click',()=>{ui.dayMode=!ui.dayMode;applyTheme()});
   $('btn-save').addEventListener('click',openSaveModal);
-  $('btn-help').addEventListener('click',startTutorial);
+  $('btn-help').addEventListener('click',function(e){e.stopPropagation();startTutorial();});
   document.addEventListener('click',e=>{if(!$('theme-wrap').contains(e.target))$('theme-menu').classList.add('hidden')});
 
   // Sidebar nav
@@ -2194,7 +2215,7 @@ function _showTutoStep(){
   let tl,tt;
   if(s.placement==='right'){
     tl=r.right+pad+10;
-    tt=r.top+r.height/2-th/2-70;
+    tt=r.top+r.height/2-th/2-130;
     tl=Math.min(tl,window.innerWidth-tw-8);
     tt=Math.max(60,Math.min(tt,window.innerHeight-th-20));
   } else {
