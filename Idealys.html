@@ -93,7 +93,7 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .view{display:none;height:100%;overflow:auto;padding:20px}
 .view.active{display:flex;flex-direction:column;gap:16px}
 #view-ruche.active{padding:0;overflow:hidden}
-#view-kanban.active{overflow:hidden;flex-direction:row;gap:0;padding:0}
+#view-kanban.active{overflow:hidden;flex-direction:column;gap:0;padding:0}
 
 /* ===== DASHBOARD ===== */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
@@ -148,7 +148,9 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .step-add input:focus{outline:none;border-color:var(--ac)}
 
 /* ===== KANBAN ===== */
-#kanban-board{display:flex;height:100%;overflow-x:auto}
+#kanban-tag-bar{flex-shrink:0;padding:8px 14px;border-bottom:1px solid var(--brd);background:var(--bg2)}
+#kanban-tag-bar:empty{display:none}
+#kanban-board{display:flex;flex:1;overflow-x:auto;overflow-y:hidden}
 .kanban-col{min-width:240px;max-width:280px;flex:1;display:flex;flex-direction:column;border-right:1px solid var(--brd);background:var(--bg)}
 .kanban-col:last-child{border-right:none}
 .kanban-col-header{padding:12px 14px 10px;font-size:.78rem;font-weight:700;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
@@ -492,6 +494,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
       </div>
     </div>
     <div id="view-kanban" class="view">
+      <div id="kanban-tag-bar"></div>
       <div id="kanban-board"></div>
     </div>
     <div id="view-liste" class="view" style="padding:0;flex-direction:column">
@@ -708,7 +711,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 const SEED_DATA={ideas:[],categories:[],mapPositions:{},prompts:[]};
 /*__SEED_END__*/
 
-const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'},{id:'archived',label:'Amélioration continue',emoji:'🔄',color:'#8892a4'}];
+const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'archived',label:'Amélioration continue',emoji:'🔄',color:'#8892a4'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
@@ -1257,10 +1260,9 @@ function toggleConnection(fromId,toId){
 /* ===== KANBAN ===== */
 function renderKanban(){
   const board=document.getElementById('kanban-board');
-  const wrap=board.parentElement;
-  let bar=wrap.querySelector('.tag-filter-bar');if(bar)bar.remove();
-  const barHTML=tagFilterBarHTML();
-  if(barHTML){wrap.insertAdjacentHTML('afterbegin',barHTML);bindTagFilter(wrap,renderKanban)}
+  const tagBarEl=document.getElementById('kanban-tag-bar');
+  tagBarEl.innerHTML=tagFilterBarHTML();
+  if(tagBarEl.innerHTML)bindTagFilter(tagBarEl,renderKanban);
   board.innerHTML='';
   STATUSES.forEach(status=>{
     const ideas=applyTagFilter(state.ideas.filter(i=>i.status===status.id));
