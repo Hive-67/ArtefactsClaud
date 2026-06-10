@@ -376,6 +376,12 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .tag-filter-clear{font-size:.68rem;padding:3px 9px;border-radius:10px;background:transparent;color:var(--danger);border:1px solid var(--danger);cursor:pointer;transition:all .15s}
 .tag-filter-clear:hover{background:var(--danger);color:#fff}
 .tag-chip.clickable{cursor:pointer;transition:opacity .15s}.tag-chip.clickable:hover{opacity:.75}
+.nav-drag-handle{margin-left:auto;font-size:1rem;color:var(--tx2);opacity:.3;cursor:grab;touch-action:none;flex-shrink:0;user-select:none;padding:0 4px;line-height:1;letter-spacing:-1px}
+.nav-drag-handle:hover{opacity:.8}
+.nav-btn.dragging .nav-drag-handle{cursor:grabbing}
+#sidebar.collapsed .nav-drag-handle{display:none}
+.tag-dash-chip{display:inline-block;font-size:.7rem;padding:4px 10px;border-radius:10px;background:var(--bg3);color:var(--tx2);cursor:pointer;border:1px solid var(--brd);transition:all .15s;user-select:none}
+.tag-dash-chip:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 /* ===== PROMPTS VIEW ===== */
 .prompt-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px;margin-bottom:14px;transition:border-color .2s}
 .prompt-card:hover{border-color:var(--ac)}
@@ -434,13 +440,13 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 <!-- APP -->
 <div id="app">
   <nav id="sidebar">
-    <button class="nav-btn active" data-view="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
-    <button class="nav-btn" data-view="idees"><span class="nav-icon">💡</span><span class="nav-label">Idées</span></button>
-    <button class="nav-btn" data-view="projets"><span class="nav-icon">📁</span><span class="nav-label">Projets</span></button>
-    <button class="nav-btn" data-view="ruche"><span class="nav-icon">🐝</span><span class="nav-label">Ruche</span></button>
-    <button class="nav-btn" data-view="kanban"><span class="nav-icon">📋</span><span class="nav-label">Kanban</span></button>
-    <button class="nav-btn" data-view="liste"><span class="nav-icon">📑</span><span class="nav-label">Liste</span></button>
-    <button class="nav-btn" data-view="prompts"><span class="nav-icon">🤖</span><span class="nav-label">Prompts</span></button>
+    <button class="nav-btn active" data-view="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="idees"><span class="nav-icon">💡</span><span class="nav-label">Idées</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="projets"><span class="nav-icon">📁</span><span class="nav-label">Projets</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="ruche"><span class="nav-icon">🐝</span><span class="nav-label">Ruche</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="kanban"><span class="nav-icon">📋</span><span class="nav-label">Kanban</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="liste"><span class="nav-icon">📑</span><span class="nav-label">Liste</span><span class="nav-drag-handle">⠿</span></button>
+    <button class="nav-btn" data-view="prompts"><span class="nav-icon">🤖</span><span class="nav-label">Prompts</span><span class="nav-drag-handle">⠿</span></button>
     <button class="nav-btn" id="sidebar-toggle" style="margin-top:auto"><span class="nav-icon">◀</span><span class="nav-label">Réduire</span></button>
   </nav>
   <main id="main">
@@ -780,11 +786,18 @@ function renderDashboard(){
   const pct=tS?Math.round(dS/tS*100):0;
   const recent=[...state.ideas].sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt)).slice(0,6);
   const projCount=state.ideas.filter(i=>i.type==='project').length;
+  const dashTags=allTags();
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
       <h2 class="view-title">📊 Dashboard</h2>
       <button class="btn btn-primary" id="dash-add-btn">＋ Nouvelle idée</button>
     </div>
+    ${dashTags.length?`<div class="dash-section" style="padding:10px 14px">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:.68rem;color:var(--tx2);flex-shrink:0;font-weight:700">🏷️ Tags</span>
+        ${dashTags.map(t=>`<span class="tag-dash-chip" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}
+      </div>
+    </div>`:''}
     <div class="dash-grid">
       <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-label">Idées totales</div></div>
       <div class="stat-card"><div class="stat-val" style="color:var(--ac)">${projCount}</div><div class="stat-label">📁 Projets</div></div>
@@ -829,6 +842,7 @@ function renderDashboard(){
     </div>`;
   el.querySelectorAll('.idea-mini[data-id]').forEach(el2=>el2.addEventListener('click',()=>openIdeaModal(el2.dataset.id)));
   el.querySelector('#dash-add-btn').addEventListener('click',()=>openIdeaModal());
+  el.querySelectorAll('.tag-dash-chip').forEach(chip=>chip.addEventListener('click',()=>{ui.filterTag=chip.dataset.tag;switchView('projets')}));
   el.querySelectorAll('.done-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ?','Supprimer cette idée terminée ?',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderDashboard()})));
   const clearDone=el.querySelector('#dash-clear-done');
   if(clearDone)clearDone.addEventListener('click',()=>confirm2('Tout supprimer ?','Supprimer toutes les idées terminées ?',()=>{state.ideas=state.ideas.filter(i=>i.status!=='done');persistState();renderDashboard()}));
@@ -2086,6 +2100,40 @@ function init(){
   document.getElementById('sidebar-toggle').addEventListener('click',()=>{
     const sb=document.getElementById('sidebar');sb.classList.toggle('collapsed');
     document.querySelector('#sidebar-toggle .nav-icon').textContent=sb.classList.contains('collapsed')?'▶':'◀';
+  });
+
+  // Touch drag-to-reorder sidebar
+  let sbTouchDrag=null;
+  document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
+    const handle=btn.querySelector('.nav-drag-handle');
+    if(!handle)return;
+    handle.addEventListener('touchstart',ev=>{
+      ev.preventDefault();ev.stopPropagation();
+      sbTouchDrag={btn,view:btn.dataset.view};
+      btn.classList.add('dragging');
+    },{passive:false});
+  });
+  window.addEventListener('touchmove',ev=>{
+    if(!sbTouchDrag)return;
+    const y=ev.touches[0].clientY;
+    const btns=[...document.querySelectorAll('#sidebar .nav-btn[data-view]')];
+    btns.forEach(b=>b.classList.remove('drag-over'));
+    const tgt=btns.find(b=>{if(b===sbTouchDrag.btn)return false;const r=b.getBoundingClientRect();return y>=r.top&&y<=r.bottom});
+    if(tgt)tgt.classList.add('drag-over');
+  },{passive:true});
+  window.addEventListener('touchend',ev=>{
+    if(!sbTouchDrag)return;
+    const y=ev.changedTouches[0].clientY;
+    const btns=[...document.querySelectorAll('#sidebar .nav-btn[data-view]')];
+    btns.forEach(b=>{b.classList.remove('drag-over');b.classList.remove('dragging')});
+    const tgt=btns.find(b=>{if(b===sbTouchDrag.btn)return false;const r=b.getBoundingClientRect();return y>=r.top&&y<=r.bottom});
+    if(tgt){
+      const from=sbTouchDrag.view,to=tgt.dataset.view;
+      const order=[...(ui.sidebarOrder||DEFAULT_NAV_ORDER)];
+      const fi=order.indexOf(from),ti=order.indexOf(to);
+      if(fi>=0&&ti>=0){order.splice(fi,1);order.splice(ti,0,from);ui.sidebarOrder=order;applySidebarOrder();saveSidebarOrder()}
+    }
+    sbTouchDrag=null;
   });
 
   // Header
