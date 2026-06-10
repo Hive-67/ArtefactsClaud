@@ -21,8 +21,6 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-rms.day{--bg:#f0f9ff;--bg2:#daf2fc;--bg3:#b0e4f8;--bg4:#82d4f5;--brd:#00b4d840;--tx:#021624;--tx2:#065a7e;--ac:#0094b4;--ok:#1a6e48;--warn:#9a6400;--danger:#b62025}
 .theme-dracula{--bg:#282a36;--bg2:#21222c;--bg3:#44475a;--bg4:#6272a4;--brd:#44475a;--tx:#f8f8f2;--tx2:#b8bdd9;--ac:#ff79c6;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
 .theme-dracula.day{--bg:#fff5fb;--bg2:#f4e8f2;--bg3:#e8d7e6;--bg4:#d7c1d2;--brd:#b58aa8;--tx:#21121d;--tx2:#65485c;--ac:#9a0060;--ok:#197a00;--warn:#8a6000;--danger:#cc0022}
-.theme-winretro{--bg:#1f1f1f;--bg2:#2b2b2b;--bg3:#3a3a3a;--bg4:#4a4a4a;--brd:#808080;--tx:#f2f2f2;--tx2:#c0c0c0;--ac:#3b6ea5;--ok:#00aa00;--warn:#aa8800;--danger:#cc0000;--font-h:'Syne',sans-serif}
-.theme-winretro.day{--bg:#c0c0c0;--bg2:#c0c0c0;--bg3:#d4d0c8;--bg4:#e8e4dc;--brd:#808080;--tx:#000;--tx2:#444;--ac:#000080;--ok:#006600;--warn:#886600;--danger:#990000}
 .theme-win95{--bg:#1a1a1a;--bg2:#242424;--bg3:#363636;--bg4:#484848;--brd:#808080;--tx:#c0c0c0;--tx2:#888888;--ac:#000080;--ok:#008000;--warn:#808000;--danger:#c00000;--font-h:'Courier New',monospace}
 .theme-win95.day{--bg:#c0c0c0;--bg2:#c0c0c0;--bg3:#d4d0c8;--bg4:#ffffff;--brd:#808080;--tx:#000000;--tx2:#444444;--ac:#000080;--ok:#006600;--warn:#808000;--danger:#990000}
 .theme-probleu{--bg:#060c1a;--bg2:#0c1526;--bg3:#111e36;--bg4:#182748;--brd:#2b5ab840;--tx:#d4e6fc;--tx2:#7090b8;--ac:#3d8ef8;--ok:#2ed573;--warn:#ffa502;--danger:#ff6b81;--font-h:'Syne',sans-serif}
@@ -35,8 +33,8 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-cyberpunk.day{--bg:#fff3f8;--bg2:#f7e3ef;--bg3:#ebcadf;--bg4:#dcaacb;--brd:#99003d55;--tx:#210011;--tx2:#66334b;--ac:#99003d;--ok:#007a66;--warn:#8a6000;--danger:#cc0022}
 .theme-spectre{--bg:#0a0a0f;--bg2:#0f0f16;--bg3:#16161f;--bg4:#1e1e2a;--brd:#2a2a3a;--tx:#e8e8f0;--tx2:#9ba0aa;--ac:#4df0a0;--ok:#4df0a0;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
 .theme-spectre.day{--bg:#f0f7f4;--bg2:#e0eee8;--bg3:#cfddd8;--bg4:#bdd0cb;--brd:#1a6e5040;--tx:#0a1412;--tx2:#2e4a44;--ac:#1a6e50;--ok:#1a6e50;--warn:#8a6000;--danger:#cc0022}
-.theme-matrix{--bg:#050805;--bg2:#081008;--bg3:#0d180d;--bg4:#132013;--brd:#2bd90030;--tx:#2bd900;--tx2:#1e9900;--ac:#2bd900;--ok:#00ff88;--warn:#ffcc00;--danger:#ff3300;--font-h:'Press Start 2P',monospace}
-.theme-matrix.day{--bg:#f1faef;--bg2:#e1f2dc;--bg3:#cce6c5;--bg4:#b2d6aa;--brd:#197a0035;--tx:#10240a;--tx2:#315d24;--ac:#197a00;--ok:#006b38;--warn:#8a6000;--danger:#cc0022}
+/* Spectre grid background */
+body.theme-spectre .view,body.theme-spectre .panel{background-color:var(--bg);background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);background-size:36px 36px}
 /* ===== WIN95 AUTHENTIC RETRO OVERRIDES ===== */
 body.theme-win95{font-family:'Courier New',monospace}
 body.theme-win95 .btn,body.theme-win95 .hbtn{border-radius:0;border:2px solid;border-color:#dfdfdf #808080 #808080 #dfdfdf}
@@ -140,8 +138,9 @@ label{display:block;font-size:.7rem;color:var(--tx2);margin-bottom:4px}
 .rdv-client{font-size:.68rem;color:var(--tx2)}
 
 /* ===== CLIENTS LIST ===== */
-#search-bar{position:sticky;top:0;z-index:10;background:var(--bg);padding:8px 0 10px;margin:-16px -16px 0;padding:8px 16px 10px}
+#search-bar{position:sticky;top:0;z-index:10;background:var(--bg);padding:8px 16px 10px;margin:-16px -16px 0}
 #search-bar input{background:var(--bg2);font-size:.9rem}
+#search-bar #filter-bar{margin:8px 0 0}
 .client-card{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:14px;margin-bottom:9px;cursor:pointer;transition:border-color .2s,transform .15s}
 .client-card:hover,.client-card:active{border-color:var(--ac);transform:translateY(-1px)}
 .client-avatar{width:42px;height:42px;border-radius:50%;background:color-mix(in srgb,var(--ac) 20%,transparent);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:.95rem;color:var(--ac);flex-shrink:0}
@@ -530,8 +529,8 @@ body.day #header-logo-light{display:inline-block}
     <div id="view-clients" class="view">
       <div id="search-bar">
         <input type="search" id="client-search" placeholder="🔍 Rechercher un client…" autocomplete="off">
+        <div id="filter-bar"></div>
       </div>
-      <div id="filter-bar"></div>
       <div id="clients-list"></div>
     </div>
     <!-- M5 RELANCES -->
@@ -1065,12 +1064,10 @@ const THEMES=[
   {id:'probleu',  label:'Pro Bleu',   emoji:'💼'},
   {id:'luxe',     label:'Luxe Epure', emoji:'✨'},
   {id:'win95',    label:'Windows 95', emoji:'🖥️'},
-  {id:'winretro', label:'Win Retro',  emoji:'🪟'},
   {id:'dracula',  label:'Dracula',    emoji:'🧛'},
   {id:'picsou',   label:'Picsou',     emoji:'🪙'},
   {id:'cyberpunk',label:'Cyberpunk',  emoji:'⚡'},
   {id:'spectre',  label:'Spectre',    emoji:'👾'},
-  {id:'matrix',   label:'Matrix',     emoji:'🟢'},
 ];
 
 const STATUT_COLOR={
