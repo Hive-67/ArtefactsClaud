@@ -716,7 +716,7 @@ let ui={
   view:'dashboard',theme:'hiveos',dayMode:false,
   editingId:null,selectedId:null,
   modalSteps:[],modalTags:[],formPriority:'medium',formStatus:'backlog',_mapPos:null,
-  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,connectFrom:null,connectStep:0},
+  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
   tourStep:0,sidebarOrder:null,filterTag:null
@@ -889,6 +889,7 @@ function drawRuche(){
       ui.ruche.dragNodeStart={mx:ev.clientX,my:ev.clientY,ox:pos.x,oy:pos.y};
     });
     ng.addEventListener('click',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode)selectIdea(id)});
+    ng.addEventListener('dblclick',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode)openIdeaDetail(id)});
     ng.addEventListener('touchstart',ev=>{
       ev.stopPropagation();
       if(ev.touches.length!==1)return;
@@ -967,7 +968,8 @@ function svgText(g,txt,x,y,size,fill,bold){const t=mkSVG('text');t.setAttribute(
 function getPos(id){if(!state.mapPositions[id]){const a=Math.random()*Math.PI*2,r=150+Math.random()*200;state.mapPositions[id]={x:400+Math.cos(a)*r,y:300+Math.sin(a)*r}}return state.mapPositions[id]}
 function applyRucheTransform(){const g=document.getElementById('ruche-g');if(g)g.setAttribute('transform',`translate(${ui.ruche.tx},${ui.ruche.ty}) scale(${ui.ruche.scale})`)}
 
-function selectIdea(id){ui.selectedId=id;drawRuche();openRucheDetail(id)}
+function selectIdea(id){ui.selectedId=id;drawRuche()}
+function openIdeaDetail(id){ui.selectedId=id;drawRuche();openRucheDetail(id)}
 
 function openRucheDetail(id){
   const idea=state.ideas.find(i=>i.id===id);if(!idea)return;
@@ -1077,6 +1079,7 @@ function initRucheEvents(){
       const t=ev.touches[0],tg=ev.target;
       if(tg===svg||tg.id==='ruche-g'||tg.id==='ruche-edges'||tg.id==='ruche-nodes'){
         ui.ruche.panning=true;
+        ui.ruche._panMoved=false;
         ui.ruche.panStart={mx:t.clientX,my:t.clientY,tx:ui.ruche.tx,ty:ui.ruche.ty};
         container.classList.add('panning');
       }
@@ -1105,8 +1108,10 @@ function initRucheEvents(){
       }
     }
     if(ui.ruche.panning&&!ui.ruche.dragging){
-      ui.ruche.tx=ui.ruche.panStart.tx+(t.clientX-ui.ruche.panStart.mx);
-      ui.ruche.ty=ui.ruche.panStart.ty+(t.clientY-ui.ruche.panStart.my);
+      const pdx=t.clientX-ui.ruche.panStart.mx,pdy=t.clientY-ui.ruche.panStart.my;
+      if(Math.hypot(pdx,pdy)>8)ui.ruche._panMoved=true;
+      ui.ruche.tx=ui.ruche.panStart.tx+pdx;
+      ui.ruche.ty=ui.ruche.panStart.ty+pdy;
       applyRucheTransform();ev.preventDefault();
     }
     if(ui.ruche.dragging){
@@ -1119,10 +1124,23 @@ function initRucheEvents(){
     }
   },{passive:false});
 
-  window.addEventListener('touchend',()=>{
-    if(ui.ruche._touchPending){selectIdea(ui.ruche._touchPending.id);ui.ruche._touchPending=null}
+  window.addEventListener('touchend',ev=>{
+    if(ui.ruche._touchPending){
+      const tid=ui.ruche._touchPending.id,now=Date.now();
+      if(ui.ruche._lastTap&&ui.ruche._lastTap.id===tid&&now-ui.ruche._lastTap.t<350){
+        openIdeaDetail(tid);ui.ruche._lastTap=null;
+      }else{
+        selectIdea(tid);ui.ruche._lastTap={id:tid,t:now};
+      }
+      ui.ruche._touchPending=null;
+    }else if(!ui.ruche.dragging&&!ui.ruche._panMoved&&ui.ruche.panStart){
+      const det=document.getElementById('ruche-detail');
+      if(det.classList.contains('open')&&!ev.target.closest('#ruche-detail')){
+        det.classList.remove('open');ui.selectedId=null;drawRuche();
+      }
+    }
     if(ui.ruche.dragging){persistState();ui.ruche.dragging=null;ui.ruche.dragNodeStart=null}
-    ui.ruche.panning=false;container.classList.remove('panning');ui.ruche.panStart=null;ui.ruche._pinch0=null;
+    ui.ruche.panning=false;container.classList.remove('panning');ui.ruche.panStart=null;ui.ruche._pinch0=null;ui.ruche._panMoved=false;
   });
   svg.addEventListener('wheel',ev=>{
     ev.preventDefault();
@@ -1132,6 +1150,12 @@ function initRucheEvents(){
     ui.ruche.scale=Math.min(3,Math.max(.2,ui.ruche.scale*f));
     applyRucheTransform();
   },{passive:false});
+  svg.addEventListener('click',ev=>{
+    if(!ev.target.closest('.ruche-node-g')&&!ev.target.closest('#ruche-detail')){
+      const det=document.getElementById('ruche-detail');
+      if(det.classList.contains('open')){det.classList.remove('open');ui.selectedId=null;drawRuche()}
+    }
+  });
   svg.addEventListener('dblclick',ev=>{
     if(ev.target.closest('.ruche-node-g'))return;
     const r=svg.getBoundingClientRect();
