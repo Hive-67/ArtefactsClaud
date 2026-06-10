@@ -2080,50 +2080,101 @@ function initNotepadDrag(){
 
 
 /* ===== TUTORIAL INTERACTIF ===== */
+// ─── Phase helpers ───────────────────────────────────────────────────────────
+function _sbExpand(){
+  const sb=$(‘sidebar’);
+  if(sb.classList.contains(‘collapsed’)){
+    sb.style.transition=’none’;
+    sb.classList.remove(‘collapsed’);
+    updateSidebarToggleIcon();
+    void sb.offsetWidth;
+    requestAnimationFrame(()=>{sb.style.transition=’’;});
+  }
+}
+
 const TUTO_STEPS=[
-  {id:"header-logo",  title:"Logo RMS Consulting", desc:"Logo de l’application RMS Consulting. Cliquez pour revenir au tableau de bord depuis n’importe quelle vue."},
-  {id:"btn-notepad",  title:"📝 Bloc-notes",       desc:"Ouvre un bloc-notes flottant. Déplacez-le, redimensionnez-le depuis ses coins. Copiez le contenu ou envoyez-le par mail en un clic."},
-  {id:"btn-theme",    title:"🎨 Thèmes",       desc:"9 thèmes visuels : HiveOS, RMS, Dracula, Matrix, Cyberpunk, Spectre… Chaque thème possède un mode jour et nuit."},
-  {id:"btn-daynight", title:"☀️ / 🌙 Jour / Nuit", desc:"Bascule entre le mode sombre (nuit) et le mode clair (jour). Le réglage est mémorisé automatiquement."},
-  {id:"btn-save",     title:"💾 Sauvegarde",        desc:"Exportez vos données en JSON, importez un fichier existant, ou téléchargez l’application complète en local."},
-  {id:"btn-help",     title:"❓ Tutoriel",          desc:"Vous y êtes ! Relancez ce guide à tout moment pour redécouvrir les fonctionnalités de l’application."},
+  // ── Phase 1 : En-tête (6 étapes) ─────────────────────────────────────────
+  {id:"header-center",  phase:"En-tête",     title:"🐝 HiveOS",
+   desc:"Cliquez ici pour ouvrir le guide HiveOS : fonctionnement local, synchronisation Drive, routine de sauvegarde et bloc-notes."},
+  {id:"btn-notepad",    phase:"En-tête",     title:"📝 Note",
+   desc:"Ouvre un bloc-notes flottant. Prenez des notes rapides, copiez-les ou envoyez-les directement par e-mail en un clic."},
+  {id:"btn-theme",      phase:"En-tête",     title:"🎨 Thème",
+   desc:"9 thèmes visuels disponibles : HiveOS, RMS, Dracula, Matrix, Cyberpunk… Chaque thème possède un mode jour et nuit."},
+  {id:"btn-daynight",   phase:"En-tête",     title:"☀️ Jour / Nuit",
+   desc:"Bascule entre le mode sombre et le mode clair. Le réglage est mémorisé automatiquement à la prochaine ouverture."},
+  {id:"btn-save",       phase:"En-tête",     title:"💾 Sauvegarde",
+   desc:"Exportez vos données en JSON, importez un fichier existant ou téléchargez l’application complète pour l’utiliser hors connexion."},
+  {id:"btn-help",       phase:"En-tête",     title:"❓ Aide",
+   desc:"Relancez ce tutoriel à tout moment pour redécouvrir toutes les fonctionnalités. Vous y êtes !"},
+  // ── Phase 2 : Navigation (1 étape) ───────────────────────────────────────
+  {id:"sidebar-toggle", phase:"Navigation",  title:"◀ Réduire le menu",
+   desc:"Cliquez sur cette flèche pour réduire la barre latérale. Les icônes restent visibles avec leurs infobulles au survol.",
+   before:_sbExpand},
+  // ── Phase 3 : Sections (6 étapes) ────────────────────────────────────────
+  {sel:"[data-view=’dashboard’]", phase:"Sections", title:"🏠 Dashboard",
+   desc:"Vue du matin : relances urgentes, rendez-vous du jour et objectif de la semaine réunis en un seul écran.",
+   before:_sbExpand},
+  {sel:"[data-view=’clients’]",   phase:"Sections", title:"👥 Répertoire",
+   desc:"Liste complète de vos clients. Tapez sur un nom pour ouvrir la fiche détaillée. Le bouton ＋ permet d’en ajouter un.",
+   before:_sbExpand},
+  {sel:"[data-view=’relances’]",  phase:"Sections", title:"🔔 Relances",
+   desc:"Vue centralisée de toutes les relances. Rouge = en retard, orange = aujourd’hui, vert = à venir.",
+   before:_sbExpand},
+  {sel:"[data-view=’agenda’]",    phase:"Sections", title:"📅 Rendez-vous",
+   desc:"Calendrier de vos rendez-vous en vue semaine ou mois. Ajoutez, modifiez ou supprimez vos créneaux facilement.",
+   before:_sbExpand},
+  {sel:"[data-view=’taches’]",    phase:"Sections", title:"✅ Tâches",
+   desc:"Gérez vos tâches quotidiennes, liez-les à un client pour un suivi précis et filtrez-les par priorité.",
+   before:_sbExpand},
+  {sel:"[data-view=’domaines’]",  phase:"Sections", title:"🗂️ Domaines",
+   desc:"10 domaines métier (Assurance Vie, Crédit Immobilier…) avec la liste des pièces justificatives requises pour chacun.",
+   before:_sbExpand},
 ];
 let _tutoStep=0;
 
 function startTutorial(){
   _tutoStep=0;
-  const dc=$('tuto-dots');
-  dc.innerHTML=TUTO_STEPS.map((_,i)=>`<span class="tuto-dot${i===0?' active':''}"></span>`).join('');
-  $('tuto-overlay').classList.remove('hidden');
+  const dc=$(‘tuto-dots’);
+  let html=’’;
+  let prevPhase=’’;
+  TUTO_STEPS.forEach((s,i)=>{
+    if(i>0&&s.phase!==prevPhase){
+      html+=’<span style="width:3px;height:3px;border-radius:50%;background:var(--brd);display:inline-block;margin:0 3px;opacity:.7;flex-shrink:0"></span>’;
+    }
+    prevPhase=s.phase;
+    html+=`<span class="tuto-dot${i===0?’ active’:’’}"></span>`;
+  });
+  dc.innerHTML=html;
+  $(‘tuto-overlay’).classList.remove(‘hidden’);
   _showTutoStep();
 }
 
 function _showTutoStep(){
   const s=TUTO_STEPS[_tutoStep];
-  const el=$(s.id);
+  if(s.before)s.before();
+  const el=s.id?$(s.id):(s.sel?document.querySelector(s.sel):null);
   if(!el){_nextTuto();return;}
   const r=el.getBoundingClientRect();
   const pad=8;
-  const spot=$('tuto-spotlight');
-  spot.style.left=(r.left-pad)+'px';
-  spot.style.top=(r.top-pad)+'px';
-  spot.style.width=(r.width+pad*2)+'px';
-  spot.style.height=(r.height+pad*2)+'px';
-  $('tuto-title').textContent=s.title;
-  $('tuto-desc').textContent=s.desc;
-  $('tuto-step-num').textContent=(_tutoStep+1)+' / '+TUTO_STEPS.length;
-  $('tuto-next').textContent=_tutoStep<TUTO_STEPS.length-1?'Suivant →':'✓ Terminer';
-  document.querySelectorAll('.tuto-dot').forEach((d,i)=>d.classList.toggle('active',i===_tutoStep));
-  // Position tooltip below or above spotlight
-  const tip=$('tuto-tooltip');
-  const tw=270,th=180;
+  const spot=$(‘tuto-spotlight’);
+  spot.style.left=(r.left-pad)+’px’;
+  spot.style.top=(r.top-pad)+’px’;
+  spot.style.width=(r.width+pad*2)+’px’;
+  spot.style.height=(r.height+pad*2)+’px’;
+  $(‘tuto-title’).textContent=s.title;
+  $(‘tuto-desc’).textContent=s.desc;
+  $(‘tuto-step-num’).innerHTML=’<span style="color:var(--ac);font-weight:700">’+s.phase+’</span> &nbsp;·&nbsp; ‘+(_tutoStep+1)+’ / ‘+TUTO_STEPS.length;
+  $(‘tuto-next’).textContent=_tutoStep<TUTO_STEPS.length-1?’Suivant →’:’✓ Terminer’;
+  document.querySelectorAll(‘.tuto-dot’).forEach((d,i)=>d.classList.toggle(‘active’,i===_tutoStep));
+  const tip=$(‘tuto-tooltip’);
+  const tw=270,th=190;
   let tl=r.left+r.width/2-tw/2;
   let tt=r.bottom+pad+14;
   tl=Math.max(8,Math.min(tl,window.innerWidth-tw-8));
   if(tt+th>window.innerHeight-20){tt=r.top-th-14;}
   if(tt<60){tt=60;}
-  tip.style.left=tl+'px';
-  tip.style.top=tt+'px';
+  tip.style.left=tl+’px’;
+  tip.style.top=tt+’px’;
 }
 
 function _nextTuto(){
@@ -2133,7 +2184,7 @@ function _nextTuto(){
 }
 
 function _endTuto(){
-  $('tuto-overlay').classList.add('hidden');
+  $(‘tuto-overlay’).classList.add(‘hidden’);
 }
 
 
