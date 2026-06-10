@@ -327,8 +327,8 @@ body.theme-rms:not(.day) #fab{color:#000}
 #tuto-tooltip{position:absolute;background:var(--bg2);border:2px solid var(--ac);border-radius:14px;padding:16px 18px;width:270px;z-index:2;box-shadow:0 8px 32px #0009;transition:left .28s ease,top .28s ease}
 #tuto-title{font-family:var(--font-h,'Syne',sans-serif);font-weight:700;font-size:.95rem;color:var(--ac);margin-bottom:8px}
 #tuto-desc{font-size:.75rem;color:var(--tx2);line-height:1.55;margin-bottom:14px}
-#tuto-nav{display:flex;align-items:center;gap:8px}
-#tuto-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+#tuto-nav{display:flex;align-items:center;justify-content:flex-start;gap:8px}
+#tuto-dots{display:flex;gap:5px;align-items:center;justify-content:center;margin:6px 0 12px}
 .tuto-dot{width:7px;height:7px;border-radius:50%;background:var(--bg4);transition:all .2s;display:inline-block}
 .tuto-dot.active{background:var(--ac);width:12px;border-radius:4px}
 #tuto-skip{background:transparent;border:none;color:var(--tx2);font-size:.68rem;cursor:pointer;font-family:'Space Mono',monospace;padding:4px;white-space:nowrap}
@@ -868,11 +868,11 @@ body.day #header-logo-light{display:inline-block}
   <div id="tuto-spotlight"></div>
   <div id="tuto-tooltip">
     <div id="tuto-step-num"></div>
+    <div id="tuto-dots"></div>
     <div id="tuto-title"></div>
     <div id="tuto-desc"></div>
     <div id="tuto-nav">
       <button id="tuto-skip">✕ Quitter</button>
-      <div id="tuto-dots"></div>
     </div>
     <div id="tuto-tap-hint">👆 Appuyer n'importe où pour continuer</div>
   </div>
