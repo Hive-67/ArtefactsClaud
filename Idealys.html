@@ -462,6 +462,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <button class="btn" id="ruche-fit" title="Ajuster la vue">⊡ Ajuster</button>
           <button class="btn" id="ruche-add-btn">＋ Idée</button>
           <button class="btn" id="ruche-connect-btn" title="Cliquez sur 2 idées pour les relier">🔗 Lier 2 idées</button>
+          <button class="btn" id="ruche-delink-btn" title="Cliquez sur 2 idées liées pour supprimer leur connexion">🔓 Délier</button>
         </div>
         <div id="connect-hint">Cliquez sur la 1ère idée à connecter…</div>
         <svg id="ruche-svg"><g id="ruche-g"><g id="ruche-edges"></g><g id="ruche-nodes"></g></g></svg>
@@ -716,7 +717,7 @@ let ui={
   view:'dashboard',theme:'hiveos',dayMode:false,
   editingId:null,selectedId:null,
   modalSteps:[],modalTags:[],formPriority:'medium',formStatus:'backlog',_mapPos:null,
-  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false},
+  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
   tourStep:0,sidebarOrder:null,filterTag:null
@@ -888,13 +889,14 @@ function drawRuche(){
       ui.ruche.dragging=id;
       ui.ruche.dragNodeStart={mx:ev.clientX,my:ev.clientY,ox:pos.x,oy:pos.y};
     });
-    ng.addEventListener('click',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode)selectIdea(id)});
-    ng.addEventListener('dblclick',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode)openIdeaDetail(id)});
+    ng.addEventListener('click',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode&&!ui.ruche.delinkMode)selectIdea(id);else if(ui.ruche.delinkMode)handleDelink(id,ng)});
+    ng.addEventListener('dblclick',ev=>{ev.stopPropagation();if(!ui.ruche.connectMode&&!ui.ruche.delinkMode)openIdeaDetail(id)});
     ng.addEventListener('touchstart',ev=>{
       ev.stopPropagation();
       if(ev.touches.length!==1)return;
       const t=ev.touches[0];
       if(ui.ruche.connectMode){handleConnect(id,ng);return}
+      if(ui.ruche.delinkMode){handleDelink(id,ng);return}
       const pos=getPos(id);
       ui.ruche._touchPending={id,mx:t.clientX,my:t.clientY,ox:pos.x,oy:pos.y};
     },{passive:true});
@@ -902,23 +904,46 @@ function drawRuche(){
 }
 
 function handleConnect(id,ng){
+  const hint=document.getElementById('connect-hint');
   if(!ui.ruche.connectFrom){
-    ui.ruche.connectFrom=id;
-    ui.ruche.connectStep=1;
+    ui.ruche.connectFrom=id;ui.ruche.connectStep=1;
     ng.querySelector('rect.node-body').setAttribute('stroke','var(--ac)');
     ng.querySelector('rect.node-body').setAttribute('stroke-width','2.5');
-    const hint=document.getElementById('connect-hint');
     hint.textContent='Maintenant cliquez sur la 2ème idée à connecter…';
-    hint.style.display='block';
+    hint.style.background='';hint.style.display='block';
   } else if(ui.ruche.connectFrom!==id){
     toggleConnection(ui.ruche.connectFrom,id);
-    ui.ruche.connectFrom=null;ui.ruche.connectStep=0;
-    ui.ruche.connectMode=false;
+    ui.ruche.connectFrom=null;ui.ruche.connectStep=0;ui.ruche.connectMode=false;
     document.getElementById('ruche-connect-btn').classList.remove('active');
-    document.getElementById('connect-hint').style.display='none';
-    drawRuche();
-    toast('Connexion mise à jour !')
+    hint.style.display='none';drawRuche();toast('🔗 Connexion mise à jour !');
   }
+}
+
+function handleDelink(id,ng){
+  const hint=document.getElementById('connect-hint');
+  if(!ui.ruche.connectFrom){
+    ui.ruche.connectFrom=id;
+    ng.querySelector('rect.node-body').setAttribute('stroke','var(--danger)');
+    ng.querySelector('rect.node-body').setAttribute('stroke-width','2.5');
+    hint.textContent='Maintenant cliquez sur la 2ème idée à délier…';
+    hint.style.background='var(--danger)';hint.style.display='block';
+  } else if(ui.ruche.connectFrom!==id){
+    removeConnection(ui.ruche.connectFrom,id);
+    ui.ruche.connectFrom=null;ui.ruche.delinkMode=false;
+    document.getElementById('ruche-delink-btn').classList.remove('active');
+    hint.style.display='none';hint.style.background='';drawRuche();toast('🔓 Lien supprimé !');
+  }
+}
+
+function removeConnection(fromId,toId){
+  [fromId,toId].forEach((a,i)=>{
+    const idea=state.ideas.find(x=>x.id===a);
+    if(!idea||!idea.connections)return;
+    const other=[fromId,toId][1-i];
+    const idx=idea.connections.indexOf(other);
+    if(idx>=0)idea.connections.splice(idx,1);
+  });
+  persistState();
 }
 
 function drawNode(parent,idea){
@@ -1167,11 +1192,21 @@ function initRucheEvents(){
   document.getElementById('ruche-add-btn').addEventListener('click',()=>openIdeaModal());
   document.getElementById('ruche-connect-btn').addEventListener('click',()=>{
     ui.ruche.connectMode=!ui.ruche.connectMode;
+    if(ui.ruche.connectMode){ui.ruche.delinkMode=false;document.getElementById('ruche-delink-btn').classList.remove('active')}
     ui.ruche.connectFrom=null;ui.ruche.connectStep=0;
     document.getElementById('ruche-connect-btn').classList.toggle('active',ui.ruche.connectMode);
     const hint=document.getElementById('connect-hint');
-    if(ui.ruche.connectMode){hint.textContent='Cliquez sur la 1ère idée à connecter…';hint.style.display='block'}
+    if(ui.ruche.connectMode){hint.textContent='Cliquez sur la 1ère idée à connecter…';hint.style.background='';hint.style.display='block'}
     else hint.style.display='none';
+  });
+  document.getElementById('ruche-delink-btn').addEventListener('click',()=>{
+    ui.ruche.delinkMode=!ui.ruche.delinkMode;
+    if(ui.ruche.delinkMode){ui.ruche.connectMode=false;document.getElementById('ruche-connect-btn').classList.remove('active')}
+    ui.ruche.connectFrom=null;
+    document.getElementById('ruche-delink-btn').classList.toggle('active',ui.ruche.delinkMode);
+    const hint=document.getElementById('connect-hint');
+    if(ui.ruche.delinkMode){hint.textContent='Cliquez sur la 1ère idée à délier…';hint.style.background='var(--danger)';hint.style.display='block'}
+    else{hint.style.display='none';hint.style.background=''}
   });
   document.getElementById('rd-close').addEventListener('click',()=>{document.getElementById('ruche-detail').classList.remove('open');ui.selectedId=null;drawRuche()});
   document.getElementById('rd-edit').addEventListener('click',()=>openIdeaModal(ui.selectedId));
