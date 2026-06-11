@@ -1760,7 +1760,19 @@ function refreshView(){
 /* ===== SAVE/EXPORT/IMPORT ===== */
 function getExport(){return{ideas:state.ideas,categories:state.categories,mapPositions:state.mapPositions,prompts:state.prompts||[]}}
 function openSaveModal(){document.getElementById('save-json').value=JSON.stringify(getExport(),null,2);document.getElementById('save-modal').classList.remove('hidden')}
-function downloadJson(){const b=new Blob([JSON.stringify(getExport(),null,2)],{type:'application/json'});dl(b,'idealys-backup.json')}
+async function downloadJson(){
+  const json=JSON.stringify(getExport(),null,2);
+  if(window.showSaveFilePicker){
+    try{
+      const fh=await window.showSaveFilePicker({suggestedName:'idealys-backup.json',types:[{description:'Fichier JSON',accept:{'application/json':['.json']}}]});
+      const w=await fh.createWritable();
+      await w.write(json);await w.close();
+      toast('💾 Fichier enregistré !');
+    }catch(e){if(e.name!=='AbortError')dl(new Blob([json],{type:'application/json'}),'idealys-backup.json')}
+  }else{
+    dl(new Blob([json],{type:'application/json'}),'idealys-backup.json');
+  }
+}
 function copyToClipboard(text,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>toast(msg)).catch(()=>{legacyCopy(text);toast(msg)})}else{legacyCopy(text);toast(msg)}}
 function legacyCopy(text){const el=document.createElement('textarea');el.value=text;el.style.cssText='position:fixed;top:-999px;left:-999px';document.body.appendChild(el);el.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(el)}
 function copyJson(){copyToClipboard(JSON.stringify(getExport(),null,2),'JSON copié !')}
