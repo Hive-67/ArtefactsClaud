@@ -498,6 +498,10 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <button class="btn" id="ruche-add-btn">＋ Idée</button>
           <button class="btn" id="ruche-connect-btn" title="Cliquez sur 2 idées pour les relier">🔗 Lier 2 idées</button>
           <button class="btn" id="ruche-delink-btn" title="Cliquez sur 2 idées liées pour supprimer leur connexion">🔓 Délier</button>
+          <span style="width:1px;background:var(--brd);align-self:stretch;margin:0 4px"></span>
+          <button class="btn" id="ruche-view-all" title="Afficher tout">🌐 Tout</button>
+          <button class="btn" id="ruche-view-ideas" title="Afficher uniquement les idées">💡 Idées</button>
+          <button class="btn" id="ruche-view-projects" title="Afficher uniquement les projets">📁 Projets</button>
         </div>
         <div id="connect-hint">Cliquez sur la 1ère idée à connecter…</div>
         <svg id="ruche-svg"><g id="ruche-g"><g id="ruche-edges"></g><g id="ruche-nodes"></g></g></svg>
@@ -753,7 +757,7 @@ let ui={
   view:'dashboard',theme:'hiveos',dayMode:false,
   editingId:null,selectedId:null,
   modalSteps:[],modalTags:[],formPriority:'medium',formStatus:'backlog',_mapPos:null,
-  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false},
+  ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false,viewMode:'all'},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
   tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null
@@ -928,15 +932,23 @@ function renderDashboard(){
 /* ===== RUCHE — MIND MAP ===== */
 const NW=170,NH=90;
 
-function renderRuche(){initRucheEvents();drawRuche()}
+function renderRuche(){initRucheEvents();['all','ideas','projects'].forEach(m=>document.getElementById('ruche-view-'+m).classList.toggle('active',m===ui.ruche.viewMode));drawRuche()}
 
 function drawRuche(){
   const edgesG=document.getElementById('ruche-edges');
   const nodesG=document.getElementById('ruche-nodes');
   edgesG.innerHTML='';nodesG.innerHTML='';
   applyRucheTransform();
-  state.ideas.forEach(idea=>{
+  const vm=ui.ruche.viewMode;
+  const visibleIdeas=state.ideas.filter(i=>{
+    if(vm==='ideas')return i.type!=='project';
+    if(vm==='projects')return i.type==='project';
+    return true;
+  });
+  const visibleIds=new Set(visibleIdeas.map(i=>i.id));
+  visibleIdeas.forEach(idea=>{
     (idea.connections||[]).forEach(tid=>{
+      if(!visibleIds.has(tid))return;
       const sp=getPos(idea.id),tp=getPos(tid);
       const x1=sp.x+NW/2,y1=sp.y+NH/2,x2=tp.x+NW/2,y2=tp.y+NH/2,cx=(x1+x2)/2;
       const p=mkSVG('path');p.setAttribute('d',`M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`);
@@ -944,7 +956,7 @@ function drawRuche(){
       edgesG.appendChild(p);
     });
   });
-  state.ideas.forEach(idea=>drawNode(nodesG,idea));
+  visibleIdeas.forEach(idea=>drawNode(nodesG,idea));
   nodesG.querySelectorAll('.ruche-node-g').forEach(ng=>{
     const id=ng.dataset.id;
     ng.addEventListener('mousedown',ev=>{
@@ -1274,6 +1286,17 @@ function initRucheEvents(){
     if(ui.ruche.delinkMode){hint.textContent='Cliquez sur la 1ère idée à délier…';hint.style.background='var(--danger)';hint.style.display='block'}
     else{hint.style.display='none';hint.style.background=''}
   });
+  function setRucheViewMode(mode){
+    ui.ruche.viewMode=mode;
+    ['all','ideas','projects'].forEach(m=>document.getElementById('ruche-view-'+m).classList.toggle('active',m===mode));
+    if(ui.selectedId&&!state.ideas.filter(i=>{if(mode==='ideas')return i.type!=='project';if(mode==='projects')return i.type==='project';return true}).find(i=>i.id===ui.selectedId)){
+      ui.selectedId=null;document.getElementById('ruche-detail').classList.remove('open');
+    }
+    drawRuche();
+  }
+  document.getElementById('ruche-view-all').addEventListener('click',()=>setRucheViewMode('all'));
+  document.getElementById('ruche-view-ideas').addEventListener('click',()=>setRucheViewMode(ui.ruche.viewMode==='ideas'?'all':'ideas'));
+  document.getElementById('ruche-view-projects').addEventListener('click',()=>setRucheViewMode(ui.ruche.viewMode==='projects'?'all':'projects'));
   document.getElementById('rd-close').addEventListener('click',()=>{document.getElementById('ruche-detail').classList.remove('open');ui.selectedId=null;drawRuche()});
   document.getElementById('rd-edit').addEventListener('click',()=>openIdeaModal(ui.selectedId));
   document.getElementById('rd-delete').addEventListener('click',()=>{
