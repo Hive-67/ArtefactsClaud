@@ -376,6 +376,11 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 
 /* ===== PROJETS VIEW ===== */
 .proj-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:16px;transition:border-color .2s}
+.projs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.projs-grid .proj-card{margin-bottom:0}
+.proj-view-toggle{display:flex;gap:4px}
+.proj-view-toggle .btn{padding:5px 10px;font-size:.8rem;opacity:.5}
+.proj-view-toggle .btn.active{opacity:1;background:var(--bg3);border-color:var(--ac);color:var(--ac)}
 .proj-card:hover{border-color:var(--ac)}
 .proj-card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .proj-status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -813,7 +818,7 @@ let ui={
   ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false,viewMode:'all',_lpTimer:null},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
-  tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null,
+  tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null,projView:'list',
   modalScores:{feasibility:50,difficulty:'medium',timeRatio:3,moneyRatio:2}
 };
 const DEFAULT_NAV_ORDER=['dashboard','idees','projets','ruche','kanban','liste','prompts'];
@@ -2325,15 +2330,23 @@ function renderProjets(){
   const el=document.getElementById('view-projets');
   const projects=applyTagFilter(state.ideas.filter(i=>i.type==='project'));
 
+  const isGrid=ui.projView==='grid';
   let html=tagFilterBarHTML();
-  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px;flex-wrap:wrap">
     <div class="rush-section-title" style="margin:0">📁 Projets <span class="rush-count">${projects.length}</span></div>
-    <button class="btn btn-primary btn-sm" id="proj-add-btn">＋ Nouveau projet</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="proj-view-toggle">
+        <button class="btn${!isGrid?' active':''}" id="proj-view-list" title="Vue liste">☰</button>
+        <button class="btn${isGrid?' active':''}" id="proj-view-grid" title="Vue colonnes">⊞</button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="proj-add-btn">＋ Nouveau projet</button>
+    </div>
   </div>`;
 
   if(!projects.length){
     html+=`<p class="rush-empty">Aucun projet. Crée-en un avec le bouton ci-dessus.</p>`;
   }else{
+    if(isGrid)html+=`<div class="projs-grid">`;
     html+=projects.map(proj=>{
       const tasks=proj.steps||[];
       const done=tasks.reduce((a,t)=>(t.done?1:0)+a+(t.subtasks||[]).filter(s=>s.done).length,0);
@@ -2357,10 +2370,15 @@ function renderProjets(){
         </div>
       </div>`;
     }).join('');
+    if(isGrid)html+=`</div>`;
   }
 
   el.innerHTML=html;
   bindTagFilter(el,renderProjets);
+  const vlBtn=el.querySelector('#proj-view-list');
+  const vgBtn=el.querySelector('#proj-view-grid');
+  if(vlBtn)vlBtn.addEventListener('click',()=>{ui.projView='list';renderProjets()});
+  if(vgBtn)vgBtn.addEventListener('click',()=>{ui.projView='grid';renderProjets()});
   const addBtn=el.querySelector('#proj-add-btn');
   if(addBtn)addBtn.addEventListener('click',()=>{ui._defaultType='project';openIdeaModal(null,null,'in_progress')});
   el.querySelectorAll('.pc-edit').forEach(b=>b.addEventListener('click',()=>openIdeaModal(b.dataset.id)));
