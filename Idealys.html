@@ -699,6 +699,30 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
       </div>
     </div>
     <div class="form-row">
+      <label>Scores</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div class="quick-gauge-row">
+          <span class="quick-gauge-label">Faisabilité</span>
+          <input type="range" id="f-feas" min="0" max="100" value="50" style="flex:1">
+          <span id="f-feas-val" style="font-size:.7rem;color:var(--ac);font-weight:700;width:36px;text-align:right">50%</span>
+        </div>
+        <div class="quick-gauge-row" style="flex-wrap:wrap;gap:6px">
+          <span class="quick-gauge-label">Difficulté</span>
+          <div class="radio-group" id="f-diff" style="gap:4px">
+            <div class="radio-opt" data-val="low" style="font-size:.65rem;padding:3px 8px">🟢 Basse</div>
+            <div class="radio-opt selected" data-val="medium" style="font-size:.65rem;padding:3px 8px">🟡 Moy.</div>
+            <div class="radio-opt" data-val="high" style="font-size:.65rem;padding:3px 8px">🔴 Haute</div>
+          </div>
+        </div>
+        <div class="quick-gauge-row">
+          <span class="quick-gauge-label">Temps</span>
+          <div class="gauge-dots" id="f-time"><span class="gauge-dot filled" data-v="1"></span><span class="gauge-dot filled" data-v="2"></span><span class="gauge-dot filled" data-v="3"></span><span class="gauge-dot" data-v="4"></span><span class="gauge-dot" data-v="5"></span></div>
+          <span class="quick-gauge-label" style="width:42px;margin-left:10px">Argent</span>
+          <div class="gauge-dots" id="f-money"><span class="gauge-dot filled" data-v="1"></span><span class="gauge-dot filled" data-v="2"></span><span class="gauge-dot" data-v="3"></span><span class="gauge-dot" data-v="4"></span><span class="gauge-dot" data-v="5"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
       <label>Étapes</label>
       <div id="f-steps"></div>
       <div class="step-add mt8">
@@ -761,7 +785,8 @@ let ui={
   ruche:{tx:0,ty:0,scale:1,panning:false,panStart:null,dragging:null,dragNodeStart:null,connectMode:false,delinkMode:false,connectFrom:null,connectStep:0,_lastTap:null,_panMoved:false,viewMode:'all'},
   kanban:{dragging:null},
   liste:{groupBy:'status',sortBy:'date',search:'',expanded:new Set()},
-  tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null
+  tourStep:0,sidebarOrder:null,filterTag:null,dashFilter:null,
+  modalScores:{feasibility:50,difficulty:'medium',timeRatio:3,moneyRatio:2}
 };
 const DEFAULT_NAV_ORDER=['dashboard','idees','projets','ruche','kanban','liste','prompts'];
 
@@ -1680,6 +1705,12 @@ function openIdeaModal(editId=null,mapPos=null,defaultStatus=null){
   ui.modalTags=idea?[...(idea.tags||[])]:[];
   ui.modalSteps=idea?idea.steps.map(s=>({...s})):[];
   radioSet('f-priority',ui.formPriority);radioSet('f-status',ui.formStatus);
+  const sc=idea&&idea.scores?idea.scores:{feasibility:50,difficulty:'medium',timeRatio:3,moneyRatio:2};
+  ui.modalScores={feasibility:sc.feasibility??50,difficulty:sc.difficulty||'medium',timeRatio:sc.timeRatio||3,moneyRatio:sc.moneyRatio||2};
+  document.getElementById('f-feas').value=ui.modalScores.feasibility;
+  document.getElementById('f-feas-val').textContent=ui.modalScores.feasibility+'%';
+  radioSet('f-diff',ui.modalScores.difficulty);
+  ['f-time','f-money'].forEach(gid=>{const key=gid==='f-time'?'timeRatio':'moneyRatio';document.querySelectorAll('#'+gid+' .gauge-dot').forEach(d=>d.classList.toggle('filled',+d.dataset.v<=ui.modalScores[key]))});
   renderModalTags();renderModalSteps();
   const dl=document.getElementById('cat-list');
   dl.innerHTML=state.categories.map(c=>`<option value="${esc(c)}">`).join('');
@@ -1713,7 +1744,7 @@ function saveIdeaModal(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){document.getElementById('f-title').style.borderColor='var(--danger)';document.getElementById('f-title').focus();return}
   document.getElementById('f-title').style.borderColor='';
-  const data={title,description:document.getElementById('f-desc').value.trim(),category:document.getElementById('f-category').value.trim(),priority:ui.formPriority,status:ui.formStatus,tags:[...ui.modalTags],color:document.getElementById('f-color').value,steps:ui.modalSteps.map(s=>({...s})),dueDate:document.getElementById('f-due').value||null};
+  const data={title,description:document.getElementById('f-desc').value.trim(),category:document.getElementById('f-category').value.trim(),priority:ui.formPriority,status:ui.formStatus,tags:[...ui.modalTags],color:document.getElementById('f-color').value,steps:ui.modalSteps.map(s=>({...s})),dueDate:document.getElementById('f-due').value||null,scores:{...ui.modalScores}};
   if(ui.editingId){updateIdea(ui.editingId,data);toast('Idée mise à jour !')}
   else{if(ui._defaultType){data.type=ui._defaultType;ui._defaultType=null}createIdea({...data,mapPos:ui._mapPos});toast('Créé !')}
   closeIdeaModal();refreshView();
@@ -2365,6 +2396,9 @@ function init(){
   document.getElementById('idea-modal').addEventListener('click',ev=>{if(ev.target===document.getElementById('idea-modal'))closeIdeaModal()});
   document.querySelectorAll('#f-priority .radio-opt').forEach(opt=>{opt.addEventListener('click',()=>{ui.formPriority=opt.dataset.val;radioSet('f-priority',ui.formPriority)})});
   document.querySelectorAll('#f-status .radio-opt').forEach(opt=>{opt.addEventListener('click',()=>{ui.formStatus=opt.dataset.val;radioSet('f-status',ui.formStatus)})});
+  document.getElementById('f-feas').addEventListener('input',ev=>{ui.modalScores.feasibility=+ev.target.value;document.getElementById('f-feas-val').textContent=ev.target.value+'%'});
+  document.querySelectorAll('#f-diff .radio-opt').forEach(opt=>{opt.addEventListener('click',()=>{ui.modalScores.difficulty=opt.dataset.val;radioSet('f-diff',opt.dataset.val)})});
+  ['f-time','f-money'].forEach(gid=>{const key=gid==='f-time'?'timeRatio':'moneyRatio';document.querySelectorAll('#'+gid+' .gauge-dot').forEach(dot=>{dot.addEventListener('click',()=>{ui.modalScores[key]=+dot.dataset.v;document.querySelectorAll('#'+gid+' .gauge-dot').forEach(d=>d.classList.toggle('filled',+d.dataset.v<=ui.modalScores[key]))})})});
   document.getElementById('f-step-add').addEventListener('click',()=>{
     const inp=document.getElementById('f-step-input');
     if(!inp.value.trim()){inp.focus();inp.style.borderColor='var(--danger)';setTimeout(()=>{inp.style.borderColor=''},1200);return}
