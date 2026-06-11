@@ -749,6 +749,23 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="report-modal">
+  <div class="modal" style="max-width:540px;width:95%">
+    <button class="modal-close" id="report-close">✕</button>
+    <h2 style="margin-bottom:12px">📤 Exporter / Partager</h2>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn btn-sm" id="report-mode-text" style="flex:1">📋 Compte-rendu</button>
+      <button class="btn btn-sm" id="report-mode-prompt" style="flex:1">🤖 Prompt Claude</button>
+    </div>
+    <textarea id="report-text" readonly style="width:100%;height:260px;font-size:.72rem;font-family:monospace;background:var(--bg3);border:1px solid var(--brd);color:var(--tx);border-radius:8px;padding:10px;resize:vertical;line-height:1.5"></textarea>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="report-copy" style="flex:1">📋 Copier</button>
+      <button class="btn" id="report-email" style="flex:1">📧 Email</button>
+      <button class="btn" id="report-share" style="flex:1;display:none">📱 Partager</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOUR — 4 panneaux + boîte -->
 <div id="tour-overlay" class="hidden">
   <div class="tour-panel" id="tp-top"></div>
@@ -859,7 +876,10 @@ function renderDashboard(){
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
       <h2 class="view-title">📊 Dashboard</h2>
-      <button class="btn btn-primary" id="dash-add-btn">＋ Nouvelle idée</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn" id="dash-report-btn" title="Exporter / Partager">📤</button>
+        <button class="btn btn-primary" id="dash-add-btn">＋ Nouvelle idée</button>
+      </div>
     </div>
     ${dashTags.length?`<div class="dash-section" style="padding:10px 14px">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -969,6 +989,7 @@ function renderDashboard(){
   const fltClose=el.querySelector('#dash-flt-close');if(fltClose)fltClose.addEventListener('click',()=>{ui.dashFilter=null;renderDashboard()});
   el.querySelectorAll('.idea-mini[data-id]').forEach(el2=>el2.addEventListener('click',()=>openIdeaModal(el2.dataset.id)));
   el.querySelector('#dash-add-btn').addEventListener('click',()=>openIdeaModal());
+  el.querySelector('#dash-report-btn').addEventListener('click',openReportModal);
   el.querySelectorAll('.tag-dash-chip').forEach(chip=>chip.addEventListener('click',()=>{ui.filterTag=chip.dataset.tag;switchView('projets')}));
   el.querySelectorAll('.done-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ?','Supprimer cette idée terminée ?',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderDashboard()})));
   const clearDone=el.querySelector('#dash-clear-done');
@@ -1810,6 +1831,61 @@ function restoreJson(replace){
     persistState();document.getElementById('restore-json').value='';document.getElementById('save-modal').classList.add('hidden');toast('Données restaurées !');refreshView();
   }catch(err){toast('JSON invalide : '+err.message,'danger')}
 }
+function generateReport(asPrompt=false){
+  const ideaItems=state.ideas.filter(i=>i.type!=='project');
+  const projItems=state.ideas.filter(i=>i.type==='project');
+  const byS={};STATUSES.forEach(s=>{byS[s.id]=state.ideas.filter(i=>i.status===s.id).length});
+  const dS=state.ideas.reduce((a,i)=>a+i.steps.filter(s=>s.done).length,0);
+  const tS=state.ideas.reduce((a,i)=>a+i.steps.length,0);
+  const pct=tS?Math.round(dS/tS*100):0;
+  const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+  let txt='';
+  if(asPrompt){
+    txt=`Voici l'état complet de mon espace de gestion d'idées et projets (Idealys) au ${date}. Analyse-le et aide-moi à identifier les priorités et les prochaines actions :\n\n`;
+  }else{
+    txt=`📊 COMPTE-RENDU IDEALYS — ${date}\n${'═'.repeat(42)}\n\n`;
+  }
+  txt+=`💡 IDÉES (${ideaItems.length})\n${'─'.repeat(30)}\n`;
+  if(!ideaItems.length){txt+='  Aucune idée.\n';}
+  else ideaItems.forEach(i=>{
+    const st=STATUSES.find(s=>s.id===i.status)||STATUSES[0];
+    const pr=PRIORITIES.find(p=>p.id===i.priority)||PRIORITIES[1];
+    txt+=`  • ${i.title}\n    ${st.emoji} ${st.label} | ${pr.emoji} ${pr.label}`;
+    if(i.scores?.feasibility!==undefined)txt+=` | Faisabilité: ${i.scores.feasibility}%`;
+    if(i.description)txt+=`\n    "${i.description}"`;
+    txt+='\n';
+  });
+  txt+=`\n📁 PROJETS (${projItems.length})\n${'─'.repeat(30)}\n`;
+  if(!projItems.length){txt+='  Aucun projet.\n';}
+  else projItems.forEach(i=>{
+    const st=STATUSES.find(s=>s.id===i.status)||STATUSES[0];
+    const pr=PRIORITIES.find(p=>p.id===i.priority)||PRIORITIES[1];
+    const tasks=i.steps||[];
+    const done=tasks.reduce((a,t)=>(t.done?1:0)+a+(t.subtasks||[]).filter(s=>s.done).length,0);
+    const tot=tasks.reduce((a,t)=>a+1+(t.subtasks||[]).length,0);
+    txt+=`  • ${i.title}\n    ${st.emoji} ${st.label} | ${pr.emoji} ${pr.label}`;
+    if(tot)txt+=` | ${Math.round(done/tot*100)}% (${done}/${tot} tâches)`;
+    if(i.description)txt+=`\n    "${i.description}"`;
+    if((i.tags||[]).length)txt+=`\n    Tags: ${i.tags.join(', ')}`;
+    txt+='\n';
+  });
+  txt+=`\n📈 STATISTIQUES\n${'─'.repeat(30)}\n`;
+  STATUSES.forEach(s=>{if(byS[s.id])txt+=`  ${s.emoji} ${s.label}: ${byS[s.id]}\n`});
+  txt+=`  Progression globale: ${pct}% (${dS}/${tS} étapes)\n`;
+  if(asPrompt){
+    txt+=`\n${'─'.repeat(42)}\nSur la base de ces informations :\n1. Quelles sont les priorités immédiates ?\n2. Y a-t-il des blocages à anticiper ?\n3. Quelles sont les prochaines actions concrètes à prendre ?`;
+  }
+  return txt;
+}
+let _reportMode='text';
+function openReportModal(){
+  _reportMode='text';
+  document.getElementById('report-text').value=generateReport(false);
+  document.getElementById('report-mode-text').classList.add('active');
+  document.getElementById('report-mode-prompt').classList.remove('active');
+  document.getElementById('report-share').style.display=navigator.share?'':'none';
+  document.getElementById('report-modal').classList.remove('hidden');
+}
 function copyUrl(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(getExport()))));copyToClipboard(location.origin+location.pathname+'#d='+d,'URL copiée !')}
 function downloadApp(){
   const name=document.getElementById('dl-filename').value.trim()||'Idealys';
@@ -2216,23 +2292,16 @@ function rushIdeaCardHTML(idea){
 
 function renderProjets(){
   const el=document.getElementById('view-projets');
-  const ideas=applyTagFilter(state.ideas.filter(i=>i.type!=='project'));
   const projects=applyTagFilter(state.ideas.filter(i=>i.type==='project'));
 
   let html=tagFilterBarHTML();
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="rush-section-title" style="margin:0">📁 Projets <span class="rush-count">${projects.length}</span></div>
+    <button class="btn btn-primary btn-sm" id="proj-add-btn">＋ Nouveau projet</button>
+  </div>`;
 
-  // Section Idées
-  html+=`<div class="rush-section-title">💡 Idées <span class="rush-count">${ideas.length}</span></div>`;
-  if(!ideas.length){
-    html+=`<p class="rush-empty">Aucune idée. Capture-en une depuis l'onglet 💡 ou le bouton rapide.</p>`;
-  }else{
-    html+=`<div class="rush-ideas-grid">${ideas.map(rushIdeaCardHTML).join('')}</div>`;
-  }
-
-  // Section Projets
-  html+=`<div class="rush-section-title" style="margin-top:28px">📁 Projets <span class="rush-count">${projects.length}</span></div>`;
   if(!projects.length){
-    html+=`<p class="rush-empty">Aucun projet. Transforme une idée en projet avec le bouton 📁 → Projet.</p>`;
+    html+=`<p class="rush-empty">Aucun projet. Crée-en un avec le bouton ci-dessus.</p>`;
   }else{
     html+=projects.map(proj=>{
       const tasks=proj.steps||[];
@@ -2260,15 +2329,20 @@ function renderProjets(){
   }
 
   el.innerHTML=html;
-
   bindTagFilter(el,renderProjets);
-  // Listeners idées
-  el.querySelectorAll('.ri-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(b.dataset.id)));
-  el.querySelectorAll('.ri-toproj').forEach(b=>b.addEventListener('click',()=>transformToProject(b.dataset.id)));
-  el.querySelectorAll('.ri-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer l\'idée ?','Cette action est irréversible.',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderProjets()})));
-  // Listeners projets
-  el.querySelectorAll('.pc-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(b.dataset.id)));
+  const addBtn=el.querySelector('#proj-add-btn');
+  if(addBtn)addBtn.addEventListener('click',()=>{ui._defaultType='project';openIdeaModal(null,null,'in_progress')});
+  el.querySelectorAll('.pc-edit').forEach(b=>b.addEventListener('click',()=>openIdeaModal(b.dataset.id)));
   el.querySelectorAll('.pc-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer le projet ?','Cette action est irréversible.',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderProjets()})));
+  el.querySelectorAll('.pt-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('pti-'+b.dataset.idea);const t=inp.value.trim();if(!t)return;addTask(b.dataset.idea,t);inp.value='';renderProjets()}));
+  el.querySelectorAll('.pt-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addTask(inp.dataset.idea,t);inp.value='';renderProjets()}));
+  el.querySelectorAll('.pt-task-check').forEach(cb=>cb.addEventListener('change',()=>{toggleTask(cb.dataset.idea,cb.dataset.task);renderProjets()}));
+  el.querySelectorAll('.pt-sub-check').forEach(cb=>cb.addEventListener('change',()=>{toggleSubtask(cb.dataset.idea,cb.dataset.task,cb.dataset.sub);renderProjets()}));
+  el.querySelectorAll('.pt-task-del').forEach(b=>b.addEventListener('click',()=>{deleteTask(b.dataset.idea,b.dataset.task);renderProjets()}));
+  el.querySelectorAll('.pt-sub-del').forEach(b=>b.addEventListener('click',()=>{deleteSubtask(b.dataset.idea,b.dataset.task,b.dataset.sub);renderProjets()}));
+  el.querySelectorAll('.pt-sub-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('psi-'+b.dataset.idea+'-'+b.dataset.task);const t=inp.value.trim();if(!t)return;addSubtask(b.dataset.idea,b.dataset.task,t);inp.value='';renderProjets()}));
+  el.querySelectorAll('.pt-sub-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addSubtask(inp.dataset.idea,inp.dataset.task,t);inp.value='';renderProjets()}));
+}
   el.querySelectorAll('.pt-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('pti-'+b.dataset.idea);const t=inp.value.trim();if(!t)return;addTask(b.dataset.idea,t);inp.value='';renderProjets()}));
   el.querySelectorAll('.pt-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addTask(inp.dataset.idea,t);inp.value='';renderProjets()}));
   el.querySelectorAll('.pt-task-check').forEach(cb=>cb.addEventListener('change',()=>{toggleTask(cb.dataset.idea,cb.dataset.task);renderProjets()}));
@@ -2414,6 +2488,15 @@ function init(){
   document.getElementById('btn-daynight').addEventListener('click',()=>{ui.dayMode=!ui.dayMode;applyTheme()});
   document.getElementById('btn-save').addEventListener('click',openSaveModal);
   document.getElementById('btn-help').addEventListener('click',startTour);
+
+  // Report modal
+  document.getElementById('report-close').addEventListener('click',()=>document.getElementById('report-modal').classList.add('hidden'));
+  document.getElementById('report-modal').addEventListener('click',ev=>{if(ev.target===document.getElementById('report-modal'))document.getElementById('report-modal').classList.add('hidden')});
+  document.getElementById('report-mode-text').addEventListener('click',()=>{_reportMode='text';document.getElementById('report-text').value=generateReport(false);document.getElementById('report-mode-text').classList.add('active');document.getElementById('report-mode-prompt').classList.remove('active')});
+  document.getElementById('report-mode-prompt').addEventListener('click',()=>{_reportMode='prompt';document.getElementById('report-text').value=generateReport(true);document.getElementById('report-mode-prompt').classList.add('active');document.getElementById('report-mode-text').classList.remove('active')});
+  document.getElementById('report-copy').addEventListener('click',()=>copyToClipboard(document.getElementById('report-text').value,_reportMode==='prompt'?'🤖 Prompt copié !':'📋 Compte-rendu copié !'));
+  document.getElementById('report-email').addEventListener('click',()=>{const txt=encodeURIComponent(document.getElementById('report-text').value);window.open(`mailto:?subject=${encodeURIComponent('Compte-rendu Idealys')}&body=${txt}`)});
+  document.getElementById('report-share').addEventListener('click',()=>{if(navigator.share)navigator.share({title:'Compte-rendu Idealys',text:document.getElementById('report-text').value}).catch(()=>{})});
 
   // Save modal
   document.getElementById('save-close').addEventListener('click',()=>document.getElementById('save-modal').classList.add('hidden'));
