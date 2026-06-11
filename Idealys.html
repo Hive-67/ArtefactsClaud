@@ -1152,6 +1152,9 @@ function drawNode(parent,idea){
     const fg=mkSVG('rect');fg.setAttribute('x',14);fg.setAttribute('y',70);fg.setAttribute('width',(NW-28)*pct);fg.setAttribute('height',5);fg.setAttribute('rx',2.5);fg.setAttribute('fill',color);g.appendChild(fg);
     const st2=mkSVG('text');st2.setAttribute('x',NW-14);st2.setAttribute('y',82);st2.setAttribute('font-size',9);st2.setAttribute('fill','var(--tx2)');st2.setAttribute('text-anchor','end');st2.textContent=`${doneS}/${totS}`;g.appendChild(st2);
   }
+  if(idea.subMap&&Object.keys(idea.subMap.nodes).length>1){
+    svgText(g,'🐝',NW-18,20,13,'');
+  }
   parent.appendChild(g);
 }
 function mkSVG(tag){return document.createElementNS('http://www.w3.org/2000/svg',tag)}
