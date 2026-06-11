@@ -2228,7 +2228,13 @@ function renderIdees(){
 }
 
 function ideaCardHTML(idea){
-  const feas=(idea.scores||{}).feasibility??50;
+  const sc=idea.scores||{};
+  const feas=sc.feasibility??50;
+  const diff=sc.difficulty||'medium';
+  const diffLbl={low:'Faible',medium:'Moy.',high:'Élevée'};
+  const diffCls={low:'diff-low',medium:'diff-medium',high:'diff-high'};
+  const time=sc.timeRatio||0,money=sc.moneyRatio||0;
+  const dots=n=>[1,2,3,4,5].map(i=>`<span class="gauge-mini-dot${i<=n?' on':''}"></span>`).join('');
   const q=(idea.title+' '+(idea.description||'')+' '+(idea.tags||[]).join(' ')).toLowerCase();
   return`<div class="idea-card" data-q="${esc(q)}">
     <div class="idea-card-head">
@@ -2240,12 +2246,17 @@ function ideaCardHTML(idea){
       </div>
     </div>
     ${idea.description?`<div class="idea-card-desc">${esc(idea.description)}</div>`:''}
-    <div style="margin:8px 0">
+    <div style="margin:8px 0 4px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
         <span style="font-size:.65rem;color:var(--tx2)">Faisabilité</span>
         <span style="font-size:.7rem;color:var(--ac);font-weight:700">${feas}%</span>
       </div>
       <div class="feas-bar"><div class="feas-fill" style="width:${feas}%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">
+        <span class="diff-pill ${diffCls[diff]}">${diffLbl[diff]}</span>
+        <span style="font-size:.65rem;color:var(--tx2)">⏱ <span class="gauge-mini">${dots(time)}</span></span>
+        <span style="font-size:.65rem;color:var(--tx2)">💰 <span class="gauge-mini">${dots(money)}</span></span>
+      </div>
     </div>
     ${(idea.tags||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(idea.tags||[]).map(t=>`<span class="tag-chip clickable" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}</div>`:''}
   </div>`;
