@@ -2375,7 +2375,13 @@ function renderProjets(){
 function addTask(ideaId,title){
   const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
   if(!idea.steps)idea.steps=[];
-  idea.steps.push({id:genId(),title,done:false,order:idea.steps.length,subtasks:[]});
+  const newStep={id:genId(),title,done:false,order:idea.steps.length,subtasks:[]};
+  idea.steps.push(newStep);
+  const m=rspEnsureMap(idea);
+  const root=m.nodes['root'];
+  const cnt=Object.values(m.nodes).filter(n=>n.parentId==='root').length;
+  const a=(-35+cnt*30)*Math.PI/180;
+  m.nodes[newStep.id]={id:newStep.id,label:title,parentId:'root',x:root.x+Math.cos(a)*180,y:root.y+Math.sin(a)*180};
   idea.updatedAt=new Date().toISOString();persistState();
 }
 
@@ -2396,7 +2402,12 @@ function toggleSubtask(ideaId,taskId,subId){
 
 function deleteTask(ideaId,taskId){
   const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
-  idea.steps=idea.steps.filter(s=>s.id!==taskId);idea.updatedAt=new Date().toISOString();persistState();
+  idea.steps=idea.steps.filter(s=>s.id!==taskId);
+  if(idea.subMap?.nodes){
+    delete idea.subMap.nodes[taskId];
+    idea.subMap.links=(idea.subMap.links||[]).filter(l=>l.from!==taskId&&l.to!==taskId);
+  }
+  idea.updatedAt=new Date().toISOString();persistState();
 }
 
 function deleteSubtask(ideaId,taskId,subId){
