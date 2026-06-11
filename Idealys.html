@@ -2679,7 +2679,7 @@ function init(){
 
   // Report modal
   document.getElementById('report-close').addEventListener('click',()=>document.getElementById('report-modal').classList.add('hidden'));
-  document.getElementById('report-modal').addEventListener('click',ev=>{if(ev.target===document.getElementById('report-modal'))document.getElementById('report-modal').classList.add('hidden')});
+
   document.getElementById('report-mode-text').addEventListener('click',()=>{_reportMode='text';document.getElementById('report-text').value=generateReport(false);document.getElementById('report-mode-text').classList.add('active');document.getElementById('report-mode-prompt').classList.remove('active')});
   document.getElementById('report-mode-prompt').addEventListener('click',()=>{_reportMode='prompt';document.getElementById('report-text').value=generateReport(true);document.getElementById('report-mode-prompt').classList.add('active');document.getElementById('report-mode-text').classList.remove('active')});
   document.getElementById('report-copy').addEventListener('click',()=>copyToClipboard(document.getElementById('report-text').value,_reportMode==='prompt'?'🤖 Prompt copié !':'📋 Compte-rendu copié !'));
@@ -2695,13 +2695,12 @@ function init(){
   document.getElementById('copy-url').addEventListener('click',copyUrl);
   document.getElementById('dl-app').addEventListener('click',downloadApp);
   document.getElementById('factory-reset').addEventListener('click',factoryReset);
-  document.getElementById('save-modal').addEventListener('click',ev=>{if(ev.target===document.getElementById('save-modal'))document.getElementById('save-modal').classList.add('hidden')});
+
 
   // Idea modal
   document.getElementById('idea-close').addEventListener('click',closeIdeaModal);
   document.getElementById('idea-cancel').addEventListener('click',closeIdeaModal);
   document.getElementById('idea-save').addEventListener('click',saveIdeaModal);
-  document.getElementById('idea-modal').addEventListener('click',ev=>{if(ev.target===document.getElementById('idea-modal'))closeIdeaModal()});
   document.querySelectorAll('#f-priority .radio-opt').forEach(opt=>{opt.addEventListener('click',()=>{ui.formPriority=opt.dataset.val;radioSet('f-priority',ui.formPriority)})});
   document.querySelectorAll('#f-status .radio-opt').forEach(opt=>{opt.addEventListener('click',()=>{ui.formStatus=opt.dataset.val;radioSet('f-status',ui.formStatus)})});
   document.getElementById('f-feas').addEventListener('input',ev=>{ui.modalScores.feasibility=+ev.target.value;document.getElementById('f-feas-val').textContent=ev.target.value+'%'});
