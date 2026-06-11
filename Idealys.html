@@ -1369,19 +1369,37 @@ function renderKanban(){
   tagBarEl.innerHTML=tagFilterBarHTML();
   if(tagBarEl.innerHTML)bindTagFilter(tagBarEl,renderKanban);
   board.innerHTML='';
-  STATUSES.forEach(status=>{
-    const ideas=applyTagFilter(state.ideas.filter(i=>i.status===status.id));
+
+  // Colonne Projets (tous les type='project', tous statuts confondus)
+  const projItems=applyTagFilter(state.ideas.filter(i=>i.type==='project'));
+  const projCol=document.createElement('div');
+  projCol.className='kanban-col';projCol.dataset.status='__projets__';
+  projCol.innerHTML=`
+    <div class="kanban-col-header">
+      <span>📁 Projets</span>
+      <span class="kanban-col-count">${projItems.length}</span>
+    </div>
+    <div class="kanban-cards" id="kc-__projets__">
+      ${projItems.map(i=>kanbanCard(i,true)).join('')}
+    </div>
+    <div class="kanban-add"><button data-addstatus="__projets__">＋ Ajouter un projet</button></div>`;
+  board.appendChild(projCol);
+
+  // Colonnes par statut (idées non-projet uniquement) dans l'ordre voulu
+  ['in_progress','paused','backlog','archived','done'].forEach(sid=>{
+    const status=STATUSES.find(s=>s.id===sid);if(!status)return;
+    const ideas=applyTagFilter(state.ideas.filter(i=>i.status===sid&&i.type!=='project'));
     const col=document.createElement('div');
-    col.className='kanban-col';col.dataset.status=status.id;
+    col.className='kanban-col';col.dataset.status=sid;
     col.innerHTML=`
       <div class="kanban-col-header">
         <span>${status.emoji} ${status.label}</span>
         <span class="kanban-col-count">${ideas.length}</span>
       </div>
-      <div class="kanban-cards" id="kc-${status.id}">
+      <div class="kanban-cards" id="kc-${sid}">
         ${ideas.map(i=>kanbanCard(i)).join('')}
       </div>
-      <div class="kanban-add"><button data-addstatus="${status.id}">＋ Ajouter une idée</button></div>`;
+      <div class="kanban-add"><button data-addstatus="${sid}">＋ Ajouter une idée</button></div>`;
     board.appendChild(col);
   });
 
@@ -1402,19 +1420,29 @@ function renderKanban(){
     col.addEventListener('drop',ev=>{
       ev.preventDefault();col.classList.remove('drag-over');
       const id=ui.kanban.dragging;if(!id)return;
-      const status=col.id.replace('kc-','');
+      const colId=col.id.replace('kc-','');
       const idea=state.ideas.find(i=>i.id===id);
-      if(idea&&idea.status!==status){idea.status=status;idea.updatedAt=new Date().toISOString();persistState();renderKanban()}
+      if(!idea)return;
+      if(colId==='__projets__'){
+        if(idea.type!=='project'){idea.type='project';idea.updatedAt=new Date().toISOString();persistState();renderKanban()}
+      } else {
+        if(idea.status!==colId){idea.status=colId;idea.updatedAt=new Date().toISOString();persistState();renderKanban()}
+      }
     });
   });
   board.querySelectorAll('[data-addstatus]').forEach(btn=>{
-    btn.addEventListener('click',()=>openIdeaModal(null,null,btn.dataset.addstatus));
+    btn.addEventListener('click',()=>{
+      const s=btn.dataset.addstatus;
+      if(s==='__projets__'){ui._defaultType='project';openIdeaModal(null,null,'in_progress')}
+      else{ui._defaultType=null;openIdeaModal(null,null,s)}
+    });
   });
 }
 
-function kanbanCard(idea){
+function kanbanCard(idea,showStatus=false){
   const pr=PRIORITIES.find(p=>p.id===idea.priority)||PRIORITIES[1];
   const isProj=idea.type==='project';
+  const st=STATUSES.find(s=>s.id===idea.status)||STATUSES[0];
   const steps=idea.steps||[];
   const done=isProj
     ?steps.reduce((a,s)=>(s.done?1:0)+(s.subtasks||[]).filter(x=>x.done).length+a,0)
@@ -1432,6 +1460,7 @@ function kanbanCard(idea){
     ${idea.description?`<div class="kanban-card-desc">${esc(idea.description)}</div>`:''}
     <div class="kanban-card-meta">
       <span class="priority-badge p-${idea.priority}">${pr.emoji} ${pr.label}</span>
+      ${showStatus?`<span style="font-size:.65rem;color:var(--tx2);white-space:nowrap">${st.emoji} ${st.label}</span>`:''}
       ${(idea.tags||[]).slice(0,2).map(t=>`<span class="tag-chip clickable" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}
     </div>
     ${idea.scores?`<div style="margin-top:6px">${gaugeMiniHTML(idea.scores)}</div>`:''}
@@ -1603,6 +1632,7 @@ function listeIdeaHTML(idea){
 function createIdea(data){
   const id=genId(),now=new Date().toISOString();
   const idea={id,title:data.title||'Nouvelle idée',description:data.description||'',category:data.category||'',priority:data.priority||'medium',status:data.status||'backlog',tags:data.tags||[],color:data.color||'#7d206f',steps:[],connections:[],notes:'',createdAt:now,updatedAt:now,dueDate:data.dueDate||null};
+  if(data.type)idea.type=data.type;
   if(data.steps)idea.steps=data.steps;
   state.ideas.push(idea);
   if(data.mapPos)state.mapPositions[id]=data.mapPos;
@@ -1685,7 +1715,7 @@ function saveIdeaModal(){
   document.getElementById('f-title').style.borderColor='';
   const data={title,description:document.getElementById('f-desc').value.trim(),category:document.getElementById('f-category').value.trim(),priority:ui.formPriority,status:ui.formStatus,tags:[...ui.modalTags],color:document.getElementById('f-color').value,steps:ui.modalSteps.map(s=>({...s})),dueDate:document.getElementById('f-due').value||null};
   if(ui.editingId){updateIdea(ui.editingId,data);toast('Idée mise à jour !')}
-  else{createIdea({...data,mapPos:ui._mapPos});toast('Idée créée !')}
+  else{if(ui._defaultType){data.type=ui._defaultType;ui._defaultType=null}createIdea({...data,mapPos:ui._mapPos});toast('Créé !')}
   closeIdeaModal();refreshView();
 }
 function refreshView(){
