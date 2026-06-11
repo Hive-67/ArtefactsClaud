@@ -495,6 +495,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <button class="btn" id="ruche-zoom-in">＋</button>
           <button class="btn" id="ruche-zoom-out">－</button>
           <button class="btn" id="ruche-fit" title="Ajuster la vue">⊡ Ajuster</button>
+          <button class="btn" id="ruche-autolayout" title="Aligner automatiquement les nœuds">📐 Aligner</button>
           <button class="btn" id="ruche-add-btn">＋ Idée</button>
           <button class="btn" id="ruche-connect-btn" title="Cliquez sur 2 idées pour les relier">🔗 Lier 2 idées</button>
           <button class="btn" id="ruche-delink-btn" title="Cliquez sur 2 idées liées pour supprimer leur connexion">🔓 Délier</button>
@@ -1267,6 +1268,7 @@ function initRucheEvents(){
   document.getElementById('ruche-zoom-in').addEventListener('click',()=>{ui.ruche.scale=Math.min(3,ui.ruche.scale*1.2);applyRucheTransform()});
   document.getElementById('ruche-zoom-out').addEventListener('click',()=>{ui.ruche.scale=Math.max(.2,ui.ruche.scale*.8);applyRucheTransform()});
   document.getElementById('ruche-fit').addEventListener('click',fitRuche);
+  document.getElementById('ruche-autolayout').addEventListener('click',autoLayoutRuche);
   document.getElementById('ruche-add-btn').addEventListener('click',()=>openIdeaModal());
   document.getElementById('ruche-connect-btn').addEventListener('click',()=>{
     ui.ruche.connectMode=!ui.ruche.connectMode;
@@ -1320,6 +1322,23 @@ function redrawEdges(){
       const p=mkSVG('path');p.setAttribute('d',`M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`);p.setAttribute('class','ruche-edge');edgesG.appendChild(p);
     });
   });
+}
+
+function autoLayoutRuche(){
+  const vm=ui.ruche.viewMode;
+  const visible=state.ideas.filter(i=>{
+    if(vm==='ideas')return i.type!=='project';
+    if(vm==='projects')return i.type==='project';
+    return true;
+  });
+  if(!visible.length)return;
+  const COLS=Math.max(3,Math.ceil(Math.sqrt(visible.length*1.6)));
+  const GAPX=NW+40,GAPY=NH+50;
+  const grouped=[...STATUSES.map(s=>visible.filter(i=>i.status===s.id||(!i.status&&s.id==='backlog'))).filter(g=>g.length)].flat();
+  grouped.forEach((idea,i)=>{
+    state.mapPositions[idea.id]={x:(i%COLS)*GAPX,y:Math.floor(i/COLS)*GAPY};
+  });
+  persistState();fitRuche();drawRuche();toast('📐 Nœuds alignés !');
 }
 
 function fitRuche(){
