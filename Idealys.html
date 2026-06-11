@@ -1943,28 +1943,61 @@ function dl(blob,name){const a=document.createElement('a');a.href=URL.createObje
 
 /* ===== CONFIRM ===== */
 let _renameId=null;
+let _renameSub=null;
 function openRenameModal(id){
   const idea=state.ideas.find(i=>i.id===id);if(!idea)return;
-  _renameId=id;
+  _renameId=id;_renameSub=null;
   const inp=document.getElementById('rename-input');
   inp.value=idea.title;
   document.getElementById('rename-modal').classList.remove('hidden');
   setTimeout(()=>{inp.focus();inp.select()},60);
 }
-function saveRename(){
-  const idea=state.ideas.find(i=>i.id===_renameId);if(!idea)return;
-  const v=document.getElementById('rename-input').value.trim();
-  if(!v)return;
-  idea.title=v;
-  if(idea.subMap?.nodes?.root)idea.subMap.nodes.root.label=v;
-  idea.updatedAt=new Date().toISOString();
-  persistState();
-  document.getElementById('rename-modal').classList.add('hidden');
-  _renameId=null;
-  refreshView();
-  toast('✏️ Renommé !');
+function openSubRenameModal(ideaId,taskId,subId){
+  const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
+  const task=(idea.steps||[]).find(s=>s.id===taskId);if(!task)return;
+  const sub=(task.subtasks||[]).find(s=>s.id===subId);if(!sub)return;
+  _renameId=null;_renameSub={ideaId,taskId,subId};
+  const inp=document.getElementById('rename-input');
+  inp.value=sub.title;
+  document.getElementById('rename-modal').classList.remove('hidden');
+  setTimeout(()=>{inp.focus();inp.select()},60);
 }
-function closeRenameModal(){document.getElementById('rename-modal').classList.add('hidden');_renameId=null;}
+function openTaskRenameModal(ideaId,taskId){
+  const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
+  const task=(idea.steps||[]).find(s=>s.id===taskId);if(!task)return;
+  _renameId=null;_renameSub={ideaId,taskId,subId:null};
+  const inp=document.getElementById('rename-input');
+  inp.value=task.title;
+  document.getElementById('rename-modal').classList.remove('hidden');
+  setTimeout(()=>{inp.focus();inp.select()},60);
+}
+function saveRename(){
+  const v=document.getElementById('rename-input').value.trim();if(!v)return;
+  if(_renameSub){
+    const {ideaId,taskId,subId}=_renameSub;
+    const idea=state.ideas.find(i=>i.id===ideaId);
+    if(idea){
+      const task=(idea.steps||[]).find(s=>s.id===taskId);
+      if(task){
+        if(subId){const sub=(task.subtasks||[]).find(s=>s.id===subId);if(sub)sub.title=v;}
+        else task.title=v;
+        idea.updatedAt=new Date().toISOString();persistState();
+      }
+    }
+    _renameSub=null;
+  }else if(_renameId){
+    const idea=state.ideas.find(i=>i.id===_renameId);
+    if(idea){
+      idea.title=v;
+      if(idea.subMap?.nodes?.root)idea.subMap.nodes.root.label=v;
+      idea.updatedAt=new Date().toISOString();persistState();
+    }
+    _renameId=null;
+  }
+  document.getElementById('rename-modal').classList.add('hidden');
+  refreshView();toast('✏️ Renommé !');
+}
+function closeRenameModal(){document.getElementById('rename-modal').classList.add('hidden');_renameId=null;_renameSub=null;}
 function confirm2(title,msg,onOk){
   document.getElementById('confirm-title').textContent=title;
   document.getElementById('confirm-msg').textContent=msg;
@@ -2329,12 +2362,14 @@ function projTaskHTML(ideaId,task){
     <div class="proj-task-row">
       <input type="checkbox" class="pt-task-check"${task.done?' checked':''} data-idea="${ideaId}" data-task="${task.id}">
       <span class="proj-task-title">${esc(task.title)}</span>
+      <button class="idea-card-btn pt-task-rename" data-idea="${ideaId}" data-task="${task.id}" title="Renommer">✏️</button>
       <button class="idea-card-btn pt-task-del" data-idea="${ideaId}" data-task="${task.id}" title="Supprimer">🗑️</button>
     </div>
     <div class="proj-subs">
       ${subs.map(sub=>`<div class="proj-sub-row${sub.done?' sub-done':''}">
         <input type="checkbox" class="pt-sub-check"${sub.done?' checked':''} data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}">
         <span>${esc(sub.title)}</span>
+        <button class="idea-card-btn pt-sub-rename" data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}" title="Renommer">✏️</button>
         <button class="idea-card-btn pt-sub-del" data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}" title="Supprimer">🗑️</button>
       </div>`).join('')}
       <div class="proj-sub-add">
@@ -2424,7 +2459,9 @@ function renderProjets(){
   el.querySelectorAll('.pt-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addTask(inp.dataset.idea,t);inp.value='';renderProjets()}));
   el.querySelectorAll('.pt-task-check').forEach(cb=>cb.addEventListener('change',()=>{toggleTask(cb.dataset.idea,cb.dataset.task);renderProjets()}));
   el.querySelectorAll('.pt-sub-check').forEach(cb=>cb.addEventListener('change',()=>{toggleSubtask(cb.dataset.idea,cb.dataset.task,cb.dataset.sub);renderProjets()}));
+  el.querySelectorAll('.pt-task-rename').forEach(b=>b.addEventListener('click',()=>openTaskRenameModal(b.dataset.idea,b.dataset.task)));
   el.querySelectorAll('.pt-task-del').forEach(b=>b.addEventListener('click',()=>{deleteTask(b.dataset.idea,b.dataset.task);renderProjets()}));
+  el.querySelectorAll('.pt-sub-rename').forEach(b=>b.addEventListener('click',()=>openSubRenameModal(b.dataset.idea,b.dataset.task,b.dataset.sub)));
   el.querySelectorAll('.pt-sub-del').forEach(b=>b.addEventListener('click',()=>{deleteSubtask(b.dataset.idea,b.dataset.task,b.dataset.sub);renderProjets()}));
   el.querySelectorAll('.pt-sub-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('psi-'+b.dataset.idea+'-'+b.dataset.task);const t=inp.value.trim();if(!t)return;addSubtask(b.dataset.idea,b.dataset.task,t);inp.value='';renderProjets()}));
   el.querySelectorAll('.pt-sub-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addSubtask(inp.dataset.idea,inp.dataset.task,t);inp.value='';renderProjets()}));
