@@ -516,6 +516,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <button class="btn" id="ruche-zoom-out">－</button>
           <button class="btn" id="ruche-fit" title="Ajuster la vue">⊡ Ajuster</button>
           <button class="btn" id="ruche-autolayout" title="Aligner automatiquement les nœuds">📐 Aligner</button>
+          <button class="btn" id="ruche-profiles-btn" title="Sauvegarder / restaurer une disposition">💾 Profils</button>
           <button class="btn" id="ruche-add-btn">＋ Idée</button>
           <button class="btn" id="ruche-connect-btn" title="Cliquez sur 2 idées pour les relier">🔗 Lier 2 idées</button>
           <button class="btn" id="ruche-delink-btn" title="Cliquez sur 2 idées liées pour supprimer leur connexion">🔓 Délier</button>
@@ -771,6 +772,17 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
     </div>
   </div>
 </div>
+<div class="modal-overlay hidden" id="layout-profiles-modal">
+  <div class="modal" style="max-width:400px;display:flex;flex-direction:column;max-height:80vh">
+    <button class="modal-close" id="layout-profiles-close">✕</button>
+    <h2 id="layout-profiles-title" style="margin-bottom:14px">💾 Profils de vue</h2>
+    <div id="layout-profiles-list" style="flex:1;overflow-y:auto;margin-bottom:12px;min-height:60px"></div>
+    <div class="form-row" style="display:flex;gap:8px;margin-bottom:0">
+      <input type="text" id="layout-profiles-name" placeholder="Nom du profil…" style="flex:1;font-size:.85rem">
+      <button class="btn btn-primary" id="layout-profiles-save" style="white-space:nowrap">＋ Sauvegarder</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay hidden" id="confirm-modal">
   <div class="modal">
     <h3 id="confirm-title">Confirmer</h3>
@@ -827,7 +839,7 @@ const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
 const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
 
-let state={ideas:[],categories:[],mapPositions:{},prompts:[]};
+let state={ideas:[],categories:[],mapPositions:{},prompts:[],rucheLayouts:[]};
 let ui={
   view:'dashboard',theme:'hiveos',dayMode:false,
   editingId:null,selectedId:null,
@@ -2908,8 +2920,72 @@ function initSubMap(){
   document.getElementById('rsp-world').addEventListener('touchend',()=>rspOnEnd());
   document.getElementById('rsp-close').addEventListener('click',closeSubMap);
   document.getElementById('rsp-layout-btn').addEventListener('click',rspAutoLayout);
+  document.getElementById('rsp-profiles-btn').addEventListener('click',()=>openLayoutModal('submap'));
   document.getElementById('rsp-ai-btn').addEventListener('click',rspGenerateAIPrompt);
   document.getElementById('rsp-add-btn').addEventListener('click',()=>{if(_rspSel){_rspMode='add';rspRenderBottom();}else{toast('Sélectionne d\'abord un nœud','warn')}});
+}
+
+/* ===== LAYOUT PROFILES ===== */
+let _layoutCtx=null;
+function openLayoutModal(ctx){
+  _layoutCtx=ctx;
+  document.getElementById('layout-profiles-title').textContent=ctx==='ruche'?'💾 Profils — Ruche':'💾 Profils — Mini-ruche';
+  document.getElementById('layout-profiles-name').value='';
+  renderLayoutProfiles();
+  document.getElementById('layout-profiles-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('layout-profiles-name').focus(),80);
+}
+function closeLayoutModal(){document.getElementById('layout-profiles-modal').classList.add('hidden');_layoutCtx=null;}
+function getLayoutsArr(){
+  if(_layoutCtx==='ruche'){if(!state.rucheLayouts)state.rucheLayouts=[];return state.rucheLayouts;}
+  const idea=state.ideas.find(i=>i.id===_rspId);if(!idea)return[];
+  if(!idea.subMapLayouts)idea.subMapLayouts=[];return idea.subMapLayouts;
+}
+function renderLayoutProfiles(){
+  const list=document.getElementById('layout-profiles-list');
+  const arr=getLayoutsArr();
+  if(!arr.length){list.innerHTML='<p style="color:var(--tx2);font-size:.8rem;text-align:center;padding:20px 0">Aucun profil sauvegardé</p>';return;}
+  list.innerHTML=arr.map(l=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--brd)">
+    <span style="flex:1;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.name)}</span>
+    <button class="btn btn-sm" data-load-layout="${l.id}">🔄 Restaurer</button>
+    <button class="btn btn-sm" data-del-layout="${l.id}" style="color:#fca5a5;background:var(--bg3)">🗑️</button>
+  </div>`).join('');
+  list.querySelectorAll('[data-load-layout]').forEach(b=>b.addEventListener('click',()=>loadLayoutById(b.dataset.loadLayout)));
+  list.querySelectorAll('[data-del-layout]').forEach(b=>b.addEventListener('click',()=>deleteLayoutById(b.dataset.delLayout)));
+}
+function saveLayoutProfile(){
+  const name=document.getElementById('layout-profiles-name').value.trim();
+  if(!name){toast('Donne un nom au profil','warn');return;}
+  const id=genId();
+  if(_layoutCtx==='ruche'){
+    if(!state.rucheLayouts)state.rucheLayouts=[];
+    const positions={};Object.entries(state.mapPositions).forEach(([k,v])=>positions[k]={x:v.x,y:v.y});
+    state.rucheLayouts.push({id,name,positions,tx:ui.ruche.tx,ty:ui.ruche.ty,scale:ui.ruche.scale});
+  }else{
+    const idea=state.ideas.find(i=>i.id===_rspId);if(!idea?.subMap)return;
+    if(!idea.subMapLayouts)idea.subMapLayouts=[];
+    const nodePositions={};Object.entries(idea.subMap.nodes).forEach(([k,v])=>nodePositions[k]={x:v.x,y:v.y});
+    idea.subMapLayouts.push({id,name,nodePositions,ps:{..._rspPs},z:_rspZ});
+  }
+  persistState();document.getElementById('layout-profiles-name').value='';renderLayoutProfiles();toast('💾 Profil "'+name+'" sauvegardé !');
+}
+function loadLayoutById(layoutId){
+  const arr=getLayoutsArr();const l=arr.find(x=>x.id===layoutId);if(!l)return;
+  if(_layoutCtx==='ruche'){
+    Object.entries(l.positions).forEach(([k,v])=>{state.mapPositions[k]={x:v.x,y:v.y};});
+    ui.ruche.tx=l.tx;ui.ruche.ty=l.ty;ui.ruche.scale=l.scale;
+    persistState();applyRucheTransform();drawRuche();closeLayoutModal();toast('🔄 Vue "'+l.name+'" restaurée !');
+  }else{
+    const idea=state.ideas.find(i=>i.id===_rspId);if(!idea?.subMap)return;
+    Object.entries(l.nodePositions).forEach(([k,v])=>{if(idea.subMap.nodes[k]){idea.subMap.nodes[k].x=v.x;idea.subMap.nodes[k].y=v.y;}});
+    _rspPs={...l.ps};_rspZ=l.z;
+    persistState();rspRender();closeLayoutModal();toast('🔄 Vue "'+l.name+'" restaurée !');
+  }
+}
+function deleteLayoutById(layoutId){
+  if(_layoutCtx==='ruche'){state.rucheLayouts=(state.rucheLayouts||[]).filter(l=>l.id!==layoutId);}
+  else{const idea=state.ideas.find(i=>i.id===_rspId);if(idea)idea.subMapLayouts=(idea.subMapLayouts||[]).filter(l=>l.id!==layoutId);}
+  persistState();renderLayoutProfiles();toast('🗑️ Profil supprimé');
 }
 
 /* ===== UTILITY ===== */
@@ -3009,6 +3085,12 @@ function init(){
   document.getElementById('factory-reset').addEventListener('click',factoryReset);
 
 
+  // Layout profiles modal
+  document.getElementById('layout-profiles-close').addEventListener('click',closeLayoutModal);
+  document.getElementById('layout-profiles-save').addEventListener('click',saveLayoutProfile);
+  document.getElementById('layout-profiles-name').addEventListener('keydown',ev=>{if(ev.key==='Enter')saveLayoutProfile();else if(ev.key==='Escape')closeLayoutModal();});
+  document.getElementById('ruche-profiles-btn').addEventListener('click',()=>openLayoutModal('ruche'));
+
   // Rename modal
   document.getElementById('rename-close').addEventListener('click',closeRenameModal);
   document.getElementById('rename-cancel').addEventListener('click',closeRenameModal);
@@ -3059,6 +3141,7 @@ window.addEventListener('load',init);
     <button class="btn" id="rsp-close">← Retour</button>
     <span id="rsp-title" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Sous-carte</span>
     <button class="btn" id="rsp-layout-btn" title="Organiser automatiquement" style="font-size:.8rem">📐</button>
+    <button class="btn" id="rsp-profiles-btn" title="Sauvegarder / restaurer une disposition" style="font-size:.8rem">💾</button>
     <button class="btn" id="rsp-ai-btn" title="Générer un prompt IA" style="font-size:.8rem">🤖</button>
     <button class="btn btn-primary" id="rsp-add-btn" style="font-size:.75rem">＋ Nœud fils</button>
   </div>
