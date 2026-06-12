@@ -1945,6 +1945,7 @@ function dl(blob,name){const a=document.createElement('a');a.href=URL.createObje
 /* ===== CONFIRM ===== */
 let _renameId=null;
 let _renameSub=null;
+let _copiedSub=null;
 function openRenameModal(id){
   const idea=state.ideas.find(i=>i.id===id);if(!idea)return;
   _renameId=id;_renameSub=null;
@@ -2359,10 +2360,12 @@ function toggleTask(ideaId,taskId){
 
 function projTaskHTML(ideaId,task){
   const subs=task.subtasks||[];
+  const pasteBtn=_copiedSub?`<button class="btn btn-sm pt-sub-paste" data-idea="${ideaId}" data-task="${task.id}" title="Coller «${esc(_copiedSub.title)}»" style="font-size:.65rem;padding:2px 7px;opacity:.8">📋 Coller</button>`:'';
   return`<div class="proj-task${task.done?' task-done':''}">
     <div class="proj-task-row">
       <input type="checkbox" class="pt-task-check"${task.done?' checked':''} data-idea="${ideaId}" data-task="${task.id}">
       <span class="proj-task-title">${esc(task.title)}</span>
+      ${pasteBtn}
       <button class="idea-card-btn pt-task-rename" data-idea="${ideaId}" data-task="${task.id}" title="Renommer">✏️</button>
       <button class="idea-card-btn pt-task-del" data-idea="${ideaId}" data-task="${task.id}" title="Supprimer">🗑️</button>
     </div>
@@ -2370,6 +2373,7 @@ function projTaskHTML(ideaId,task){
       ${subs.map(sub=>`<div class="proj-sub-row${sub.done?' sub-done':''}">
         <input type="checkbox" class="pt-sub-check"${sub.done?' checked':''} data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}">
         <span>${esc(sub.title)}</span>
+        <button class="idea-card-btn pt-sub-copy" data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}" data-title="${esc(sub.title)}" title="Copier">📋</button>
         <button class="idea-card-btn pt-sub-rename" data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}" title="Renommer">✏️</button>
         <button class="idea-card-btn pt-sub-del" data-idea="${ideaId}" data-task="${task.id}" data-sub="${sub.id}" title="Supprimer">🗑️</button>
       </div>`).join('')}
@@ -2462,6 +2466,14 @@ function renderProjets(){
   el.querySelectorAll('.pt-sub-check').forEach(cb=>cb.addEventListener('change',()=>{toggleSubtask(cb.dataset.idea,cb.dataset.task,cb.dataset.sub);renderProjets()}));
   el.querySelectorAll('.pt-task-rename').forEach(b=>b.addEventListener('click',()=>openTaskRenameModal(b.dataset.idea,b.dataset.task)));
   el.querySelectorAll('.pt-task-del').forEach(b=>b.addEventListener('click',()=>{deleteTask(b.dataset.idea,b.dataset.task);renderProjets()}));
+  el.querySelectorAll('.pt-sub-copy').forEach(b=>b.addEventListener('click',()=>{
+    _copiedSub={title:b.dataset.title};renderProjets();toast('📋 Sous-tâche copiée — clique sur "Coller" dans une autre tâche');
+  }));
+  el.querySelectorAll('.pt-sub-paste').forEach(b=>b.addEventListener('click',()=>{
+    if(!_copiedSub)return;
+    addSubtask(b.dataset.idea,b.dataset.task,_copiedSub.title);
+    renderProjets();toast('✅ Sous-tâche collée !');
+  }));
   el.querySelectorAll('.pt-sub-rename').forEach(b=>b.addEventListener('click',()=>openSubRenameModal(b.dataset.idea,b.dataset.task,b.dataset.sub)));
   el.querySelectorAll('.pt-sub-del').forEach(b=>b.addEventListener('click',()=>{deleteSubtask(b.dataset.idea,b.dataset.task,b.dataset.sub);renderProjets()}));
   el.querySelectorAll('.pt-sub-add-btn').forEach(b=>b.addEventListener('click',()=>{const inp=document.getElementById('psi-'+b.dataset.idea+'-'+b.dataset.task);const t=inp.value.trim();if(!t)return;addSubtask(b.dataset.idea,b.dataset.task,t);inp.value='';renderProjets()}));
