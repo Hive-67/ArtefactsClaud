@@ -391,7 +391,10 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .proj-progress-lbl{font-size:.7rem;color:var(--tx2);margin-bottom:12px;text-align:right}
 .proj-tasks{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
 .proj-task{border-left:2px solid var(--brd);padding-left:10px;margin-bottom:2px}
-.proj-task.task-done .proj-task-title{text-decoration:line-through;opacity:.45}
+.proj-task.drag-over{border-left-color:var(--ac);background:var(--bg3);border-radius:6px}
+.proj-task.dragging{opacity:.4}
+.proj-task-grip{cursor:grab;color:var(--tx2);font-size:.9rem;flex-shrink:0;user-select:none;padding:0 2px;opacity:.5;line-height:1}
+.node-grip{cursor:grab;user-select:none}
 .proj-task-row{display:flex;align-items:center;gap:8px;padding:5px 0}
 .proj-task-title{flex:1;font-size:.8rem}
 .proj-subs{margin-left:16px;display:flex;flex-direction:column;gap:1px}
@@ -1174,6 +1177,29 @@ function drawNode(parent,idea){
   if(idea.subMap&&Object.keys(idea.subMap.nodes).length>1){
     svgText(g,'🐝',NW-18,20,13,'');
   }
+  // Drag handle — bottom-left corner, bypasses long-press sub-map
+  const grip=mkSVG('text');
+  grip.setAttribute('class','node-grip');
+  grip.setAttribute('x',10);grip.setAttribute('y',NH-6);
+  grip.setAttribute('font-size',11);grip.setAttribute('fill','var(--tx2)');
+  grip.setAttribute('opacity',.55);grip.textContent='⠿';
+  g.appendChild(grip);
+  grip.addEventListener('mousedown',ev=>{
+    if(ev.button!==0)return;
+    ev.stopPropagation();
+    clearTimeout(ui.ruche._lpTimer);ui.ruche._lpTimer=null;
+    const pos=getPos(id);
+    ui.ruche.dragging=id;
+    ui.ruche.dragNodeStart={mx:ev.clientX,my:ev.clientY,ox:pos.x,oy:pos.y};
+  });
+  grip.addEventListener('touchstart',ev=>{
+    ev.stopPropagation();
+    if(ev.touches.length!==1)return;
+    clearTimeout(ui.ruche._lpTimer);ui.ruche._lpTimer=null;
+    const t=ev.touches[0],pos=getPos(id);
+    ui.ruche._touchPending={id,mx:t.clientX,my:t.clientY,ox:pos.x,oy:pos.y};
+    // no LP timer — grip is drag-only
+  },{passive:true});
   parent.appendChild(g);
 }
 function mkSVG(tag){return document.createElementNS('http://www.w3.org/2000/svg',tag)}
@@ -2361,8 +2387,9 @@ function toggleTask(ideaId,taskId){
 function projTaskHTML(ideaId,task){
   const subs=task.subtasks||[];
   const pasteBtn=_copiedSub?`<button class="btn btn-sm pt-sub-paste" data-idea="${ideaId}" data-task="${task.id}" title="Coller «${esc(_copiedSub.title)}»" style="font-size:.65rem;padding:2px 7px;opacity:.8">📋 Coller</button>`:'';
-  return`<div class="proj-task${task.done?' task-done':''}">
+  return`<div class="proj-task${task.done?' task-done':''}" draggable="true" data-task-id="${task.id}" data-idea-id="${ideaId}">
     <div class="proj-task-row">
+      <span class="proj-task-grip" title="Glisser pour réordonner">⠿</span>
       <input type="checkbox" class="pt-task-check"${task.done?' checked':''} data-idea="${ideaId}" data-task="${task.id}">
       <span class="proj-task-title">${esc(task.title)}</span>
       ${pasteBtn}
@@ -2464,6 +2491,35 @@ function renderProjets(){
   el.querySelectorAll('.pt-input').forEach(inp=>inp.addEventListener('keydown',ev=>{if(ev.key!=='Enter')return;const t=inp.value.trim();if(!t)return;addTask(inp.dataset.idea,t);inp.value='';renderProjets()}));
   el.querySelectorAll('.pt-task-check').forEach(cb=>cb.addEventListener('change',()=>{toggleTask(cb.dataset.idea,cb.dataset.task);renderProjets()}));
   el.querySelectorAll('.pt-sub-check').forEach(cb=>cb.addEventListener('change',()=>{toggleSubtask(cb.dataset.idea,cb.dataset.task,cb.dataset.sub);renderProjets()}));
+  let _dragTaskSrc=null;
+  el.querySelectorAll('.proj-task[draggable]').forEach(t=>{
+    t.addEventListener('dragstart',ev=>{
+      _dragTaskSrc={ideaId:t.dataset.ideaId,taskId:t.dataset.taskId};
+      ev.dataTransfer.effectAllowed='move';
+      setTimeout(()=>t.classList.add('dragging'),0);
+    });
+    t.addEventListener('dragend',()=>{
+      t.classList.remove('dragging');
+      el.querySelectorAll('.proj-task.drag-over').forEach(e=>e.classList.remove('drag-over'));
+    });
+    t.addEventListener('dragover',ev=>{
+      if(!_dragTaskSrc||t.dataset.taskId===_dragTaskSrc.taskId)return;
+      ev.preventDefault();
+      el.querySelectorAll('.proj-task.drag-over').forEach(e=>e.classList.remove('drag-over'));
+      t.classList.add('drag-over');
+    });
+    t.addEventListener('drop',ev=>{
+      ev.preventDefault();
+      if(!_dragTaskSrc||t.dataset.taskId===_dragTaskSrc.taskId)return;
+      const idea=state.ideas.find(i=>i.id===_dragTaskSrc.ideaId);if(!idea)return;
+      const from=idea.steps.findIndex(s=>s.id===_dragTaskSrc.taskId);
+      const to=idea.steps.findIndex(s=>s.id===t.dataset.taskId);
+      if(from<0||to<0)return;
+      idea.steps.splice(to,0,idea.steps.splice(from,1)[0]);
+      idea.updatedAt=new Date().toISOString();persistState();
+      _dragTaskSrc=null;renderProjets();
+    });
+  });
   el.querySelectorAll('.pt-task-rename').forEach(b=>b.addEventListener('click',()=>openTaskRenameModal(b.dataset.idea,b.dataset.task)));
   el.querySelectorAll('.pt-task-del').forEach(b=>b.addEventListener('click',()=>{deleteTask(b.dataset.idea,b.dataset.task);renderProjets()}));
   el.querySelectorAll('.pt-sub-copy').forEach(b=>b.addEventListener('click',()=>{
