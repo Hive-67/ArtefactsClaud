@@ -467,7 +467,8 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 #rsp-wrap{flex:1;overflow:hidden;position:relative;touch-action:none;cursor:grab;}
 #rsp-world{position:absolute;transform-origin:0 0;width:4000px;height:4000px;}
 #rsp-svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;}
-#rsp-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid var(--brd);min-height:56px;display:flex;align-items:center;padding:8px 12px;gap:6px;flex-wrap:nowrap;}
+#rsp-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid var(--brd);min-height:56px;display:flex;align-items:center;padding:8px 12px;gap:6px;flex-wrap:wrap;}
+.rsp-prio-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;font-size:.6rem;font-weight:700;color:#fff;flex-shrink:0;margin-left:4px;}
 .rsp-card{position:absolute;border-radius:10px;height:42px;display:flex;align-items:center;padding:0 12px 0 14px;cursor:pointer;border:2px solid transparent;font-family:'Space Mono',monospace;white-space:nowrap;background:linear-gradient(135deg,var(--bg2),var(--bg3));transition:box-shadow .15s,border-color .15s;}
 .rsp-card-accent{position:absolute;left:0;top:5px;bottom:5px;width:3px;border-radius:2px 0 0 2px;}
 </style>
@@ -2641,6 +2642,7 @@ function initTagInput(){
 /* ===== RUCHE SUB-MAP ===== */
 const RSP_PAL=["#a855f7","#3b82f6","#22d3ee","#34d399","#fb923c","#f87171","#ec4899"];
 const RSP_NH=42;
+const RSP_PRIO={1:{c:'#ef4444',l:'P1'},2:{c:'#f97316',l:'P2'},3:{c:'#eab308',l:'P3'},4:{c:'#22c55e',l:'P4'}};
 let _rspId=null,_rspSel=null,_rspMode='idle',_rspLinkSrc=null;
 let _rspDrag=null,_rspPan=null,_rspPinch=null;
 let _rspPs={x:0,y:0},_rspZ=1;
@@ -2720,7 +2722,9 @@ function rspRender(){
     const el=document.createElement('div');
     el.className='rsp-card';el.dataset.id=node.id;
     el.style.cssText=`left:${node.x-w/2}px;top:${node.y-RSP_NH/2}px;width:${w}px;border-color:${isSel?c:isLS?'rgba(255,255,255,.4)':c+'22'};box-shadow:${isSel?`0 0 22px ${c}55,0 4px 12px #0009`:'0 2px 8px #0006'};`;
-    el.innerHTML=`<div class="rsp-card-accent" style="background:${c}"></div><span style="color:${d===0?'var(--tx)':d===1?c+'ee':'var(--tx2)'};font-size:${d===0?13:11}px;font-weight:${d<2?700:500};overflow:hidden;text-overflow:ellipsis;max-width:${w-22}px">${esc(node.label)}</span>`;
+    const prio=node.priority?RSP_PRIO[node.priority]:null;
+    const prioBadge=prio?`<span class="rsp-prio-badge" style="background:${prio.c}">${prio.l}</span>`:'';
+    el.innerHTML=`<div class="rsp-card-accent" style="background:${c}"></div><span style="color:${d===0?'var(--tx)':d===1?c+'ee':'var(--tx2)'};font-size:${d===0?13:11}px;font-weight:${d<2?700:500};overflow:hidden;text-overflow:ellipsis;max-width:${w-42}px">${esc(node.label)}</span>${prioBadge}`;
     el.addEventListener('mousedown',ev=>{ev.stopPropagation();_rspDrag={id:node.id,stx:ev.clientX,sty:ev.clientY,snx:node.x,sny:node.y,moved:false}});
     el.addEventListener('touchstart',ev=>{ev.stopPropagation();ev.preventDefault();const t=ev.touches[0];_rspDrag={id:node.id,stx:t.clientX,sty:t.clientY,snx:node.x,sny:node.y,moved:false}},{passive:false});
     world.appendChild(el);
@@ -2737,6 +2741,21 @@ function rspRenderBottom(){
     bar.appendChild(rspBtn('🔗','var(--bg3)','#60a5fa',()=>rspStartLink(),'1px solid var(--brd)'));
     bar.appendChild(rspBtn('✏','var(--bg3)','var(--tx2)',()=>rspStartMode('rename'),'1px solid var(--brd)'));
     if(_rspSel!=='root')bar.appendChild(rspBtn('×','#3b0a0a','#fca5a5',()=>rspStartMode('del'),'1px solid #7f1d1d44'));
+    const prioRow=document.createElement('div');prioRow.style.cssText='display:flex;gap:4px;width:100%;padding-top:2px';
+    Object.entries(RSP_PRIO).forEach(([k,v])=>{
+      const cur=node.priority===+k;
+      const pb=document.createElement('button');
+      pb.style.cssText=`flex:1;border:2px solid ${cur?v.c:'transparent'};border-radius:7px;padding:4px 0;background:${cur?v.c+'22':'var(--bg3)'};color:${v.c};font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit`;
+      pb.textContent=v.l;
+      pb.addEventListener('click',ev=>{ev.stopPropagation();const idea=state.ideas.find(i=>i.id===_rspId);if(idea?.subMap?.nodes[_rspSel]){idea.subMap.nodes[_rspSel].priority=cur?null:+k;persistState();rspRender();}});
+      prioRow.appendChild(pb);
+    });
+    const noPrio=document.createElement('button');
+    noPrio.style.cssText='flex-shrink:0;border:2px solid transparent;border-radius:7px;padding:4px 8px;background:var(--bg3);color:var(--tx2);font-size:.7rem;cursor:pointer;font-family:inherit';
+    noPrio.textContent='—';noPrio.title='Supprimer priorité';
+    noPrio.addEventListener('click',ev=>{ev.stopPropagation();const idea=state.ideas.find(i=>i.id===_rspId);if(idea?.subMap?.nodes[_rspSel]){delete idea.subMap.nodes[_rspSel].priority;persistState();rspRender();}});
+    prioRow.appendChild(noPrio);
+    bar.appendChild(prioRow);
   }else if(_rspMode==='add'||_rspMode==='rename'){
     const lbl=document.createElement('span');lbl.style.cssText='color:var(--tx2);font-size:.7rem;flex-shrink:0';lbl.textContent=_rspMode==='add'?'Nom :':'Renommer :';
     const inp=document.createElement('input');inp.style.cssText='flex:1;min-width:60px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--tx);padding:6px 9px;font-family:inherit;font-size:.75rem;outline:none';
@@ -2781,6 +2800,49 @@ function rspDoDelete(){
   wk(_rspSel);dead.forEach(id=>delete nodes[id]);
   idea.subMap.links=(idea.subMap.links||[]).filter(l=>!dead.has(l.from)&&!dead.has(l.to));
   _rspSel=null;_rspMode='idle';persistState();rspRender();
+}
+function rspAutoLayout(){
+  const idea=state.ideas.find(i=>i.id===_rspId);if(!idea?.subMap)return;
+  const {nodes}=idea.subMap;
+  const cx=500,cy=280;
+  nodes['root'].x=cx;nodes['root'].y=cy;
+  const tasks=Object.values(nodes).filter(n=>n.parentId==='root');
+  const sortedTasks=[...tasks].sort((a,b)=>(a.priority||99)-(b.priority||99));
+  sortedTasks.forEach((task,i)=>{
+    const angle=(2*Math.PI/sortedTasks.length)*i-Math.PI/2;
+    task.x=cx+Math.cos(angle)*230;task.y=cy+Math.sin(angle)*230;
+    const subs=Object.values(nodes).filter(n=>n.parentId===task.id);
+    const sortedSubs=[...subs].sort((a,b)=>(a.priority||99)-(b.priority||99));
+    sortedSubs.forEach((sub,j)=>{
+      const spread=subs.length>1?((j/(subs.length-1))-.5)*Math.PI*.9:0;
+      const subAngle=angle+spread;
+      sub.x=task.x+Math.cos(subAngle)*155;sub.y=task.y+Math.sin(subAngle)*155;
+    });
+  });
+  persistState();rspRender();toast('📐 Disposition organisée !');
+}
+function rspGenerateAIPrompt(){
+  const idea=state.ideas.find(i=>i.id===_rspId);if(!idea?.subMap)return;
+  const {nodes}=idea.subMap;
+  const root=nodes['root'];
+  let txt=`# Projet : ${root.label}\n\n`;
+  const tasks=Object.values(nodes).filter(n=>n.parentId==='root').sort((a,b)=>(a.priority||99)-(b.priority||99));
+  tasks.forEach(task=>{
+    const pLabel=task.priority?` [${RSP_PRIO[task.priority].l}]`:'';
+    txt+=`## ${task.label}${pLabel}\n`;
+    const subs=Object.values(nodes).filter(n=>n.parentId===task.id).sort((a,b)=>(a.priority||99)-(b.priority||99));
+    subs.forEach(sub=>{
+      const pSub=sub.priority?` [${RSP_PRIO[sub.priority].l}]`:'';
+      txt+=`- ${sub.label}${pSub}\n`;
+    });
+    txt+='\n';
+  });
+  txt+=`\nGénère un dashboard de suivi de projet structuré pour ce projet, avec les tâches et sous-tâches ci-dessus. Identifie les dépendances, priorise les actions critiques et propose un plan d'action clair.`;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>toast('🤖 Prompt copié dans le presse-papier !'));
+  }else{
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('🤖 Prompt copié !');
+  }
 }
 function rspOnMove(tx,ty){
   if(_rspDrag){
@@ -2833,6 +2895,8 @@ function initSubMap(){
   },{passive:false});
   document.getElementById('rsp-world').addEventListener('touchend',()=>rspOnEnd());
   document.getElementById('rsp-close').addEventListener('click',closeSubMap);
+  document.getElementById('rsp-layout-btn').addEventListener('click',rspAutoLayout);
+  document.getElementById('rsp-ai-btn').addEventListener('click',rspGenerateAIPrompt);
   document.getElementById('rsp-add-btn').addEventListener('click',()=>{if(_rspSel){_rspMode='add';rspRenderBottom();}else{toast('Sélectionne d\'abord un nœud','warn')}});
 }
 
@@ -2981,7 +3045,9 @@ window.addEventListener('load',init);
 <div id="ruche-submap-panel">
   <div id="rsp-header">
     <button class="btn" id="rsp-close">← Retour</button>
-    <span id="rsp-title">Sous-carte</span>
+    <span id="rsp-title" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Sous-carte</span>
+    <button class="btn" id="rsp-layout-btn" title="Organiser automatiquement" style="font-size:.8rem">📐</button>
+    <button class="btn" id="rsp-ai-btn" title="Générer un prompt IA" style="font-size:.8rem">🤖</button>
     <button class="btn btn-primary" id="rsp-add-btn" style="font-size:.75rem">＋ Nœud fils</button>
   </div>
   <div id="rsp-wrap">
