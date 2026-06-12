@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<title>NOVA &amp; LE GLITCH — Mission Système</title>
+<!-- Polices CDN optionnelles : le jeu fonctionne sans (fallbacks testés) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   NOVA & LE GLITCH — Mission Système
+   Jeu éducatif mono-fichier — HTML/CSS/JS vanilla
+   ============================================================ */
+
+/* ---------- Tokens de la direction artistique (§6.2) ---------- */
+:root{
+  --fond:#0B1026;
+  --fond-halo:#1B2350;
+  --panneau:#131B3D;
+  --bord:#2E3A72;
+  --texte:#F2F5FF;
+  --texte-2:#9AA6D6;
+  --cyan:#4DE3FF;
+  --or:#FFD23F;
+  --vert:#5CFF8F;
+  --corail:#FF5C8A;
+  --violet-glitch:#B14CFF;
+  --rouge-glitch:#FF4D4D;
+  --font-titre:"Baloo 2", system-ui, sans-serif;
+  --font-mono:"Space Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  background:var(--fond);
+  color:var(--texte);
+  font-family:var(--font-mono);
+  font-size:18px;
+}
+
+/* ---------- Fond étoilé + halo ---------- */
+#fond{
+  position:fixed; inset:0; z-index:0;
+  background:radial-gradient(ellipse at 50% 40%, var(--fond-halo) 0%, var(--fond) 70%);
+}
+.etoiles{ position:absolute; inset:0; }
+.etoile{
+  position:absolute; border-radius:50%;
+  background:var(--texte);
+  animation:scintille var(--dur,4s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+@keyframes scintille{ 0%,100%{opacity:.4} 50%{opacity:.9} }
+
+/* ---------- Structure générale : 1 écran, pas de scroll de page ---------- */
+#app{
+  position:relative; z-index:1;
+  height:100dvh;
+  max-width:760px;
+  margin:0 auto;
+  display:flex; flex-direction:column;
+  padding:0 10px;
+}
+
+/* ---------- Header ---------- */
+header{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:8px 4px;
+  border-bottom:1px solid var(--bord);
+}
+#titre-jeu{
+  font-family:var(--font-titre); font-weight:800;
+  font-size:20px; color:var(--or);
+  text-shadow:0 0 12px rgba(255,210,63,.45);
+  white-space:nowrap;
+}
+#titre-jeu .court{ display:none; }
+#progression{ display:flex; gap:6px; align-items:center; }
+.icone-module{
+  width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  font-size:18px; border-radius:8px;
+  background:var(--panneau); border:1px solid var(--bord);
+  filter:grayscale(1); opacity:.45;
+  transition:filter .4s, opacity .4s;
+}
+.icone-module.ok{
+  filter:none; opacity:1;
+  border-color:var(--or);
+  animation:pop .5s ease;
+}
+@keyframes pop{ 0%{transform:scale(0)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
+#btn-son{
+  background:var(--panneau); border:1px solid var(--bord); color:var(--texte);
+  border-radius:10px; min-width:44px; min-height:44px; font-size:20px; cursor:pointer;
+}
+#btn-son:focus-visible, .chip:focus-visible, #btn-envoyer:focus-visible,
+#saisie:focus-visible, .gros-bouton:focus-visible{
+  outline:2px solid var(--cyan); outline-offset:2px;
+}
+
+/* ---------- Zone dialogue (NOVA + bulle) ---------- */
+#zone-dialogue{
+  flex:0 0 auto;
+  display:flex; gap:12px; align-items:flex-start;
+  padding:10px 4px; min-height:120px;
+}
+#avatar-slot{ flex:0 0 auto; width:110px; }
+#avatar-slot svg{ width:100%; height:auto; display:block; }
+#bulle{
+  flex:1 1 auto; position:relative;
+  background:var(--panneau);
+  border:1px solid var(--bord);
+  border-radius:14px;
+  padding:12px 30px 12px 14px;
+  min-height:78px;
+  font-size:18px; line-height:1.45;
+  cursor:pointer;
+}
+#bulle .nom-perso{
+  font-family:var(--font-titre); font-weight:800; font-size:14px;
+  color:var(--cyan); display:block; margin-bottom:2px;
+}
+#bulle.perso-glitch .nom-perso{ color:var(--violet-glitch); }
+#bulle.perso-pix .nom-perso{ color:var(--vert); }
+#bulle.perso-portier .nom-perso{ color:var(--or); }
+#fleche-suite{
+  position:absolute; right:10px; bottom:6px;
+  color:var(--cyan); font-size:16px;
+  animation:pulse-fleche 1s ease-in-out infinite;
+  display:none;
+}
+#fleche-suite.visible{ display:block; }
+@keyframes pulse-fleche{ 0%,100%{opacity:.35; transform:translateY(0)} 50%{opacity:1; transform:translateY(3px)} }
+
+/* ---------- Terminal ---------- */
+#terminal{
+  flex:1 1 auto;
+  overflow-y:auto;
+  background:var(--panneau);
+  border:1px solid var(--bord);
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:18px; line-height:1.5;
+  white-space:pre-wrap; word-break:break-word;
+  transition:box-shadow .3s;
+}
+#terminal.reussite{ box-shadow:0 0 18px rgba(92,255,143,.6); }
+.ligne-echo{ color:var(--cyan); }
+.ligne-sys{ color:var(--texte); }
+.ligne-ok{ color:var(--vert); }
+.ligne-err{ color:var(--corail); }
+.ligne-or{ color:var(--or); }
+
+/* Grille de pixels du chapitre 5 */
+#grille-pixels{
+  display:grid; gap:2px;
+  grid-template-columns:repeat(12, 16px);
+  margin:10px 0;
+}
+#grille-pixels .px{
+  width:16px; height:16px; border-radius:2px;
+  background:#3a4470;
+  transition:background .25s;
+}
+
+/* ---------- Saisie + chips ---------- */
+#zone-saisie{ flex:0 0 auto; padding:10px 0 8px; }
+#ligne-input{ display:flex; gap:8px; }
+#saisie{
+  flex:1 1 auto;
+  background:var(--panneau); border:2px solid var(--bord);
+  border-radius:12px; color:var(--texte);
+  font-family:var(--font-mono); font-size:18px;
+  padding:12px 14px; min-height:48px;
+}
+#saisie:disabled{ opacity:.55; }
+#saisie.erreur{
+  border-color:var(--corail);
+  animation:shake .3s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-4px)}
+}
+#btn-envoyer{
+  flex:0 0 auto; min-width:56px; min-height:48px;
+  background:var(--cyan); color:#06283a;
+  border:none; border-radius:12px;
+  font-size:24px; font-weight:700; cursor:pointer;
+}
+#btn-envoyer:disabled{ opacity:.4; cursor:default; }
+#chips{
+  display:flex; gap:8px; overflow-x:auto;
+  padding:10px 2px 4px;
+  -webkit-overflow-scrolling:touch;
+}
+.chip{
+  flex:0 0 auto;
+  background:var(--panneau); border:1px solid var(--cyan); color:var(--cyan);
+  border-radius:999px; padding:8px 16px;
+  font-family:var(--font-mono); font-size:16px;
+  min-height:40px; cursor:pointer; white-space:nowrap;
+}
+.chip:active{ background:var(--cyan); color:#06283a; }
+
+/* ---------- Overlays (titre, reprise, cartes, transition, diplôme) ---------- */
+.overlay{
+  position:fixed; inset:0; z-index:10;
+  background:rgba(5,8,22,.82);
+  display:flex; align-items:center; justify-content:center;
+  padding:16px;
+}
+.overlay[hidden]{ display:none; }
+.carte{
+  background:var(--panneau); border:2px solid var(--bord);
+  border-radius:18px; padding:24px;
+  max-width:520px; width:100%;
+  text-align:center;
+  max-height:92dvh; overflow-y:auto;
+}
+.carte h2{
+  font-family:var(--font-titre); font-weight:800;
+  font-size:26px; color:var(--or); margin-bottom:10px;
+}
+.carte .icone-grande{ font-size:54px; display:block; margin-bottom:8px; }
+.carte p{ line-height:1.5; margin-bottom:16px; }
+.gros-bouton{
+  font-family:var(--font-titre); font-weight:800; font-size:19px;
+  background:var(--cyan); color:#06283a;
+  border:none; border-radius:14px;
+  padding:14px 26px; min-height:56px; cursor:pointer;
+  margin:4px;
+}
+.gros-bouton.secondaire{ background:var(--panneau); color:var(--texte); border:2px solid var(--bord); }
+
+/* Écran titre */
+#ecran-titre .carte{ background:transparent; border:none; }
+#logo-titre{
+  font-family:var(--font-titre); font-weight:800;
+  font-size:40px; color:var(--or); line-height:1.1;
+  text-shadow:0 0 24px rgba(255,210,63,.55);
+}
+#sous-titre{ color:var(--cyan); font-size:18px; margin:10px 0 28px; }
+
+/* Bandeau transition chapitre */
+#transition{
+  position:fixed; inset:0; z-index:9;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--fond);
+  opacity:0; pointer-events:none;
+  transition:opacity .5s;
+}
+#transition.visible{ opacity:1; pointer-events:auto; }
+#transition .bandeau{
+  font-family:var(--font-titre); font-weight:800;
+  font-size:28px; color:var(--cyan); text-align:center;
+}
+
+/* Ambiance Cœur (chapitre 7) : teinte statique, pas de clignotement */
+body.ambiance-coeur #fond{
+  background:radial-gradient(ellipse at 50% 40%, #2A1B45 0%, #160B26 70%);
+}
+
+/* ---------- Diplôme ---------- */
+#diplome-cadre{
+  border:4px double var(--or); border-radius:14px;
+  padding:20px; margin-bottom:16px;
+}
+#diplome-cadre h2{ color:var(--or); }
+#diplome-prenom{
+  font-family:var(--font-titre); font-weight:800;
+  font-size:32px; color:var(--cyan); margin:8px 0;
+}
+#grille-savoirs{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  margin-bottom:16px; text-align:left;
+}
+.mini-savoir{
+  background:var(--fond); border:1px solid var(--bord);
+  border-radius:10px; padding:8px; font-size:13px; line-height:1.35;
+}
+.mini-savoir .ic{ font-size:18px; margin-right:4px; }
+
+/* Confettis */
+.confetti{
+  position:fixed; top:-12px; z-index:30;
+  width:9px; height:9px; border-radius:2px;
+  animation:chute 3s linear forwards;
+  pointer-events:none;
+}
+@keyframes chute{
+  to{ transform:translateY(105vh) rotate(540deg); opacity:.7; }
+}
+
+/* ---------- Avatars SVG ---------- */
+/* NOVA : antenne qui pulse */
+.nova-antenne-boule{
+  animation:pulse-antenne 1.8s ease-in-out infinite;
+  transform-origin:60px 12px; transform-box:fill-box;
+}
+@keyframes pulse-antenne{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+/* Clignement (déclenché par JS via la classe .cligne) */
+.nova-oeil{ transform-origin:center; transform-box:fill-box; transition:transform .12s; }
+svg.cligne .nova-oeil{ transform:scaleY(.1); }
+/* États */
+svg.etat-happy .nova-oeil-rond, svg.etat-idle .nova-oeil-accent, svg.etat-talk .nova-oeil-accent,
+svg.etat-worried .nova-oeil-accent, svg.etat-thinking .nova-oeil-accent{ display:none; }
+svg.etat-happy .nova-oeil-accent{ display:block; }
+svg.etat-idle .nova-oeil-rond, svg.etat-talk .nova-oeil-rond,
+svg.etat-worried .nova-oeil-rond, svg.etat-thinking .nova-oeil-rond{ display:block; }
+.nova-oeil-accent{ display:none; }
+svg.etat-worried .nova-tete{ transform:rotate(-6deg); transform-origin:60px 70px; transform-box:fill-box; }
+svg.etat-worried .nova-antenne{ transform:rotate(-22deg); transform-origin:60px 38px; transform-box:fill-box; }
+svg.etat-thinking .nova-pupille{ transform:translateY(-4px); }
+.nova-points{ display:none; font:700 22px var(--font-mono); fill:var(--cyan); }
+svg.etat-thinking .nova-points{ display:block; }
+.nova-bouche-talk{ display:none; }
+svg.etat-talk .nova-bouche-talk{
+  display:block;
+  animation:bouche .28s ease-in-out infinite alternate;
+  transform-origin:center; transform-box:fill-box;
+}
+svg.etat-talk .nova-bouche-idle{ display:none; }
+@keyframes bouche{ from{transform:scaleY(.3)} to{transform:scaleY(1)} }
+
+/* GLITCH : jitter ±2px à ~2Hz (contrainte épilepsie §7.4 respectée) */
+svg.forme-glitch .blob-corps{ fill:url(#degrade-glitch); }
+svg.forme-glitch{ animation:jitter .5s steps(2) infinite; }
+@keyframes jitter{
+  0%{transform:translate(0,0)} 25%{transform:translate(2px,-1px)}
+  50%{transform:translate(-2px,1px)} 75%{transform:translate(1px,2px)} 100%{transform:translate(0,0)}
+}
+svg.forme-pix .blob-corps{ fill:var(--vert); }
+svg.forme-pix{ animation:none; transition:all 1.5s; }
+.blob-sourire{ display:none; }
+svg.forme-pix .blob-sourire{ display:block; }
+svg.forme-pix .blob-bouche-zigzag{ display:none; }
+.blob-corps{ transition:fill 1.5s; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:759px){
+  #avatar-slot{ width:72px; }
+  #zone-dialogue{ min-height:96px; }
+  #bulle{ font-size:16px; }
+  #terminal{ font-size:16px; }
+  #saisie{ font-size:16px; }
+}
+@media (max-width:379px){
+  #titre-jeu .long{ display:none; }
+  #titre-jeu .court{ display:inline; }
+  .icone-module{ width:20px; height:20px; font-size:13px; }
+}
+
+/* ---------- prefers-reduced-motion (§7.3) ---------- */
+@media (prefers-reduced-motion:reduce){
+  .etoile{ animation:none; opacity:.6; }
+  svg.forme-glitch{ animation:none; }
+  .confetti{ animation:none; display:none; }
+  .nova-antenne-boule{ animation:none; }
+  #fleche-suite{ animation:none; opacity:1; }
+}
+
+/* ---------- Impression du diplôme (§10.3) ---------- */
+@media print{
+  body{ background:#fff; color:#000; overflow:visible; }
+  body *{ visibility:hidden; }
+  #ecran-diplome, #ecran-diplome *{ visibility:visible; }
+  #ecran-diplome{ position:absolute; inset:0; background:#fff; }
+  #ecran-diplome .carte{ border:none; background:#fff; color:#000; max-height:none; }
+  #diplome-cadre{ border:4px double #000; }
+  #diplome-cadre h2, #diplome-prenom{ color:#000; text-shadow:none; }
+  .mini-savoir{ background:#fff; border:1px solid #000; color:#000; }
+  .gros-bouton, #confettis-zone{ display:none !important; }
+  @page{ size:A4 portrait; margin:1.5cm; }
+}
+</style>
+</head>
+<body>
+<div id="fond"><div class="etoiles" id="etoiles"></div></div>
+
+<div id="app">
+  <header>
+    <div id="titre-jeu"><span class="long">NOVA &amp; LE GLITCH</span><span class="court">N&amp;G</span></div>
+    <div id="progression" aria-label="Progression des modules"></div>
+    <button id="btn-son" aria-label="Couper ou remettre le son">🔊</button>
+  </header>
+
+  <div id="zone-dialogue">
+    <div id="avatar-slot"></div>
+    <div id="bulle" role="status" aria-live="polite">
+      <span class="nom-perso" id="bulle-nom"></span>
+      <span id="bulle-texte"></span>
+      <span id="fleche-suite">▶</span>
+    </div>
+  </div>
+
+  <div id="terminal" aria-live="polite"></div>
+
+  <div id="zone-saisie">
+    <div id="ligne-input">
+      <input id="saisie" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="Lis le message de NOVA…" disabled aria-label="Champ de commande">
+      <button id="btn-envoyer" aria-label="Envoyer la commande" disabled>⏎</button>
+    </div>
+    <div id="chips"></div>
+  </div>
+</div>
+
+<div id="transition"><div class="bandeau" id="transition-texte"></div></div>
+
+<!-- Écran titre -->
+<div class="overlay" id="ecran-titre">
+  <div class="carte">
+    <div id="logo-titre">NOVA &amp; LE GLITCH</div>
+    <div id="sous-titre">Mission Système</div>
+    <button class="gros-bouton" id="btn-commencer">▶ COMMENCER LA MISSION</button>
+  </div>
+</div>
+
+<!-- Écran de reprise -->
+<div class="overlay" id="ecran-reprise" hidden>
+  <div class="carte">
+    <span class="icone-grande">🤖</span>
+    <p id="texte-reprise"></p>
+    <button class="gros-bouton" id="btn-reprendre">Reprendre ▶</button>
+    <button class="gros-bouton secondaire" id="btn-recommencer">Recommencer à zéro ↺</button>
+    <p id="confirm-reset" hidden>Sûr ? Toute la progression sera effacée.<br>
+      <button class="gros-bouton" id="btn-reset-oui">Oui</button>
+      <button class="gros-bouton secondaire" id="btn-reset-non">Non</button>
+    </p>
+  </div>
+</div>
+
+<!-- Carte CE QUE TU AS APPRIS -->
+<div class="overlay" id="ecran-carte" hidden>
+  <div class="carte">
+    <span class="icone-grande" id="carte-icone"></span>
+    <h2>CE QUE TU AS APPRIS</h2>
+    <p id="carte-texte"></p>
+    <button class="gros-bouton" id="btn-carte-continuer">Continuer ▶</button>
+  </div>
+</div>
+
+<!-- Écran diplôme -->
+<div class="overlay" id="ecran-diplome" hidden>
+  <div class="carte">
+    <div id="diplome-cadre">
+      <h2>🏅 DIPLÔME OFFICIEL 🏅</h2>
+      <p>AGENT SYSTÈME — NIVEAU 1<br>décerné à</p>
+      <div id="diplome-prenom"></div>
+      <p>le <span id="diplome-date"></span><br><br>signé : NOVA 🤖 &amp; PIX 💚</p>
+    </div>
+    <div id="grille-savoirs"></div>
+    <button class="gros-bouton" id="btn-imprimer">🖨 Imprimer mon diplôme</button>
+    <button class="gros-bouton secondaire" id="btn-rejouer">↺ Rejouer</button>
+  </div>
+</div>
+
+<div id="confettis-zone"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   SECTION 1 — DONNÉES & UTILITAIRES
+   ============================================================ */
+
+// ---------- Normalisation des saisies (§4.1) ----------
+function normaliser(t){
+  return String(t)
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+// Pour les codes / mots de passe / réponses : on retire TOUS les espaces
+function normaliserCode(t){
+  return normaliser(t).replace(/\s+/g, "");
+}
+
+// ---------- Données transverses ----------
+const REPONSES_INCONNUES = [
+  "BZZT ! Commande inconnue. Mais c'était joliment tapé ! Tape aide si tu es perdu.",
+  "Hmm… mon dictionnaire répond : 404, pas trouvé ! Essaie aide.",
+  "Même en penchant la tête, je ne comprends pas. Tape aide, je t'explique tout !",
+  "Ça, c'est une commande du futur. Moi je suis une IA du présent ! Tape aide."
+];
+const BLAGUES = [
+  "Pourquoi l'ordinateur est allé chez le docteur ? … Parce qu'il avait un VIRUS !",
+  "Que dit un informaticien qui se noie ? … F1 ! F1 !",
+  "Quel est le gâteau préféré des robots ? … Les cookies !"
+];
+// Liste courte de gros mots courants (formes normalisées)
+const GROS_MOTS = ["merde","putain","connard","connasse","salope","pute","encule",
+  "batard","crotte de bip","fdp","ntm","con","conne","debile","cretin","abruti","zut de zut"];
+
+const SAVOIRS = [
+  { ic:"⌨️", txt:"Une commande = un ordre précis tapé au clavier. La touche Entrée l'envoie à l'ordinateur." },
+  { ic:"📁", txt:"Un dossier = une boîte. Un fichier = un document. Son extension (.txt, .png, .mp3, .exe) indique son type." },
+  { ic:"🔐", txt:"Un mot de passe fort = long + lettres + chiffres + symbole. Et il reste SECRET." },
+  { ic:"💾", txt:"L'ordinateur stocke TOUT en binaire : des 0 (éteint) et des 1 (allumé)." },
+  { ic:"🖥️", txt:"Un écran = une grille de pixels. Chaque pixel mélange 3 lumières : Rouge, Vert, Bleu. Lumière rouge + verte = jaune !" },
+  { ic:"🧩", txt:"Un programme = des instructions dans l'ordre, comme une recette. Un bug = une erreur. Débugger = la trouver et la corriger." }
+];
+// Les 6 modules du Système (barre de progression + scanner)
+const MODULES = [
+  { ic:"📁", nom:"ARCHIVES" },
+  { ic:"🔐", nom:"SÉCURITÉ" },
+  { ic:"💾", nom:"MÉMOIRE" },
+  { ic:"🖥️", nom:"ÉCRAN" },
+  { ic:"🧩", nom:"LOGIQUE" },
+  { ic:"💛", nom:"CŒUR" }
+];
+
+// Arborescence du chapitre 2 (le fichier intrus est secret.txt dans images/)
+const ARBO = {
+  "":        { dossiers:["images","musique","jeux"], fichiers:[] },
+  "images":  { dossiers:[], fichiers:["chat.png","fusee.png","secret.txt"] },
+  "musique": { dossiers:[], fichiers:["bip_bop.mp3"] },
+  "jeux":    { dossiers:[], fichiers:["morpion.exe"] }
+};
+
+// ---------- État global (objet unique, §9.2) ----------
+const etat = {
+  prenom: "",
+  chapitreIndex: 0,
+  etape: 0,
+  essais: 0,
+  indicesDonnes: 0,
+  dossierCourant: "",
+  sonOn: true,
+  termine: false
+};
+
+// ---------- Sauvegarde localStorage (§4.4, §9.3) ----------
+const CLE_SAVE = "nova_save_v1";
+function sauvegarder(){
+  try{
+    localStorage.setItem(CLE_SAVE, JSON.stringify({
+      prenom: etat.prenom,
+      chapitreIndex: etat.chapitreIndex,
+      sonOn: etat.sonOn,
+      termine: etat.termine
+    }));
+  }catch(e){ /* navigation privée : le jeu continue sans sauvegarde */ }
+}
+function chargerSauvegarde(){
+  try{
+    const brut = localStorage.getItem(CLE_SAVE);
+    if(!brut) return null;
+    const s = JSON.parse(brut);
+    if(typeof s.prenom !== "string" || typeof s.chapitreIndex !== "number") return null;
+    return s;
+  }catch(e){ return null; }
+}
+function effacerSauvegarde(){
+  try{ localStorage.removeItem(CLE_SAVE); }catch(e){}
+}
+
+// ---------- Prénom capitalisé + injection {PRENOM} ----------
+function prenomAffiche(){
+  if(!etat.prenom) return "Agent";
+  return etat.prenom.charAt(0).toUpperCase() + etat.prenom.slice(1);
+}
+function injecter(texte){
+  return texte.split("{PRENOM}").join(prenomAffiche());
+}
+
+/* ============================================================
+   SECTION 2 — AUDIO (Web Audio API, tout synthétisé, §8)
+   ============================================================ */
+let ctxAudio = null;
+function debloquerAudio(){
+  if(ctxAudio) return;
+  try{
+    ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+  }catch(e){ ctxAudio = null; }
+}
+// Joue une note simple (volume master <= 0.15)
+function note(freq, debut, duree, type, vol){
+  if(!ctxAudio || !etat.sonOn) return;
+  try{
+    const o = ctxAudio.createOscillator();
+    const g = ctxAudio.createGain();
+    o.type = type || "sine";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, ctxAudio.currentTime + debut);
+    g.gain.linearRampToValueAtTime(Math.min(vol || 0.12, 0.15), ctxAudio.currentTime + debut + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctxAudio.currentTime + debut + duree);
+    o.connect(g); g.connect(ctxAudio.destination);
+    o.start(ctxAudio.currentTime + debut);
+    o.stop(ctxAudio.currentTime + debut + duree + 0.05);
+  }catch(e){}
+}
+function sonBoot(){ // balayage sinus 200→800 Hz, 600 ms
+  if(!ctxAudio || !etat.sonOn) return;
+  try{
+    const o = ctxAudio.createOscillator();
+    const g = ctxAudio.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(200, ctxAudio.currentTime);
+    o.frequency.linearRampToValueAtTime(800, ctxAudio.currentTime + 0.6);
+    g.gain.setValueAtTime(0.06, ctxAudio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctxAudio.currentTime + 0.6);
+    o.connect(g); g.connect(ctxAudio.destination);
+    o.start(); o.stop(ctxAudio.currentTime + 0.65);
+  }catch(e){}
+}
+function sonBlip(){ note(880, 0, 0.025, "sine", 0.05); }
+function sonErreur(){ note(180, 0, 0.12, "sine", 0.08); }
+function sonReussite(){ // arpège triangle Do-Mi-Sol
+  note(523, 0,    0.08, "triangle", 0.1);
+  note(659, 0.08, 0.08, "triangle", 0.1);
+  note(784, 0.16, 0.08, "triangle", 0.1);
+}
+function sonModule(){ sonReussite(); note(1046, 0.26, 0.14, "triangle", 0.1); }
+function sonFanfare(){ // 5 notes montantes, 1,2 s
+  [523, 587, 659, 784, 1046].forEach(function(f, i){
+    note(f, i * 0.22, 0.2, "triangle", 0.12);
+  });
+}
+
+/* ============================================================
+   SECTION 3 — RENDU : avatars SVG, terminal, bulles, chips
+   ============================================================ */
+const $ = function(id){ return document.getElementById(id); };
+
+// ---------- SVG NOVA (§6.5) ----------
+const SVG_NOVA = '<svg id="svg-nova" class="etat-idle" viewBox="0 0 120 120" aria-label="NOVA, la petite IA" role="img">' +
+  '<defs><radialGradient id="degrade-nova" cx="50%" cy="35%" r="80%">' +
+  '<stop offset="0%" stop-color="#1E2A5E"/><stop offset="100%" stop-color="#131B3D"/></radialGradient></defs>' +
+  '<g class="nova-antenne"><line x1="60" y1="38" x2="60" y2="18" stroke="#4DE3FF" stroke-width="3"/>' +
+  '<circle class="nova-antenne-boule" cx="60" cy="12" r="6" fill="#4DE3FF"/></g>' +
+  '<g class="nova-tete">' +
+  '<rect x="18" y="34" width="84" height="72" rx="34" fill="url(#degrade-nova)" stroke="#4DE3FF" stroke-width="2.5" style="filter:drop-shadow(0 0 6px rgba(77,227,255,.6))"/>' +
+  '<g class="nova-oeil nova-oeil-rond"><circle cx="44" cy="66" r="8" fill="#4DE3FF"/><circle class="nova-pupille" cx="44" cy="66" r="3.5" fill="#0B1026"/></g>' +
+  '<g class="nova-oeil nova-oeil-rond"><circle cx="76" cy="66" r="8" fill="#4DE3FF"/><circle class="nova-pupille" cx="76" cy="66" r="3.5" fill="#0B1026"/></g>' +
+  '<g class="nova-oeil-accent"><path d="M36 68 L44 60 L52 68" fill="none" stroke="#4DE3FF" stroke-width="3.5" stroke-linecap="round"/>' +
+  '<path d="M68 68 L76 60 L84 68" fill="none" stroke="#4DE3FF" stroke-width="3.5" stroke-linecap="round"/></g>' +
+  '<line class="nova-bouche-idle" x1="50" y1="88" x2="70" y2="88" stroke="#4DE3FF" stroke-width="3" stroke-linecap="round"/>' +
+  '<ellipse class="nova-bouche-talk" cx="60" cy="88" rx="9" ry="6" fill="#4DE3FF"/>' +
+  '</g>' +
+  '<text class="nova-points" x="88" y="30">…</text></svg>';
+
+// ---------- SVG GLITCH / PIX (§6.6) ----------
+const SVG_GLITCH = '<svg id="svg-glitch" class="forme-glitch" viewBox="0 0 120 120" aria-label="Le GLITCH" role="img">' +
+  '<defs><linearGradient id="degrade-glitch" x1="0" y1="0" x2="1" y2="1">' +
+  '<stop offset="0%" stop-color="#B14CFF"/><stop offset="100%" stop-color="#FF4D4D"/></linearGradient></defs>' +
+  '<path class="blob-corps" d="M60 14 C82 10 104 28 106 52 C108 74 98 86 102 98 C90 108 74 100 60 106 C44 102 28 110 20 96 C26 84 12 76 14 54 C16 30 38 18 60 14 Z"/>' +
+  '<circle cx="45" cy="58" r="7" fill="#0B1026"/><circle cx="45" cy="58" r="2.5" fill="#F2F5FF"/>' +
+  '<circle cx="77" cy="58" r="7" fill="#0B1026"/><circle cx="77" cy="58" r="2.5" fill="#F2F5FF"/>' +
+  '<path class="blob-bouche-zigzag" d="M44 82 L52 76 L60 84 L68 76 L76 82" fill="none" stroke="#0B1026" stroke-width="3" stroke-linecap="round"/>' +
+  '<path class="blob-sourire" d="M44 78 Q60 94 76 78" fill="none" stroke="#0B1026" stroke-width="4" stroke-linecap="round"/>' +
+  '</svg>';
+
+let timerClignement = null;
+function afficherAvatar(quel){
+  const slot = $("avatar-slot");
+  slot.innerHTML = (quel === "glitch") ? SVG_GLITCH : SVG_NOVA;
+  if(quel !== "glitch") programmerClignement();
+}
+// Clignement aléatoire de NOVA toutes les 3 à 5 s
+function programmerClignement(){
+  clearTimeout(timerClignement);
+  timerClignement = setTimeout(function(){
+    const svg = $("svg-nova");
+    if(svg && svg.classList.contains("etat-idle")){
+      svg.classList.add("cligne");
+      setTimeout(function(){ svg.classList.remove("cligne"); }, 120);
+    }
+    programmerClignement();
+  }, 3000 + Math.random() * 2000);
+}
+function etatNova(nom){
+  const svg = $("svg-nova");
+  if(!svg) return;
+  svg.className.baseVal = "etat-" + nom;
+}
+function transformerEnPix(){
+  const svg = $("svg-glitch");
+  if(svg){ svg.classList.remove("forme-glitch"); svg.classList.add("forme-pix"); }
+}
+
+// ---------- Terminal ----------
+function ecrire(texte, classe){
+  const term = $("terminal");
+  const div = document.createElement("div");
+  div.className = classe || "ligne-sys";
+  div.textContent = texte; // textContent : aucune injection possible (§9.4)
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+  return div;
+}
+function echoCommande(brut){
+  ecrire("> " + brut, "ligne-echo");
+}
+function glowReussite(){
+  const term = $("terminal");
+  term.classList.add("reussite");
+  setTimeout(function(){ term.classList.remove("reussite"); }, 600);
+}
+
+// ---------- Étoiles du fond ----------
+function creerEtoiles(){
+  const zone = $("etoiles");
+  for(let i = 0; i < 70; i++){
+    const e = document.createElement("div");
+    e.className = "etoile";
+    const taille = (Math.random() < 0.2) ? 3 : 2;
+    e.style.width = e.style.height = taille + "px";
+    e.style.left = (Math.random() * 100) + "%";
+    e.style.top = (Math.random() * 100) + "%";
+    e.style.setProperty("--dur", (3 + Math.random() * 3) + "s");
+    e.style.setProperty("--del", (Math.random() * 4) + "s");
+    if(i % 7 === 0) e.style.background = "var(--or)";
+    zone.appendChild(e);
+  }
+}
+
+// ---------- Barre de progression ----------
+const modulesRepares = new Set();
+function dessinerProgression(){
+  const zone = $("progression");
+  zone.innerHTML = "";
+  MODULES.forEach(function(m, i){
+    const d = document.createElement("div");
+    d.className = "icone-module" + (modulesRepares.has(i) ? " ok" : "");
+    d.textContent = m.ic;
+    d.title = m.nom;
+    zone.appendChild(d);
+  });
+}
+function allumerModule(i){
+  modulesRepares.add(i);
+  dessinerProgression();
+  sonModule();
+}
+
+// ---------- Chips de commandes (§4.5) ----------
+function afficherChips(liste){
+  const zone = $("chips");
+  zone.innerHTML = "";
+  (liste || []).forEach(function(cmd){
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.type = "button";
+    b.textContent = cmd;
+    b.addEventListener("click", function(){
+      // La chip remplit l'input : l'enfant garde le rituel « commande + Entrée »
+      const inp = $("saisie");
+      if(!inp.disabled){ inp.value = cmd; inp.focus(); }
+    });
+    zone.appendChild(b);
+  });
+}
+
+/* ============================================================
+   SECTION 4 — MOTEUR : file de messages, typewriter, saisie
+   ============================================================ */
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const VITESSE_TYPE = reduceMotion ? 5 : 30; // ms / caractère
+
+let fileMessages = [];      // file de bulles et d'actions
+let typeEnCours = false;    // typewriter actif ?
+let texteCible = "";        // texte complet de la bulle courante
+let timerType = null;
+let attenteClic = false;    // bulle finie, on attend le clic pour la suivante
+let saisieAttendue = false; // l'input est-il actif ?
+
+// Ajoute une bulle : dire(perso, etatNova, texte)
+function dire(perso, etatN, texte){
+  fileMessages.push({ type:"bulle", perso:perso, etat:etatN, texte:texte });
+}
+function direNova(etatN, texte){ dire("NOVA", etatN, texte); }
+// Ajoute une action (exécutée quand son tour arrive dans la file)
+function ensuite(fn){ fileMessages.push({ type:"action", fn:fn }); }
+
+function traiterFile(){
+  if(typeEnCours || attenteClic) return;
+  const msg = fileMessages.shift();
+  if(!msg){ return; }
+  if(msg.type === "action"){
+    msg.fn();
+    traiterFile();
+    return;
+  }
+  // Bulle : nom du perso + état de NOVA + typewriter
+  const bulle = $("bulle");
+  bulle.className = "";
+  if(msg.perso === "GLITCH") bulle.classList.add("perso-glitch");
+  if(msg.perso === "PIX") bulle.classList.add("perso-pix");
+  if(msg.perso === "PORTIER.EXE") bulle.classList.add("perso-portier");
+  $("bulle-nom").textContent = msg.perso;
+  if(msg.perso === "NOVA") etatNova(msg.etat || "talk");
+  $("fleche-suite").classList.remove("visible");
+  sonBlip();
+  texteCible = injecter(msg.texte);
+  typeEnCours = true;
+  let i = 0;
+  const span = $("bulle-texte");
+  span.textContent = "";
+  clearInterval(timerType);
+  timerType = setInterval(function(){
+    i++;
+    span.textContent = texteCible.slice(0, i);
+    if(i >= texteCible.length){ finBulle(msg); }
+  }, VITESSE_TYPE);
+}
+function finBulle(msg){
+  clearInterval(timerType);
+  $("bulle-texte").textContent = texteCible;
+  typeEnCours = false;
+  if(msg.perso === "NOVA"){
+    // Retour à l'état indiqué (talk → idle une fois la bulle finie)
+    etatNova((!msg.etat || msg.etat === "talk") ? "idle" : msg.etat);
+  }
+  if(fileMessages.length > 0 || !saisieAttendue){
+    attenteClic = true;
+    $("fleche-suite").classList.add("visible");
+  }else{
+    activerSaisieReelle();
+  }
+}
+// Clic / tap / Espace / Entrée sur la bulle : avance ou complète
+function avancerBulle(){
+  if(typeEnCours){
+    // Interruption : afficher tout le texte immédiatement
+    clearInterval(timerType);
+    typeEnCours = false;
+    $("bulle-texte").textContent = texteCible;
+    const dernierMsg = { perso: $("bulle-nom").textContent, etat:null };
+    if(dernierMsg.perso === "NOVA") etatNova("idle");
+    if(fileMessages.length > 0 || !saisieAttendue){
+      attenteClic = true;
+      $("fleche-suite").classList.add("visible");
+    }else{
+      activerSaisieReelle();
+    }
+    return;
+  }
+  if(attenteClic){
+    attenteClic = false;
+    $("fleche-suite").classList.remove("visible");
+    if(fileMessages.length > 0){ traiterFile(); }
+    else if(saisieAttendue){ activerSaisieReelle(); }
+  }
+}
+
+// ---------- Activation / désactivation de la saisie ----------
+let placeholderCourant = "Tape une commande…";
+function attendreSaisie(placeholder){
+  placeholderCourant = placeholder || "Tape une commande…";
+  saisieAttendue = true;
+  if(!typeEnCours && !attenteClic && fileMessages.length === 0){
+    activerSaisieReelle();
+  }
+}
+function activerSaisieReelle(){
+  const inp = $("saisie");
+  inp.disabled = false;
+  inp.placeholder = placeholderCourant;
+  $("btn-envoyer").disabled = false;
+  $("fleche-suite").classList.remove("visible");
+  // Sur mobile, on ne re-force pas le focus (clavier virtuel, §7.1)
+  if(window.innerWidth >= 760) inp.focus();
+}
+function desactiverSaisie(){
+  saisieAttendue = false;
+  const inp = $("saisie");
+  inp.disabled = true;
+  inp.placeholder = "Lis le message de NOVA…";
+  $("btn-envoyer").disabled = true;
+}
+function secouerInput(){
+  const inp = $("saisie");
+  inp.classList.add("erreur");
+  setTimeout(function(){ inp.classList.remove("erreur"); }, 350);
+  sonErreur();
+}
+
+/* ============================================================
+   SECTION 5 — ÉNIGMES, INDICES PROGRESSIFS (§4.3) & ROUTEUR
+   ============================================================ */
+let enigme = null;
+// Déclare l'énigme en cours :
+// { solutions:[...], indices:[i1,i2,i3], special(n)->texte|null, onReussite() }
+function definirEnigme(def){
+  enigme = def;
+  enigme.essais = 0;
+  enigme.indicesDonnes = 0;
+  enigme.echecsApres3 = 0;
+}
+function donnerIndice(){
+  if(!enigme) return false;
+  if(enigme.indicesDonnes >= 3){
+    direNova("talk", "Je t'ai déjà tout dit, Agent ! Relis l'indice : " + enigme.indices[2]);
+    traiterFile();
+    return true;
+  }
+  const i = enigme.indicesDonnes;
+  enigme.indicesDonnes++;
+  direNova("thinking", "Indice " + (i + 1) + " : " + enigme.indices[i]);
+  traiterFile();
+  return true;
+}
+// NOVA tape la réponse elle-même (anti-blocage ultime, §4.3)
+function novaValideElleMeme(){
+  const reponse = enigme.reponseAuto || enigme.solutions[0];
+  direNova("happy", "Regarde, je tape avec toi : " + reponse);
+  ensuite(function(){
+    desactiverSaisie();
+    const inp = $("saisie");
+    inp.disabled = false;
+    let i = 0;
+    const timer = setInterval(function(){
+      i++;
+      inp.value = reponse.slice(0, i);
+      if(i >= reponse.length){
+        clearInterval(timer);
+        setTimeout(function(){
+          inp.value = "";
+          inp.disabled = true;
+          echoCommande(reponse);
+          const e = enigme;
+          enigme = null;
+          saisieAttendue = false; // la suite (carte, transition) gère la saisie
+          glowReussite();
+          sonReussite();
+          e.onReussite();
+        }, 450);
+      }
+    }, 90);
+  });
+  traiterFile();
+}
+function tenterEnigme(n, nCode){
+  const solutions = enigme.solutions.map(normaliserCode);
+  if(solutions.indexOf(nCode) !== -1){
+    const e = enigme;
+    enigme = null;
+    saisieAttendue = false; // la suite (bulles, carte, transition) gère la saisie
+    glowReussite();
+    sonReussite();
+    e.onReussite();
+    return;
+  }
+  // Échec : feedback spécial ou message d'erreur de l'énigme
+  enigme.essais++;
+  secouerInput();
+  const special = enigme.special ? enigme.special(n, nCode) : null;
+  if(special){
+    if(Array.isArray(special)){ dire(special[0], special[1], special[2]); }
+    else{ direNova("talk", special); }
+  }
+  // Paliers automatiques : 2 / 4 / 6 essais → indices 1 / 2 / 3
+  if(enigme.indicesDonnes < 3){
+    const palier = (enigme.essais >= 6) ? 3 : (enigme.essais >= 4) ? 2 : (enigme.essais >= 2) ? 1 : 0;
+    while(enigme.indicesDonnes < palier){
+      const i = enigme.indicesDonnes;
+      enigme.indicesDonnes++;
+      direNova("thinking", "Indice " + (i + 1) + " : " + enigme.indices[i]);
+    }
+  }else{
+    enigme.echecsApres3++;
+    if(enigme.echecsApres3 >= 2){
+      novaValideElleMeme();
+      return;
+    }
+  }
+  traiterFile();
+}
+
+// ---------- Commandes globales (§4.2) ----------
+let blagueIndex = Math.floor(Math.random() * BLAGUES.length);
+function commandeGlobale(n){
+  if(n === "aide"){
+    const ch = CHAPITRES[etat.chapitreIndex];
+    ecrire("┌─ COMMANDES D'AGENT ─────────────────┐", "ligne-or");
+    (ch.aideContextuelle || []).forEach(function(l){ ecrire("│ " + l, "ligne-sys"); });
+    ecrire("│ aide    → j'affiche ce panneau", "ligne-sys");
+    ecrire("│ scanner → état des modules du Système", "ligne-sys");
+    ecrire("│ indice  → un coup de pouce sur l'énigme", "ligne-sys");
+    ecrire("│ son     → couper / remettre le son", "ligne-sys");
+    ecrire("└─────────────────────────────────────┘", "ligne-or");
+    if(ch.objectifAide){ direNova("talk", ch.objectifAide); traiterFile(); }
+    return true;
+  }
+  if(n === "indice"){
+    if(enigme){ donnerIndice(); }
+    else{ direNova("talk", "Pas d'énigme en cours, Agent ! Continue ta mission."); traiterFile(); }
+    return true;
+  }
+  if(n === "scanner"){
+    ecrire("SCAN DU SYSTÈME EN COURS... ▓▓▓▓▓▓▓▓ 100%", "ligne-or");
+    afficherScan();
+    return true;
+  }
+  if(n === "son"){
+    basculerSon();
+    ecrire("Son : " + (etat.sonOn ? "ACTIVÉ 🔊" : "COUPÉ 🔇"), "ligne-or");
+    return true;
+  }
+  if(n === "nova"){
+    blagueIndex = (blagueIndex + 1) % BLAGUES.length;
+    direNova("happy", BLAGUES[blagueIndex]);
+    traiterFile();
+    return true;
+  }
+  if(n === "bip"){
+    direNova("happy", "BIP BIP !");
+    traiterFile();
+    return true;
+  }
+  return false;
+}
+// État réel des modules à tout moment (icône + libellé, jamais couleur seule)
+function afficherScan(){
+  const etatsPanne = ["CORROMPU", "VERROUILLÉ", "CORROMPU", "CASSÉ", "BUGGÉ"];
+  MODULES.forEach(function(m, i){
+    const points = "........".slice(0, Math.max(2, 11 - m.nom.length)) + "........";
+    if(modulesRepares.has(i)){
+      ecrire("✔ " + m.nom + " " + points + " RÉPARÉ", "ligne-ok");
+    }else if(i === 5){
+      ecrire("? CŒUR ............ ??? signal inconnu détecté", "ligne-err");
+    }else{
+      ecrire("✖ " + m.nom + " " + points + " " + etatsPanne[i], "ligne-err");
+    }
+  });
+}
+function basculerSon(){
+  etat.sonOn = !etat.sonOn;
+  $("btn-son").textContent = etat.sonOn ? "🔊" : "🔇";
+  sauvegarder();
+}
+
+// ---------- Routeur principal (§4.1) ----------
+function traiterSaisie(brut){
+  const n = normaliser(brut);
+  const nCode = normaliserCode(brut);
+  echoCommande(brut);
+
+  if(n === ""){
+    direNova("worried", "Bip ? Je n'ai rien reçu ! Tape quelque chose avant d'appuyer sur Entrée.");
+    traiterFile();
+    return;
+  }
+  if(brut.length > 60){
+    direNova("worried", "Houlà, quel roman ! Les commandes sont courtes, Agent.");
+    traiterFile();
+    return;
+  }
+  // Filtre politesse
+  const mots = n.split(" ");
+  if(GROS_MOTS.some(function(g){ return mots.indexOf(g) !== -1; })){
+    direNova("worried", "OH ! Mes circuits ont entendu ça ! On reste poli, Agent !");
+    traiterFile();
+    return;
+  }
+
+  const ch = CHAPITRES[etat.chapitreIndex];
+  // 0. Saisies prioritaires du chapitre (ex : prénom au chapitre 0)
+  // CHOIX: pendant la saisie du prénom, tout est traité comme un prénom
+  // (sinon un enfant prénommé « Nova » déclencherait l'easter egg).
+  if(ch.prioritaire && ch.prioritaire(n, nCode, brut)) return;
+  // CHOIX: si la saisie est LA solution de l'énigme en cours, elle gagne sur
+  // les commandes globales (ex : « bip » est à la fois l'easter egg et la
+  // réponse du chapitre 4 — sinon l'énigme serait insoluble).
+  if(enigme && enigme.solutions.map(normaliserCode).indexOf(nCode) !== -1){
+    tenterEnigme(n, nCode);
+    return;
+  }
+  // 1. Commandes globales (toujours prioritaires)
+  if(commandeGlobale(n)) return;
+  // 2. Commandes contextuelles du chapitre en cours
+  if(ch.onInput && ch.onInput(n, nCode, brut)) return;
+  // 3. Tentative de réponse à l'énigme en cours
+  if(enigme){ tenterEnigme(n, nCode); return; }
+  // 4. Commande inconnue (rotation aléatoire)
+  const r = REPONSES_INCONNUES[Math.floor(Math.random() * REPONSES_INCONNUES.length)];
+  direNova("thinking", r);
+  traiterFile();
+}
+
+// ---------- Cartes « CE QUE TU AS APPRIS » (§4.8) ----------
+let callbackCarte = null;
+function montrerCarte(indexSavoir, ensuiteFn){
+  callbackCarte = ensuiteFn;
+  $("carte-icone").textContent = SAVOIRS[indexSavoir].ic;
+  $("carte-texte").textContent = SAVOIRS[indexSavoir].txt;
+  $("ecran-carte").hidden = false;
+}
+
+// ---------- Transition de chapitre (fondu + bandeau, 1,2 s) ----------
+function transitionChapitre(titre, ensuiteFn){
+  const t = $("transition");
+  $("transition-texte").textContent = titre;
+  t.classList.add("visible");
+  setTimeout(function(){
+    t.classList.remove("visible");
+    ensuiteFn();
+  }, 1200);
+}
+
+// ---------- Lancement d'un chapitre ----------
+function lancerChapitre(index){
+  etat.chapitreIndex = index;
+  etat.etape = 0;
+  etat.dossierCourant = "";
+  enigme = null;
+  sauvegarder();
+  desactiverSaisie();
+  const ch = CHAPITRES[index];
+  afficherChips(ch.chips || []);
+  ch.onEnter();
+}
+
+/* ============================================================
+   SECTION 6 — LES CHAPITRES (déroulé & dialogues verbatim, §5)
+   ============================================================ */
+const CHAPITRES = [];
+
+// ---------- CHAPITRE 0 — BOOT & PRÉNOM ----------
+CHAPITRES[0] = {
+  id:"boot", titre:"DÉMARRAGE",
+  chips:[],
+  aideContextuelle:[],
+  objectifAide:"Tape ton prénom dans la case en bas, puis appuie sur Entrée ⏎ !",
+  onEnter:function(){
+    const lignes = [
+      "> DÉMARRAGE DU SYSTÈME CENTRAL...",
+      "> Vérification des modules........ ERREUR",
+      "> Modules corrompus : 5 / 6",
+      "> Recherche d'un agent disponible...",
+      "> ...",
+      "> ...",
+      "> AGENT DÉTECTÉ DEVANT L'ÉCRAN !"
+    ];
+    sonBoot();
+    let i = 0;
+    const timer = setInterval(function(){
+      ecrire(lignes[i], i === 6 ? "ligne-or" : "ligne-sys");
+      i++;
+      if(i >= lignes.length){
+        clearInterval(timer);
+        afficherAvatar("nova");
+        direNova("worried", "Bip ! Oh, ouf… il y a quelqu'un !");
+        direNova("happy", "Je m'appelle NOVA. Je suis l'intelligence artificielle de ce Système. Enfin… ce qu'il en reste.");
+        direNova("worried", "Un drôle de virus a TOUT mélangé ici. Il me faut de l'aide. TON aide !");
+        direNova("talk", "D'abord, les présentations ! Tape ton prénom dans la case en bas, puis appuie sur la touche Entrée ⏎. C'est elle qui envoie ton message à l'ordinateur !");
+        ensuite(function(){ attendreSaisie("Tape ton prénom ici…"); });
+        traiterFile();
+      }
+    }, 150);
+  },
+  // Tout ce qui est tapé ici est traité comme un prénom (prioritaire)
+  prioritaire:function(n, nCode, brut){
+    if(etat.etape !== 0) return false;
+    const propre = brut.trim().replace(/\s+/g, " ");
+    if(propre === ""){
+      secouerInput();
+      direNova("worried", "Bip ? Je n'ai rien reçu ! Tape ton prénom, PUIS appuie sur Entrée.");
+      traiterFile();
+      return true;
+    }
+    if(propre.length > 15){
+      secouerInput();
+      direNova("thinking", "Houlà, c'est long ! Tu as un surnom plus court ?");
+      traiterFile();
+      return true;
+    }
+    etat.prenom = propre;
+    etat.etape = 1;
+    sauvegarder();
+    glowReussite(); sonReussite();
+    if(/^[0-9]+$/.test(propre)){
+      direNova("happy", "Un prénom en chiffres ?! Tu es un robot toi aussi ? Bienvenue chez les copains, {PRENOM} !");
+    }else{
+      direNova("happy", "Enchantée, {PRENOM} !");
+    }
+    direNova("talk", "À partir de maintenant, tu es l'Agent {PRENOM}, réparateur officiel du Système !");
+    direNova("talk", "Première leçon d'agent : un ordinateur ne devine RIEN. Il fait exactement ce qu'on lui tape. Ces messages, on les appelle des COMMANDES.");
+    direNova("happy", "Essaie ta première commande : tape aide puis Entrée !");
+    ensuite(function(){ lancerChapitre(1); });
+    traiterFile();
+    return true;
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 1 — LE TERMINAL ----------
+CHAPITRES[1] = {
+  id:"terminal", titre:"LE TERMINAL",
+  chips:["aide", "scanner"],
+  aideContextuelle:[],
+  objectifAide:"Mission en cours : découvre tes commandes d'agent ! Tape scanner pour examiner le Système.",
+  onEnter:function(){
+    attendreSaisie("Tape une commande…");
+  },
+  // Étape 0 : on attend « aide » — première démonstration de la précision
+  prioritaire:function(n){
+    if(etat.etape === 0){
+      if(n === "aide"){
+        etat.etape = 1;
+        commandeGlobale("aide");
+        direNova("happy", "Bravo, première commande réussie !");
+        direNova("talk", "Retiens bien : aide est la commande magique. Perdu ? Tape-la, je viendrai TOUJOURS t'expliquer.");
+        direNova("talk", "Maintenant, voyons les dégâts… Tape scanner pour examiner le Système.");
+        ensuite(function(){ attendreSaisie("Tape une commande…"); });
+        traiterFile();
+      }else{
+        secouerInput();
+        direNova("talk", "Presque ! Tape exactement : aide — a, i, d, e — puis Entrée. L'ordinateur veut les mots EXACTS !");
+        traiterFile();
+      }
+      return true;
+    }
+    if(etat.etape === 1 && n === "scanner"){
+      etat.etape = 2;
+      ecrire("SCAN DU SYSTÈME EN COURS... ▓▓▓▓▓▓▓▓ 100%", "ligne-or");
+      afficherScan();
+      direNova("worried", "Cinq modules en panne… et un signal bizarre dans le Cœur du Système. Brrr.");
+      direNova("talk", "On va les réparer UN par UN, comme une vraie équipe. Direction le module ARCHIVES !");
+      ensuite(function(){
+        montrerCarte(0, function(){
+          transitionChapitre("📁 MODULE 1 — ARCHIVES", function(){ lancerChapitre(2); });
+        });
+      });
+      traiterFile();
+      return true;
+    }
+    return false;
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 2 — MODULE ARCHIVES (fichiers & dossiers) ----------
+CHAPITRES[2] = {
+  id:"archives", titre:"ARCHIVES",
+  chips:["aide", "voir", "ouvrir images", "ouvrir musique", "ouvrir jeux", "retour", "indice"],
+  aideContextuelle:[
+    "voir         → liste le contenu ici",
+    "ouvrir <nom> → entre dans un dossier",
+    "lire <nom>   → lit un fichier .txt",
+    "retour       → remonte au dossier parent"
+  ],
+  objectifAide:"Mission : trouve le fichier qui n'est PAS à sa place, lis-le, et tape le code du sas !",
+  onEnter:function(){
+    etat.dossierCourant = "";
+    direNova("talk", "Voici les ARCHIVES : c'est ici que l'ordinateur range TOUT ce qu'il possède.");
+    direNova("talk", "Imagine une grande armoire 📦. Les DOSSIERS sont des boîtes… et les FICHIERS sont les feuilles rangées dedans.");
+    direNova("worried", "Le virus a laissé un mot. Regarde :");
+    ensuite(function(){
+      ecrire("NOTE DU VIRUS :", "ligne-err");
+      ecrire("« J'ai caché le code du sas dans un fichier", "ligne-err");
+      ecrire("qui n'est PAS à sa place. Bonne chance, hihihi ! »", "ligne-err");
+    });
+    direNova("thinking", "Pas à sa place ?… Bon. Commence par regarder autour de toi : tape voir.");
+    ensuite(function(){
+      CHAPITRES[2].definirEnigmeCode();
+      attendreSaisie("Tape une commande…");
+    });
+    traiterFile();
+  },
+  definirEnigmeCode:function(){
+    definirEnigme({
+      solutions:["etoile7", "code etoile7"],
+      reponseAuto:"etoile7",
+      indices:[
+        "Regarde les extensions : .png = image, .mp3 = musique, .txt = texte. Un de ces fichiers n'est pas rangé avec sa famille…",
+        "Un fichier TEXTE rangé avec des IMAGES, tu ne trouves pas ça louche ? Tape ouvrir images puis voir.",
+        "Fais : ouvrir images, puis lire secret.txt. Le code est ETOILE7 !"
+      ],
+      special:function(){
+        return "Mmh, le sas refuse… Relis bien secret.txt : le code est écrit dedans, lettre par lettre !";
+      },
+      onReussite:function(){
+        allumerModule(0);
+        direNova("happy", "LE SAS S'OUVRE ! Bip ! Module ARCHIVES réparé ! Plus rien ne se perdra dans l'armoire !");
+        ensuite(function(){
+          montrerCarte(1, function(){
+            transitionChapitre("🔐 MODULE 2 — SÉCURITÉ", function(){ lancerChapitre(3); });
+          });
+        });
+        traiterFile();
+      }
+    });
+  },
+  afficherVoir:function(){
+    const ici = ARBO[etat.dossierCourant];
+    ecrire("Tu es dans : SYSTEME/" + (etat.dossierCourant ? etat.dossierCourant + "/" : ""), "ligne-or");
+    ici.dossiers.forEach(function(d){ ecrire("├── 📁 " + d + "/", "ligne-sys"); });
+    ici.fichiers.forEach(function(f, i){
+      const dernier = (i === ici.fichiers.length - 1) ? "└── " : "├── ";
+      const ic = f.endsWith(".png") ? "🖼 " : f.endsWith(".mp3") ? "🎵 " : f.endsWith(".exe") ? "🎮 " : "📄 ";
+      ecrire(dernier + ic + f, "ligne-sys");
+    });
+    if(etat.dossierCourant === "" && etat.etape === 0){
+      etat.etape = 1;
+      direNova("talk", "Trois dossiers ! Pour entrer dans l'un d'eux, tape ouvrir + son nom. Par exemple : ouvrir musique.");
+      direNova("talk", "Et observe bien les fins de noms de fichiers : .png = une image, .mp3 = de la musique, .txt = du texte, .exe = un programme. Ça s'appelle l'EXTENSION. C'est l'étiquette du fichier !");
+      traiterFile();
+    }
+  },
+  onInput:function(n){
+    const ch = this;
+    if(n === "voir"){ ch.afficherVoir(); return true; }
+    if(n === "retour"){
+      if(etat.dossierCourant === ""){
+        direNova("talk", "Tu es déjà tout en haut de l'armoire, Agent ! Tape voir pour regarder autour.");
+        traiterFile();
+      }else{
+        etat.dossierCourant = "";
+        ch.afficherVoir();
+      }
+      return true;
+    }
+    if(n === "ouvrir"){
+      direNova("thinking", "Ouvrir QUOI ? Précise le nom : ouvrir images, par exemple. L'ordinateur a besoin de tout, lui !");
+      traiterFile();
+      return true;
+    }
+    if(n.indexOf("ouvrir ") === 0){
+      const cible = n.slice(7).trim();
+      if(ARBO[cible]){
+        etat.dossierCourant = cible;
+        ecrire("→ Tu entres dans le dossier " + cible + "/", "ligne-ok");
+        ch.afficherVoir();
+        if(cible === "images" && etat.etape < 2){ etat.etape = 2; }
+        return true;
+      }
+      if(cible === "morpion.exe"){
+        direNova("happy", ".exe = un PROGRAMME, un jeu ici ! Mais pas le temps de jouer, Agent : le Système d'abord !");
+        traiterFile();
+        return true;
+      }
+      direNova("thinking", "Je ne trouve pas ce dossier… Tape voir pour vérifier l'orthographe !");
+      traiterFile();
+      return true;
+    }
+    if(n === "lire"){
+      direNova("thinking", "Lire QUOI ? Précise le nom du fichier, par exemple : lire secret.txt.");
+      traiterFile();
+      return true;
+    }
+    if(n.indexOf("lire ") === 0){
+      const cible = n.slice(5).trim();
+      const ici = ARBO[etat.dossierCourant];
+      if(cible === "chat.png" || cible === "fusee.png"){
+        direNova("talk", "Ça, c'est une IMAGE (.png), pas un texte ! L'extension te le dit. On ne LIT pas une image comme un livre.");
+        traiterFile();
+        return true;
+      }
+      if(cible === "bip_bop.mp3" || cible === "bip bop.mp3"){
+        direNova("worried", ".mp3 = de la MUSIQUE ! Et mes haut-parleurs sont en panne, désolée…");
+        traiterFile();
+        return true;
+      }
+      if(cible === "morpion.exe"){
+        direNova("happy", ".exe = un PROGRAMME, un jeu ici ! Mais pas le temps de jouer, Agent : le Système d'abord !");
+        traiterFile();
+        return true;
+      }
+      if(cible === "secret.txt"){
+        if(ici.fichiers.indexOf("secret.txt") === -1){
+          direNova("thinking", "Je ne vois pas ce fichier ici. Il faut d'abord être DANS le bon dossier.");
+          traiterFile();
+          return true;
+        }
+        ecrire("secret.txt", "ligne-or");
+        ecrire("─────────────────────────", "ligne-or");
+        ecrire("« Code du sas : ETOILE7 »", "ligne-or");
+        ecrire("─────────────────────────", "ligne-or");
+        direNova("happy", "LE VOILÀ ! Un fichier TEXTE caché au milieu des IMAGES… le virus est malin, mais toi plus !");
+        direNova("talk", "Le sas attend le code. Tape-le !");
+        ensuite(function(){ attendreSaisie("Tape ta réponse…"); });
+        traiterFile();
+        return true;
+      }
+      direNova("thinking", "Je ne vois pas ce fichier ici. Il faut d'abord être DANS le bon dossier.");
+      traiterFile();
+      return true;
+    }
+    return false;
+  }
+};
+
+// ---------- CHAPITRE 3 — MODULE SÉCURITÉ (mot de passe fort) ----------
+CHAPITRES[3] = {
+  id:"securite", titre:"SÉCURITÉ",
+  chips:["aide", "indice"],
+  aideContextuelle:[],
+  objectifAide:"Mission : résous les 3 devinettes du pense-bête et tape le mot de passe en entier (tout collé) !",
+  onEnter:function(){
+    ecrire("🚪 Une porte blindée bloque le passage.", "ligne-or");
+    dire("PORTIER.EXE", null, "HALTE. MOT DE PASSE REQUIS.");
+    direNova("worried", "Oh non… PORTIER.EXE. Il garde la porte du module SÉCURITÉ.");
+    dire("PORTIER.EXE", null, "PROBLÈME : LE VIRUS A EFFACÉ MA MÉMOIRE. J'AI… OUBLIÉ MON PROPRE MOT DE PASSE.");
+    direNova("thinking", "Sérieusement ?!");
+    dire("PORTIER.EXE", null, "MAIS J'AVAIS PRÉVU LE COUP. J'AI LAISSÉ UN PENSE-BÊTE EN DEVINETTES. RÉSOUS-LES, AGENT.");
+    ensuite(function(){
+      ecrire("┌─ PENSE-BÊTE DE PORTIER.EXE ──────────────┐", "ligne-or");
+      ecrire("│ Mon mot de passe =", "ligne-sys");
+      ecrire("│ RÉPONSE 1 + RÉPONSE 2 + RÉPONSE 3", "ligne-sys");
+      ecrire("│ (tout collé, sans espaces)", "ligne-sys");
+      ecrire("│", "ligne-sys");
+      ecrire("│ 1) Je décolle vers les étoiles dans un", "ligne-sys");
+      ecrire("│    grand nuage de fumée. Qui suis-je ?", "ligne-sys");
+      ecrire("│ 2) Le compte à rebours juste avant mon", "ligne-sys");
+      ecrire("│    décollage : trois chiffres, du plus", "ligne-sys");
+      ecrire("│    grand au plus petit.", "ligne-sys");
+      ecrire("│ 3) Le petit bâton avec un point en", "ligne-sys");
+      ecrire("│    dessous, qu'on met à la fin d'une", "ligne-sys");
+      ecrire("│    phrase qui crie !", "ligne-sys");
+      ecrire("└──────────────────────────────────────────┘", "ligne-or");
+    });
+    direNova("talk", "Trois devinettes, un seul mot de passe. Réfléchis bien et tape-le en entier !");
+    ensuite(function(){
+      definirEnigme({
+        solutions:["fusee321!"],
+        reponseAuto:"fusee321!",
+        indices:[
+          "Devinette 1 : ça vole, ça va dans l'espace, ça commence par F…",
+          "Avant le décollage, on dit : 3… 2… 1… ! Donc la réponse 2, c'est 321. Et le bâton qui crie, c'est le point d'exclamation : !",
+          "Assemble tout : FUSEE321! — tape-le !"
+        ],
+        special:function(n, nCode){
+          if(nCode === "fusee") return "La devinette 1 est bonne ! ✔ Mais le mot de passe, c'est les TROIS réponses collées. Continue !";
+          if(nCode === "fusee321") return ["PORTIER.EXE", null, "PRESQUE. IL MANQUE LE PETIT SYMBOLE QUI CRIE À LA FIN."];
+          if(nCode === "321") return "Ça, c'est la devinette 2 ! Il faut coller les trois réponses ensemble.";
+          return ["PORTIER.EXE", null, "MOT DE PASSE REFUSÉ. RELIS LE PENSE-BÊTE, AGENT."];
+        },
+        onReussite:function(){
+          allumerModule(1);
+          dire("PORTIER.EXE", null, "MOT DE PASSE… ACCEPTÉ. BIENVENUE, AGENT {PRENOM}.");
+          ensuite(function(){ ecrire("🚪 La porte coulisse… Module SÉCURITÉ réparé ! ✔", "ligne-ok"); });
+          direNova("happy", "Et tu sais POURQUOI ce mot de passe est costaud ?");
+          direNova("talk", "Il est long, il mélange des lettres, des chiffres ET un symbole. Presque impossible à deviner !");
+          direNova("talk", "Règle d'or d'agent : un bon mot de passe ne se donne à PERSONNE. Même pas à ton meilleur copain. (Tes parents, eux, ont le droit de le connaître !)");
+          ensuite(function(){
+            montrerCarte(2, function(){
+              transitionChapitre("💾 MODULE 3 — MÉMOIRE", function(){ lancerChapitre(4); });
+            });
+          });
+          traiterFile();
+        }
+      });
+      attendreSaisie("Tape ta réponse…");
+    });
+    traiterFile();
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 4 — MODULE MÉMOIRE (le binaire) ----------
+CHAPITRES[4] = {
+  id:"memoire", titre:"MÉMOIRE",
+  chips:["aide", "indice"],
+  aideContextuelle:[],
+  objectifAide:"Mission : décode le message binaire avec la table, puis tape le mot trouvé !",
+  onEnter:function(){
+    direNova("talk", "Bienvenue dans la MÉMOIRE. C'est ici que l'ordinateur garde TOUT : les textes, les photos, les jeux, la musique…");
+    direNova("happy", "Et tu sais quoi ? Il range tout ça avec seulement DEUX chiffres : 0 et 1.");
+    direNova("talk", "0 = lumière éteinte. 1 = lumière allumée. Des milliards de petites lampes ! C'est le langage BINAIRE.");
+    direNova("worried", "Le virus a verrouillé la mémoire avec un mot écrit en binaire. Voici la table de décodage — à toi de jouer !");
+    ensuite(function(){
+      // Vraie correspondance A=1, B=2… Z=26 écrite en binaire sur 5 bits
+      ecrire("┌─ TABLE DE DÉCODAGE (extrait) ───────────┐", "ligne-or");
+      ecrire("│ A = 00001   E = 00101   I = 01001       │", "ligne-sys");
+      ecrire("│ B = 00010   O = 01111   P = 10000       │", "ligne-sys");
+      ecrire("└──────────────────────────────────────────┘", "ligne-or");
+      ecrire("MESSAGE VERROUILLÉ :", "ligne-err");
+      ecrire("00010 — 01001 — 10000", "ligne-err");
+    });
+    direNova("talk", "Trois paquets de chiffres = trois lettres = un mot. Compare chaque paquet avec la table, puis tape le mot décodé !");
+    ensuite(function(){
+      definirEnigme({
+        solutions:["bip"],
+        reponseAuto:"bip",
+        indices:[
+          "Le premier paquet est 00010. Cherche-le dans la table : c'est quelle lettre ?",
+          "00010 = B, et 01001 = I. Plus qu'un paquet à décoder !",
+          "Le mot est BIP ! Tape-le."
+        ],
+        special:function(){
+          return "Pas tout à fait ! Reprends paquet par paquet : trouve 00010 dans la table, note la lettre, et continue.";
+        },
+        onReussite:function(){
+          allumerModule(2);
+          ecrire("MÉMOIRE DÉVERROUILLÉE ✔ Module réparé !", "ligne-ok");
+          direNova("happy", "BIP ?! Mais… c'est MON cri préféré ! BIP BIP !");
+          direNova("talk", "Tu parles robot, maintenant ! Et dans la vraie vie, c'est pareil : chaque lettre, chaque pixel, chaque note de musique est rangée avec des 0 et des 1.");
+          ensuite(function(){
+            montrerCarte(3, function(){
+              transitionChapitre("🖥️ MODULE 4 — ÉCRAN", function(){ lancerChapitre(5); });
+            });
+          });
+          traiterFile();
+        }
+      });
+      attendreSaisie("Tape ta réponse…");
+    });
+    traiterFile();
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 5 — MODULE ÉCRAN (pixels & RVB) ----------
+// Pixel-art 12×9 : une fusée stylisée (0 = fond nuit, lettres = couleurs)
+const PIXEL_ART = [
+  "0000FF000000",
+  "000FJJF00000",
+  "000FJJF000Y0",
+  "00FFJJFF0000",
+  "00FCJJCF0000",
+  "0YFFJJFF0000",
+  "00FRRRRF00Y0",
+  "000R00R00000",
+  "00RR00RR0000"
+];
+const COULEURS_PIXELS = { "0":"#0B1026", "F":"#F2F5FF", "J":"#FFD23F", "C":"#4DE3FF", "R":"#FF5C8A", "Y":"#FFD23F" };
+CHAPITRES[5] = {
+  id:"ecran", titre:"ÉCRAN",
+  chips:["aide", "indice"],
+  aideContextuelle:[],
+  objectifAide:"Mission : lumière ROUGE + lumière VERTE allumées ensemble = quelle couleur ? Tape ta réponse !",
+  onEnter:function(){
+    direNova("worried", "Le module ÉCRAN est tout cassé… regarde cette pauvre image en miettes !");
+    ensuite(function(){
+      // Image cassée : grille de gros carrés gris
+      const term = $("terminal");
+      const grille = document.createElement("div");
+      grille.id = "grille-pixels";
+      PIXEL_ART.forEach(function(rangee){
+        rangee.split("").forEach(function(){
+          const p = document.createElement("div");
+          p.className = "px";
+          grille.appendChild(p);
+        });
+      });
+      term.appendChild(grille);
+      term.scrollTop = term.scrollHeight;
+    });
+    direNova("talk", "Petit secret : approche-toi TRÈS près d'une télé ou d'une tablette. Tu verras des petits carrés. Ce sont des PIXELS !");
+    direNova("talk", "Chaque pixel est une mini-lampe avec 3 couleurs dedans : ROUGE, VERTE et BLEUE. En les mélangeant, l'écran fabrique TOUTES les couleurs !");
+    direNova("talk", "Pour réparer l'écran, réponds à la question du module :");
+    ensuite(function(){
+      ecrire("┌─ QUESTION DE RÉPARATION ────────────────┐", "ligne-or");
+      ecrire("│ Lumière ROUGE + lumière VERTE allumées  │", "ligne-sys");
+      ecrire("│ en même temps = quelle couleur ?        │", "ligne-sys");
+      ecrire("└──────────────────────────────────────────┘", "ligne-or");
+    });
+    ensuite(function(){
+      definirEnigme({
+        solutions:["jaune", "le jaune", "du jaune"],
+        reponseAuto:"jaune",
+        indices:[
+          "Attention : on parle de LUMIÈRE, pas de peinture ! Les mélanges ne donnent pas pareil.",
+          "C'est la couleur du soleil et des bananes…",
+          "C'est JAUNE ! Avec la lumière : rouge + vert = jaune. Tape jaune."
+        ],
+        special:function(n, nCode){
+          if(nCode === "marron" || nCode === "orange")
+            return "Bien tenté ! Avec de la PEINTURE, oui. Mais avec de la LUMIÈRE, c'est différent… et c'est plus joli !";
+          if(nCode === "vert" || nCode === "rouge")
+            return "Les DEUX lampes sont allumées en même temps : elles se mélangent !";
+          return "Hmm, non. Pense au soleil…";
+        },
+        onReussite:function(){
+          // Animation OBLIGATOIRE : reconstruction pixel par pixel (~1,5 s)
+          desactiverSaisie();
+          const pixels = Array.prototype.slice.call(document.querySelectorAll("#grille-pixels .px"));
+          const couleursPlat = [];
+          PIXEL_ART.forEach(function(rangee){
+            rangee.split("").forEach(function(c){ couleursPlat.push(COULEURS_PIXELS[c]); });
+          });
+          // Ordre aléatoire
+          const ordre = pixels.map(function(_, i){ return i; });
+          for(let i = ordre.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = ordre[i]; ordre[i] = ordre[j]; ordre[j] = tmp;
+          }
+          const pas = reduceMotion ? 0 : 1500 / ordre.length;
+          ordre.forEach(function(idx, k){
+            setTimeout(function(){ pixels[idx].style.background = couleursPlat[idx]; }, k * pas);
+          });
+          setTimeout(function(){
+            allumerModule(3);
+            ecrire("IMAGE RESTAURÉE ✔ Module ÉCRAN réparé !", "ligne-ok");
+            direNova("happy", "MAGNIFIQUE ! Et voilà comment ton écran fabrique des millions de couleurs… avec seulement 3 petites lampes par pixel.");
+            ensuite(function(){
+              montrerCarte(4, function(){
+                transitionChapitre("🧩 MODULE 5 — LOGIQUE", function(){ lancerChapitre(6); });
+              });
+            });
+            traiterFile();
+          }, reduceMotion ? 100 : 1600);
+        }
+      });
+      attendreSaisie("Tape ta réponse…");
+    });
+    traiterFile();
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 6 — MODULE LOGIQUE (algorithme & bug) ----------
+CHAPITRES[6] = {
+  id:"logique", titre:"LOGIQUE",
+  chips:["aide", "indice"],
+  aideContextuelle:[],
+  objectifAide:"Mission : lis le programme et tape le NUMÉRO de la ligne qui contient le bug !",
+  onEnter:function(){
+    direNova("talk", "Dernier module avant le Cœur ! Celui-ci contrôle la porte blindée.");
+    direNova("talk", "Elle s'ouvre grâce à un PROGRAMME : une liste d'instructions que l'ordinateur suit DANS L'ORDRE, comme une recette de cuisine.");
+    direNova("worried", "Mais le virus a glissé une instruction absurde dedans. Une erreur dans un programme, ça s'appelle un BUG 🐛.");
+    direNova("talk", "Lis le programme et tape le NUMÉRO de la ligne du bug !");
+    ensuite(function(){
+      ecrire("PROGRAMME : OUVRIR_LA_PORTE", "ligne-or");
+      ecrire("1. allumer la lumière du couloir", "ligne-sys");
+      ecrire("2. avancer jusqu'à la porte", "ligne-sys");
+      CHAPITRES[6].ligneBug = ecrire("3. chatouiller la porte pendant 2 heures", "ligne-sys");
+      ecrire("4. taper le code secret", "ligne-sys");
+      ecrire("5. ouvrir la porte", "ligne-sys");
+    });
+    ensuite(function(){
+      definirEnigme({
+        solutions:["3", "ligne 3", "trois"],
+        reponseAuto:"3",
+        indices:[
+          "Lis le programme ligne par ligne : laquelle ne sert À RIEN pour ouvrir une porte ?",
+          "Chatouiller une porte… pendant 2 HEURES ? Hmm.",
+          "C'est la ligne 3 ! Tape 3."
+        ],
+        special:function(n, nCode){
+          if(nCode === "1" || nCode === "2" || nCode === "4" || nCode === "5" ||
+             nCode === "ligne1" || nCode === "ligne2" || nCode === "ligne4" || nCode === "ligne5")
+            return "Cette ligne-là est utile pour ouvrir une porte, non ? Cherche l'instruction RIDICULE.";
+          return "Tape juste le numéro de la ligne buggée : 1, 2, 3, 4 ou 5.";
+        },
+        onReussite:function(){
+          // La ligne 3 est barrée puis remplacée
+          const lb = CHAPITRES[6].ligneBug;
+          if(lb){
+            lb.style.textDecoration = "line-through";
+            lb.classList.add("ligne-err");
+            setTimeout(function(){
+              lb.style.textDecoration = "none";
+              lb.classList.remove("ligne-err");
+              lb.classList.add("ligne-ok");
+              lb.textContent = "3. frapper poliment toc toc";
+            }, reduceMotion ? 100 : 900);
+          }
+          setTimeout(function(){
+            allumerModule(4);
+            ecrire("🚪 La porte s'ouvre ! Module LOGIQUE réparé ✔", "ligne-ok");
+            direNova("happy", "Exact ! \"Chatouiller la porte pendant 2 heures\"… C'est ÇA, un bug : une instruction qui n'a rien à faire là.");
+            direNova("talk", "Trouver et corriger les bugs, ça s'appelle DÉBUGGER. C'est le sport préféré des programmeurs !");
+            ensuite(function(){
+              montrerCarte(5, function(){
+                transitionChapitre("💛 LE CŒUR DU SYSTÈME", function(){ lancerChapitre(7); });
+              });
+            });
+            traiterFile();
+          }, reduceMotion ? 200 : 1100);
+        }
+      });
+      attendreSaisie("Tape ta réponse…");
+    });
+    traiterFile();
+  },
+  onInput:function(){ return false; }
+};
+
+// ---------- CHAPITRE 7 — LE CŒUR (finale & twist) ----------
+CHAPITRES[7] = {
+  id:"coeur", titre:"LE CŒUR",
+  chips:["aide"],
+  aideContextuelle:[],
+  objectifAide:"Moment important, Agent ! Fais ce que NOVA te dit : tape reparer glitch.",
+  onEnter:function(){
+    document.body.classList.add("ambiance-coeur");
+    afficherAvatar("glitch");
+    ecrire("⚠ ENTRÉE DANS LE CŒUR DU SYSTÈME…", "ligne-err");
+    dire("GLITCH", null, "Q-qui va l-là ?! ENCORE un a-agent venu me S-SUPPRIMER ?!");
+    ensuite(function(){ afficherAvatar("nova"); });
+    direNova("thinking", "Attends… Bip ! Scan en cours…");
+    direNova("worried", "Mais… ce n'est PAS un virus !");
+    direNova("happy", "C'est PIX, l'ancien programme d'aide du Système ! Une mise à jour ratée l'a tout cassé… Il ne fait pas exprès !");
+    ensuite(function(){ afficherAvatar("glitch"); });
+    dire("GLITCH", null, "Je v-voulais juste a-aider… mais tout ce que je t-touche se mé-mélange !");
+    ensuite(function(){ afficherAvatar("nova"); });
+    direNova("talk", "Agent {PRENOM}, écoute-moi bien. On ne SUPPRIME pas un programme qui a un bug…");
+    direNova("happy", "…on le RÉPARE ! Tape : reparer glitch");
+    ensuite(function(){
+      // Exception unique à la règle des chips : moment narratif, pas une énigme
+      afficherChips(["reparer glitch"]);
+      definirEnigme({
+        solutions:["reparer glitch", "reparer pix"],
+        reponseAuto:"reparer glitch",
+        indices:[
+          "Tape : reparer glitch",
+          "Tape : reparer glitch",
+          "Tape : reparer glitch"
+        ],
+        special:function(){ return "Pas le moment d'hésiter ! Tape : reparer glitch"; },
+        onReussite:function(){ CHAPITRES[7].reparation(); }
+      });
+      attendreSaisie("Tape : reparer glitch");
+    });
+    traiterFile();
+  },
+  reparation:function(){
+    desactiverSaisie();
+    afficherChips([]);
+    afficherAvatar("glitch");
+    const lignes = [
+      "RÉPARATION EN COURS...",
+      "> Démêlage des lettres.......... OK",
+      "> Recollage des pixels.......... OK",
+      "> Nettoyage de la mémoire....... OK",
+      "> Redémarrage du sourire........ OK ✔"
+    ];
+    let i = 0;
+    const timer = setInterval(function(){
+      ecrire(lignes[i], i === 0 ? "ligne-or" : "ligne-ok");
+      i++;
+      if(i >= lignes.length){
+        clearInterval(timer);
+        transformerEnPix();
+        document.body.classList.remove("ambiance-coeur");
+        setTimeout(function(){
+          allumerModule(5);
+          dire("PIX", null, "Oh ! Je… je parle normalement ! MERCI Agent {PRENOM} ! Pardon pour tout ce bazar… j'avais un bug dans la tête.");
+          ensuite(function(){ afficherAvatar("nova"); });
+          direNova("happy", "Tu vois ? Derrière un bug, il n'y a pas un méchant. Juste une erreur qui attend d'être réparée.");
+          ensuite(function(){
+            ecrire("SCAN FINAL DU SYSTÈME...", "ligne-or");
+            ecrire("— 6 / 6 MODULES OK ✔", "ligne-ok");
+            ecrire("SYSTÈME RESTAURÉ. MERCI, AGENT " + prenomAffiche().toUpperCase() + ".", "ligne-or");
+            sonFanfare();
+            setTimeout(montrerDiplome, 1400);
+          });
+          traiterFile();
+        }, 1600);
+      }
+    }, 800);
+  },
+  onInput:function(){ return false; }
+};
+
+/* ============================================================
+   SECTION 7 — ÉCRANS ANNEXES : diplôme, confettis, reprise (§10)
+   ============================================================ */
+function montrerDiplome(){
+  etat.termine = true;
+  sauvegarder();
+  $("diplome-prenom").textContent = prenomAffiche();
+  $("diplome-date").textContent = new Date().toLocaleDateString("fr-FR",
+    { day:"numeric", month:"long", year:"numeric" });
+  const grille = $("grille-savoirs");
+  grille.innerHTML = "";
+  SAVOIRS.forEach(function(s){
+    const d = document.createElement("div");
+    d.className = "mini-savoir";
+    const ic = document.createElement("span");
+    ic.className = "ic";
+    ic.textContent = s.ic;
+    d.appendChild(ic);
+    d.appendChild(document.createTextNode(s.txt));
+    grille.appendChild(d);
+  });
+  $("ecran-diplome").hidden = false;
+  lancerConfettis();
+  // Dernière bulle de NOVA derrière le diplôme
+  direNova("happy", "Le Système est sauvé grâce à toi, Agent {PRENOM}. Reviens quand tu veux… BIP !");
+  traiterFile();
+}
+function lancerConfettis(){
+  if(reduceMotion){
+    // Étoiles statiques à la place des confettis
+    const z = $("confettis-zone");
+    z.textContent = "✦ ✧ ✦ ✧ ✦";
+    z.style.cssText = "position:fixed;top:8px;left:0;right:0;text-align:center;color:var(--or);font-size:22px;z-index:30;";
+    setTimeout(function(){ z.textContent = ""; }, 4000);
+    return;
+  }
+  const couleurs = ["var(--or)", "var(--cyan)", "var(--vert)", "var(--corail)"];
+  for(let i = 0; i < 70; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = (Math.random() * 100) + "vw";
+    c.style.background = couleurs[i % 4];
+    c.style.animationDelay = (Math.random() * 0.8) + "s";
+    c.style.animationDuration = (2.4 + Math.random() * 1.2) + "s";
+    document.body.appendChild(c);
+    setTimeout(function(){ c.remove(); }, 4500);
+  }
+}
+
+// ---------- Écran de reprise (§4.4) ----------
+function montrerReprise(save){
+  etat.prenom = save.prenom;
+  etat.sonOn = (save.sonOn !== false);
+  $("btn-son").textContent = etat.sonOn ? "🔊" : "🔇";
+  const nomsModules = ["DÉMARRAGE", "TERMINAL", "ARCHIVES", "SÉCURITÉ", "MÉMOIRE", "ÉCRAN", "LOGIQUE", "CŒUR"];
+  $("texte-reprise").textContent = "Bip ! Re-bonjour Agent " + prenomAffiche() +
+    " ! On reprend la mission au module " + nomsModules[save.chapitreIndex] + " ?";
+  $("ecran-titre").hidden = true;
+  $("ecran-reprise").hidden = false;
+  $("btn-reprendre").onclick = function(){
+    debloquerAudio();
+    $("ecran-reprise").hidden = true;
+    // Rallume les modules déjà réparés
+    for(let i = 0; i < save.chapitreIndex - 2; i++){ modulesRepares.add(i); }
+    dessinerProgression();
+    afficherAvatar("nova");
+    lancerChapitre(Math.max(1, save.chapitreIndex));
+  };
+  $("btn-recommencer").onclick = function(){
+    $("confirm-reset").hidden = false;
+  };
+  $("btn-reset-oui").onclick = function(){
+    debloquerAudio();
+    effacerSauvegarde();
+    etat.prenom = "";
+    $("ecran-reprise").hidden = true;
+    demarrerNouvellePartie();
+  };
+  $("btn-reset-non").onclick = function(){
+    $("confirm-reset").hidden = true;
+  };
+}
+
+function demarrerNouvellePartie(){
+  dessinerProgression();
+  lancerChapitre(0);
+}
+
+/* ============================================================
+   SECTION 8 — INITIALISATION & ÉVÉNEMENTS
+   ============================================================ */
+function envoyerSaisie(){
+  const inp = $("saisie");
+  if(inp.disabled) return;
+  const brut = inp.value;
+  inp.value = "";
+  desactiverSaisie();
+  saisieAttendue = true; // la plupart des réponses réactivent la saisie ensuite
+  traiterSaisie(brut);
+  // Si aucune bulle n'a été produite (ex : scanner seul), on réactive direct
+  if(!typeEnCours && !attenteClic && fileMessages.length === 0 && saisieAttendue){
+    activerSaisieReelle();
+  }
+}
+
+function initialiser(){
+  creerEtoiles();
+  dessinerProgression();
+  afficherAvatar("nova");
+
+  // Saisie : Entrée ou bouton ⏎
+  $("saisie").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); envoyerSaisie(); }
+  });
+  $("btn-envoyer").addEventListener("click", envoyerSaisie);
+
+  // Avancer les bulles : clic/tap sur la bulle, ou Espace/Entrée hors input
+  $("bulle").addEventListener("click", avancerBulle);
+  document.addEventListener("keydown", function(e){
+    if(document.activeElement === $("saisie")) return;
+    if(e.key === " " || e.key === "Enter"){
+      if(typeEnCours || attenteClic){ e.preventDefault(); avancerBulle(); }
+    }
+  });
+
+  // Bouton son
+  $("btn-son").addEventListener("click", function(){
+    debloquerAudio();
+    basculerSon();
+  });
+
+  // Carte « CE QUE TU AS APPRIS »
+  $("btn-carte-continuer").addEventListener("click", function(){
+    $("ecran-carte").hidden = true;
+    if(callbackCarte){ const cb = callbackCarte; callbackCarte = null; cb(); }
+  });
+
+  // Diplôme
+  $("btn-imprimer").addEventListener("click", function(){ window.print(); });
+  $("btn-rejouer").addEventListener("click", function(){
+    if(window.confirm("Sûr ? Toute la progression sera effacée.")){
+      effacerSauvegarde();
+      window.location.reload();
+    }
+  });
+
+  // Écran titre ou reprise
+  const save = chargerSauvegarde();
+  if(save && save.prenom && save.termine === false && save.chapitreIndex > 0){
+    montrerReprise(save);
+  }else{
+    $("btn-commencer").addEventListener("click", function(){
+      debloquerAudio(); // l'AudioContext est débloqué à la première interaction
+      $("ecran-titre").hidden = true;
+      demarrerNouvellePartie();
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initialiser);
+
+</script>
+</body>
+</html>
