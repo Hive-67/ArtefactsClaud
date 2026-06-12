@@ -517,7 +517,6 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <button class="btn" id="ruche-fit" title="Ajuster la vue">⊡ Ajuster</button>
           <button class="btn" id="ruche-autolayout" title="Aligner automatiquement les nœuds">📐 Aligner</button>
           <button class="btn" id="ruche-profiles-btn" title="Sauvegarder / restaurer une disposition">💾 Profils</button>
-          <button class="btn" id="ruche-add-btn">＋ Idée</button>
           <button class="btn" id="ruche-connect-btn" title="Cliquez sur 2 idées pour les relier">🔗 Lier 2 idées</button>
           <button class="btn" id="ruche-delink-btn" title="Cliquez sur 2 idées liées pour supprimer leur connexion">🔓 Délier</button>
           <span style="width:1px;background:var(--brd);align-self:stretch;margin:0 4px"></span>
@@ -569,7 +568,6 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
           <option value="alpha">A → Z</option>
           <option value="priority">Priorité</option>
         </select>
-        <button class="btn btn-primary btn-sm" id="liste-add-btn">＋ Idée</button>
       </div>
       <div id="liste-content"></div>
     </div>
@@ -923,7 +921,6 @@ function renderDashboard(){
       <h2 class="view-title">📊 Dashboard</h2>
       <div style="display:flex;gap:6px">
         <button class="btn" id="dash-report-btn" title="Exporter / Partager">📤</button>
-        <button class="btn btn-primary" id="dash-add-btn">＋ Nouvelle idée</button>
       </div>
     </div>
     ${dashTags.length?`<div class="dash-section" style="padding:10px 14px">
