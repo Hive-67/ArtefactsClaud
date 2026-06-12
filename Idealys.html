@@ -2008,7 +2008,11 @@ function saveRename(){
       const task=(idea.steps||[]).find(s=>s.id===taskId);
       if(task){
         if(subId){const sub=(task.subtasks||[]).find(s=>s.id===subId);if(sub)sub.title=v;}
-        else task.title=v;
+        else{
+          task.title=v;
+          // Sync le nœud de la sous-carte si il existe
+          if(idea.subMap?.nodes?.[taskId])idea.subMap.nodes[taskId].label=v;
+        }
         idea.updatedAt=new Date().toISOString();persistState();
       }
     }
@@ -2023,6 +2027,12 @@ function saveRename(){
     _renameId=null;
   }
   document.getElementById('rename-modal').classList.add('hidden');
+  // Rafraîchir le panneau sous-carte s'il est ouvert
+  if(_rspId){
+    const rspIdea=state.ideas.find(i=>i.id===_rspId);
+    if(rspIdea)document.getElementById('rsp-title').textContent=rspIdea.title;
+    rspRender();
+  }
   refreshView();toast('✏️ Renommé !');
 }
 function closeRenameModal(){document.getElementById('rename-modal').classList.add('hidden');_renameId=null;_renameSub=null;}
