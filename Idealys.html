@@ -1297,6 +1297,7 @@ function initRucheEvents(){
       applyRucheTransform();
     }
     if(ui.ruche.dragging){
+      if(ui.ruche._lpTimer){clearTimeout(ui.ruche._lpTimer);ui.ruche._lpTimer=null;}
       const ds=ui.ruche.dragNodeStart;
       const dx=(ev.clientX-ds.mx)/ui.ruche.scale,dy=(ev.clientY-ds.my)/ui.ruche.scale;
       state.mapPositions[ui.ruche.dragging]={x:ds.ox+dx,y:ds.oy+dy};
@@ -2007,8 +2008,10 @@ function saveRename(){
     if(idea){
       const task=(idea.steps||[]).find(s=>s.id===taskId);
       if(task){
-        if(subId){const sub=(task.subtasks||[]).find(s=>s.id===subId);if(sub)sub.title=v;}
-        else{
+        if(subId){
+          const sub=(task.subtasks||[]).find(s=>s.id===subId);
+          if(sub){sub.title=v;if(idea.subMap?.nodes?.[subId])idea.subMap.nodes[subId].label=v;}
+        }else{
           task.title=v;
           // Sync le nœud de la sous-carte si il existe
           if(idea.subMap?.nodes?.[taskId])idea.subMap.nodes[taskId].label=v;
@@ -2563,7 +2566,21 @@ function addSubtask(ideaId,taskId,title){
   const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
   const task=idea.steps.find(s=>s.id===taskId);if(!task)return;
   if(!task.subtasks)task.subtasks=[];
-  task.subtasks.push({id:genId(),title,done:false});
+  const newSub={id:genId(),title,done:false};
+  task.subtasks.push(newSub);
+  // Sync dans la mini-ruche : nœud enfant du nœud tâche
+  const m=rspEnsureMap(idea);
+  // S'assurer que le nœud tâche existe dans le subMap
+  if(!m.nodes[taskId]){
+    const root=m.nodes['root'];
+    const cnt=Object.values(m.nodes).filter(n=>n.parentId==='root').length;
+    const a=(-35+cnt*30)*Math.PI/180;
+    m.nodes[taskId]={id:taskId,label:task.title,parentId:'root',x:root.x+Math.cos(a)*180,y:root.y+Math.sin(a)*180};
+  }
+  const parent=m.nodes[taskId];
+  const cnt=Object.values(m.nodes).filter(n=>n.parentId===taskId).length;
+  const a=(-35+cnt*30)*Math.PI/180;
+  m.nodes[newSub.id]={id:newSub.id,label:title,parentId:taskId,x:parent.x+Math.cos(a)*130,y:parent.y+Math.sin(a)*130};
   idea.updatedAt=new Date().toISOString();persistState();
 }
 
@@ -2587,7 +2604,12 @@ function deleteTask(ideaId,taskId){
 function deleteSubtask(ideaId,taskId,subId){
   const idea=state.ideas.find(i=>i.id===ideaId);if(!idea)return;
   const task=idea.steps.find(s=>s.id===taskId);if(!task)return;
-  task.subtasks=(task.subtasks||[]).filter(s=>s.id!==subId);idea.updatedAt=new Date().toISOString();persistState();
+  task.subtasks=(task.subtasks||[]).filter(s=>s.id!==subId);
+  if(idea.subMap?.nodes){
+    delete idea.subMap.nodes[subId];
+    idea.subMap.links=(idea.subMap.links||[]).filter(l=>l.from!==subId&&l.to!==subId);
+  }
+  idea.updatedAt=new Date().toISOString();persistState();
 }
 
 function gaugeMiniHTML(scores){
