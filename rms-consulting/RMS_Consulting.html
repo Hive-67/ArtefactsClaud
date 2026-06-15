@@ -219,6 +219,9 @@
       content:''; position:absolute; right:0; top:0; bottom:0;
       width:3px; background:var(--ac); border-radius:3px 0 0 3px;
     }
+    .sidebar-item[draggable] { cursor:grab; }
+    .sidebar-item.dragging   { opacity:.35; cursor:grabbing; }
+    .sidebar-item.drag-over  { background:var(--bg4); outline:2px solid var(--ac); outline-offset:-2px; }
     .sidebar-icon  { font-size:1rem; flex-shrink:0; }
     .sidebar-label { overflow:hidden; text-overflow:ellipsis; }
 
@@ -628,7 +631,7 @@
     .mt14{margin-top:14px}
 
     /* ── Vues ── */
-    .view{display:none;padding:0 0 90px}
+    .view{display:none;padding:0 16px 90px}
     .view.active{display:block}
     body.theme-spectre .view,body.theme-spectre .crm-panel{background-color:var(--bg);background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);background-size:36px 36px}
     body.theme-spectre .btn-primary,body.theme-spectre .chip.active,body.theme-spectre .agenda-toggle button.active,body.theme-spectre #fab{color:#000}
@@ -646,7 +649,7 @@
     .progress-fill{height:100%;background:var(--ac);border-radius:3px;transition:width .4s}
 
     /* ── Clients ── */
-    #crm-search-bar{position:sticky;top:0;z-index:10;background:var(--bg);padding:10px 0;margin-bottom:6px}
+    #crm-search-bar{position:sticky;top:0;z-index:10;background:var(--bg);padding:10px 0;margin:0 -16px 6px}
     #crm-search-bar input{background:var(--bg2);font-size:.9rem}
     #filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
     .chip{padding:5px 12px;border-radius:20px;border:1px solid var(--brd);background:transparent;color:var(--tx2);font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace;white-space:nowrap}
@@ -867,44 +870,40 @@
       <span class="sidebar-title">Menu</span>
     </div>
     <div class="sidebar-content" id="sidebar-content">
-      <div class="sidebar-item active" data-view="dashboard" onclick="switchView('dashboard')">
+      <div class="sidebar-item active" id="sb-dashboard" data-view="dashboard" draggable="true" onclick="switchView('dashboard')">
         <span class="sidebar-icon">🏠</span>
         <span class="sidebar-label">Dashboard</span>
         <span class="sidebar-badge crm-hidden" id="sb-badge-dashboard"></span>
       </div>
-      <div class="sidebar-item" data-view="clients" onclick="switchView('clients')">
+      <div class="sidebar-item" id="sb-clients" data-view="clients" draggable="true" onclick="switchView('clients')">
         <span class="sidebar-icon">👥</span>
         <span class="sidebar-label">Clients</span>
       </div>
-      <div class="sidebar-item" id="sidebar-item-relances" data-view="relances" onclick="switchView('relances')">
+      <div class="sidebar-item" id="sidebar-item-relances" data-view="relances" draggable="true" onclick="switchView('relances')">
         <span class="sidebar-icon">🔔</span>
         <span class="sidebar-label">Relances</span>
         <span class="sidebar-badge crm-hidden" id="sb-badge-relances"></span>
       </div>
-      <div class="sidebar-item" data-view="agenda" onclick="switchView('agenda')">
+      <div class="sidebar-item" id="sb-agenda" data-view="agenda" draggable="true" onclick="switchView('agenda')">
         <span class="sidebar-icon">📅</span>
         <span class="sidebar-label">Agenda</span>
       </div>
-      <div class="sidebar-item" data-view="taches" onclick="switchView('taches')">
+      <div class="sidebar-item" id="sb-taches" data-view="taches" draggable="true" onclick="switchView('taches')">
         <span class="sidebar-icon">✅</span>
         <span class="sidebar-label">Tâches</span>
         <span class="sidebar-badge crm-hidden" id="sb-badge-taches"></span>
       </div>
-      <div class="sidebar-item" data-view="rediger" onclick="switchView('rediger')">
+      <div class="sidebar-item" id="sb-rediger" data-view="rediger" draggable="true" onclick="switchView('rediger')">
         <span class="sidebar-icon">✉️</span>
         <span class="sidebar-label">Rédiger</span>
       </div>
-      <div class="sidebar-item" data-view="domaines" onclick="switchView('domaines')">
+      <div class="sidebar-item" id="sb-domaines" data-view="domaines" draggable="true" onclick="switchView('domaines')">
         <span class="sidebar-icon">🗂️</span>
         <span class="sidebar-label">Domaines</span>
       </div>
-      <div class="sidebar-item" onclick="sendCREmail()">
+      <div class="sidebar-item" id="sb-cr" draggable="true" onclick="sendCREmail()">
         <span class="sidebar-icon">📧</span>
         <span class="sidebar-label">Envoyer le CR</span>
-      </div>
-      <div class="sidebar-item" id="sidebar-item-pointeuse" onclick="openPointeuseCRM()">
-        <span class="sidebar-icon">⏱️</span>
-        <span class="sidebar-label">Pointeuse</span>
       </div>
     </div>
   </aside>
@@ -1408,10 +1407,15 @@ const DOMAINE_DOCS = {
    SEED TOUR — Étapes de visite spécifiques à l'app
 ════════════════════════════════════════════════════════════════════════ */
 const TOUR_APP = [
-  { target:'#crm-search-bar', eye:'CRM 1/4', title:'🔍 Rechercher un client', text:'Recherchez par nom, prénom ou téléphone, et filtrez par statut de dossier avec les puces.', position:'bottom' },
-  { target:'#sidebar-item-relances', eye:'CRM 2/4', title:'🔔 Relances', text:'Toutes les relances en retard ou à faire aujourd\'hui sont centralisées ici, tous clients confondus.' },
-  { target:'#sidebar-item-pointeuse', eye:'CRM 3/4', title:'⏱️ Pointeuse', text:'Pointez vos heures de travail (entrée/sortie). Le journal du jour s\'affiche automatiquement.' },
-  { target:'#fab', eye:'CRM 4/4', title:'＋ Ajouter', text:'Ce bouton s\'adapte à la page active : nouveau client, nouveau RDV ou nouvelle tâche.' }
+  { target:'#sb-dashboard',          eye:'CRM 1/8', title:'🏠 Dashboard',      text:'Vue synthétique : alertes, stats clés, clients récents et prochaines actions du jour.' },
+  { target:'#sb-clients',            eye:'CRM 2/8', title:'👥 Clients',         text:'Tout ton répertoire. Recherche, filtre et ouvre chaque fiche pour consulter le sous-dossier complet.' },
+  { target:'#sidebar-item-relances', eye:'CRM 3/8', title:'🔔 Relances',        text:'Toutes les relances en retard ou à faire aujourd\'hui, centralisées tous clients confondus.' },
+  { target:'#sb-agenda',             eye:'CRM 4/8', title:'📅 Agenda',          text:'Vue semaine de tes rendez-vous. Navigue de semaine en semaine et clique un jour pour voir le détail.' },
+  { target:'#sb-taches',             eye:'CRM 5/8', title:'✅ Tâches',          text:'Suivi de tes tâches liées aux clients. Filtre par priorité ou statut et coche quand c\'est fait.' },
+  { target:'#sb-rediger',            eye:'CRM 6/8', title:'✉️ Rédiger',         text:'Compose tes emails depuis tes modèles. Traduction FR↔EN intégrée pour les contacts internationaux.' },
+  { target:'#sb-domaines',           eye:'CRM 7/8', title:'🗂️ Domaines',        text:'Organise tes clients par domaine d\'activité pour visualiser la répartition de ton portefeuille.' },
+  { target:'#sb-cr',                 eye:'CRM 8/8', title:'📧 Envoyer le CR',   text:'Génère et envoie en un clic un compte rendu complet de l\'activité du jour par e-mail.' },
+  { target:'#fab',                   eye:'CRM ✓',   title:'＋ Action rapide',   text:'Ce bouton s\'adapte à la vue active : nouveau client, nouveau RDV ou nouvelle tâche.' }
 ];
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1905,7 +1909,7 @@ function renderDashboard() {
         <span style="font-family:var(--font-h,'Syne',sans-serif);font-weight:800;font-size:1.1rem;color:var(--ac)">${objRdv}<span style="font-size:.7rem;font-weight:400;color:var(--tx2)"> cible</span></span>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-      <div style="font-size:.65rem;color:var(--tx2);margin-top:6px">Modifiez votre objectif dans ⏱️ Pointeuse (sidebar).</div>
+      <div style="font-size:.65rem;color:var(--tx2);margin-top:6px">Objectif modifiable via 💾 Sauvegarde › Paramètres.</div>
     </div>
 
     <div class="section-title">📅 RDV du jour</div>
@@ -3363,6 +3367,67 @@ $('hive-logo-wrap').addEventListener('touchend',    e  => { e.preventDefault(); 
 $('hive-logo-wrap').addEventListener('touchcancel', () => logoCancel());
 
 /* ════════════════════════════════════════════════════════════════════════
+   DRAG-AND-DROP SIDEBAR
+════════════════════════════════════════════════════════════════════════ */
+function initSidebarDnd() {
+  const content = $('sidebar-content');
+  let dragSrc = null;
+
+  content.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragSrc = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      content.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('drag-over'));
+      dragSrc = null;
+      saveSidebarOrder();
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (dragSrc && dragSrc !== item) {
+        content.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      }
+    });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrc && dragSrc !== item) {
+        const items = [...content.querySelectorAll('.sidebar-item')];
+        const from = items.indexOf(dragSrc);
+        const to   = items.indexOf(item);
+        if (from < to) item.after(dragSrc);
+        else           item.before(dragSrc);
+      }
+      item.classList.remove('drag-over');
+    });
+  });
+}
+
+function saveSidebarOrder() {
+  const order = [...$('sidebar-content').querySelectorAll('.sidebar-item')]
+    .map(el => el.id || el.dataset.view || '');
+  localStorage.setItem('hiveos_sidebar_order', JSON.stringify(order));
+}
+
+function loadSidebarOrder() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('hiveos_sidebar_order') || 'null');
+    if (!Array.isArray(saved)) return;
+    const content = $('sidebar-content');
+    saved.forEach(key => {
+      const el = content.querySelector('#' + key) || content.querySelector('[data-view="' + key + '"]');
+      if (el) content.appendChild(el);
+    });
+  } catch(e) {}
+}
+
+/* ════════════════════════════════════════════════════════════════════════
    VISITE GUIDÉE
 ════════════════════════════════════════════════════════════════════════ */
 const TOUR_SYSTEM = [
@@ -3426,19 +3491,43 @@ function renderTour() {
   const dots=$('tour-dots'); dots.innerHTML='';
   TOUR_SYSTEM.forEach((_,i)=>{ const d=document.createElement('div'); d.className='tour-dot'+(i===tourIdx?' on':''); dots.appendChild(d); });
 
-  const hl=$('tour-hl'), bg=$('tour-bg');
+  const hl=$('tour-hl'), bg=$('tour-bg'), card=$('tour-card');
+
   if (s.target) {
-    const el=document.querySelector(s.target);
-    if (el) {
-      const r=el.getBoundingClientRect();
-      hl.style.top=    (r.top-5)    +'px';
-      hl.style.left=   (r.left-5)   +'px';
-      hl.style.width=  (r.width+10) +'px';
-      hl.style.height= (r.height+10)+'px';
-      hl.style.display='block';
+    const el = document.querySelector(s.target);
+    const r  = el ? el.getBoundingClientRect() : null;
+    if (r && (r.width > 0 || r.height > 0)) {
+      hl.style.top    = (r.top  - 5) + 'px';
+      hl.style.left   = (r.left - 5) + 'px';
+      hl.style.width  = (r.width  + 10) + 'px';
+      hl.style.height = (r.height + 10) + 'px';
+      hl.style.display = 'block';
       bg.classList.remove('no-target');
-    } else { hl.style.display='none'; bg.classList.add('no-target'); }
-  } else { hl.style.display='none'; bg.classList.add('no-target'); }
+
+      /* Position la carte à côté de l'élément ciblé */
+      const cardW = 380, margin = 14, vp = window.innerWidth;
+      if (r.right + cardW + margin < vp) {
+        card.style.left      = (r.right + margin) + 'px';
+        card.style.top       = Math.max(margin, Math.min(r.top, window.innerHeight - 280)) + 'px';
+        card.style.transform = 'none';
+      } else if (r.left - cardW - margin > 0) {
+        card.style.left      = (r.left - cardW - margin) + 'px';
+        card.style.top       = Math.max(margin, Math.min(r.top, window.innerHeight - 280)) + 'px';
+        card.style.transform = 'none';
+      } else {
+        card.style.top = (r.bottom + margin) + 'px';
+        card.style.left = '50%';
+        card.style.transform = 'translateX(-50%)';
+      }
+      return;
+    }
+  }
+  /* Pas de cible ou élément invisible → carte centrée */
+  hl.style.display = 'none';
+  bg.classList.add('no-target');
+  card.style.top       = '50%';
+  card.style.left      = '50%';
+  card.style.transform = 'translate(-50%,-50%)';
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -3568,6 +3657,9 @@ async function downloadHTML() {
   // tout premier chargement (aucun état sauvegardé) ou si setAppState
   // n'a pas pu s'exécuter.
   switchView(ui.view || 'dashboard');
+
+  initSidebarDnd();
+  loadSidebarOrder();
 
   if (!localStorage.getItem('hiveos_tour_done')) startTour();
 })();
