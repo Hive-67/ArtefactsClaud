@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idéalys — HiveOS</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Press+Start+2P&family=Fredoka+One&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Press+Start+2P&family=Fredoka+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -31,6 +31,18 @@ body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);tra
 .theme-spectre.day{--bg:#f0f7f4;--bg2:#e0eee8;--bg3:#cfddd8;--bg4:#bdd0cb;--brd:#1a6e5040;--tx:#0a1412;--tx2:#2e4a44;--ac:#1a6e50;--ok:#1a6e50;--warn:#8a6000;--danger:#cc0022}
 .theme-matrix{--bg:#050805;--bg2:#081008;--bg3:#0d180d;--bg4:#132013;--brd:#2bd90030;--tx:#ffffff;--tx2:#a8e890;--ac:#2bd900;--ok:#00ff88;--warn:#ffcc00;--danger:#ff3300;--font-h:'Press Start 2P',monospace}
 .theme-matrix.day{--bg:#0d2a08;--bg2:#122e0c;--bg3:#183d10;--bg4:#1e4c14;--brd:#2bd90030;--tx:#ffffff;--tx2:#a8e890;--ac:#2bd900;--ok:#00ff88;--warn:#ffcc00;--danger:#ff3300}
+.theme-win-vintage     {--bg:#1c1c1c;--bg2:#2a2a2a;--bg3:#333;   --bg4:#404040;--brd:#606060;--tx:#e8e8e8;--tx2:#a0a0a0;--ac:#4a7cc4;--ok:#00aa00;--warn:#aa8800;--danger:#cc0000}
+.theme-win-vintage.day {--bg:#c8c4bc;--bg2:#d4d0c8;--bg3:#dedad2;--bg4:#e8e4dc;--brd:#808080;--tx:#000;   --tx2:#444;   --ac:#2a5ab8;--ok:#006600;--warn:#886600;--danger:#990000}
+.theme-vt100           {--bg:#050f05;--bg2:#071007;--bg3:#0a1a0a;--bg4:#0d200d;--brd:#1a4a1a;--tx:#33ff33;--tx2:#1a8c1a;--ac:#33ff33;--ok:#33ff33;--warn:#ffcc00;--danger:#ff3300}
+.theme-vt100.day       {--bg:#f0fff0;--bg2:#e0f7e0;--bg3:#c8ecc8;--bg4:#b0ddb0;--brd:#1a8c1a40;--tx:#0a240a;--tx2:#1a6a1a;--ac:#0a6a0a;--ok:#0a6a0a;--warn:#8a6000;--danger:#cc0022}
+.theme-ibmpc           {--bg:#0a0700;--bg2:#100e00;--bg3:#181200;--bg4:#201800;--brd:#3a2a00;--tx:#ffb000;--tx2:#a07000;--ac:#ffb000;--ok:#ffb000;--warn:#ffb000;--danger:#ffb000}
+.theme-ibmpc.day       {--bg:#fffaf0;--bg2:#f8f0d8;--bg3:#ece0b8;--bg4:#ddd098;--brd:#a07000;--tx:#1a1200;--tx2:#6a4a00;--ac:#6a4a00;--ok:#6a4a00;--warn:#6a4a00;--danger:#6a4a00}
+.theme-bunker          {--bg:#08080a;--bg2:#10100e;--bg3:#181610;--bg4:#201e14;--brd:#c9a84c30;--tx:#f0ead4;--tx2:#9a8860;--ac:#c9a84c;--ok:#c9a84c;--warn:#c9a84c;--danger:#c9a84c}
+.theme-bunker.day      {--bg:#faf8f0;--bg2:#f0ead4;--bg3:#e4d8b4;--bg4:#d4c490;--brd:#c9a84c40;--tx:#1a1408;--tx2:#6a5a30;--ac:#8a6a1a;--ok:#8a6a1a;--warn:#8a6a1a;--danger:#8a6a1a}
+
+/* VT100 / IBMPC — police et scanlines */
+body.theme-vt100,body.theme-ibmpc{font-family:'Share Tech Mono',monospace}
+body.theme-vt100::before,body.theme-ibmpc::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px)}
 
 /* Grilles Spectre/Matrix */
 .theme-spectre::before,.theme-matrix::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(77,240,160,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(77,240,160,.03) 1px,transparent 1px);background-size:40px 40px}
@@ -835,7 +847,7 @@ const SEED_DATA={"ideas":[],"categories":[],"mapPositions":{},"prompts":[]};
 
 const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'archived',label:'Amélioration continue',emoji:'🔄',color:'#8892a4'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
-const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'}];
+const THEMES=[{id:'hiveos',label:'HiveOS',emoji:'🐝'},{id:'problue',label:'Pro Bleu',emoji:'🔷'},{id:'bleu',label:'Bleu',emoji:'🔵'},{id:'dracula',label:'Dracula',emoji:'🧛'},{id:'windows95',label:'Windows 95',emoji:'🪟'},{id:'terminal',label:'Terminal',emoji:'💻'},{id:'picsou',label:'Picsou',emoji:'🪙'},{id:'cyberpunk',label:'Cyberpunk',emoji:'⚡'},{id:'spectre',label:'Spectre',emoji:'👾'},{id:'matrix',label:'Matrix',emoji:'🟢'},{id:'win-vintage',label:'Win Vintage',emoji:'🖥️'},{id:'vt100',label:'VT-100',emoji:'🖨️'},{id:'ibmpc',label:'IBM PC',emoji:'🟡'},{id:'bunker',label:'Bunker',emoji:'🏚️'}];
 
 let state={ideas:[],categories:[],mapPositions:{},prompts:[],rucheLayouts:[]};
 let ui={
