@@ -3,17 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Maquette → Prompt IA — HiveOS Lite</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <title>Postes Logistique · TCGE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
 
-    /* ══ THÈMES — VERSION LITE (2 × 2 MODES) ══════════════════════════════ */
+    /* ══ THÈMES 10 × 2 MODES ════════════════════════════════════════════ */
     .theme-hiveos          { --bg:#111;    --bg2:#1c1c1c; --bg3:#262626; --bg4:#303030; --brd:#7d206f33; --tx:#f5f5f5; --tx2:#b8a7b5; --ac:#b01678; }
     .theme-hiveos.day      { --bg:#fef9f4; --bg2:#f5eaf0; --bg3:#ecdae6; --bg4:#e0c8d8; --brd:rgba(125,32,111,.12); --tx:#180812; --tx2:#5f4057; --ac:#9a145f; }
     .theme-bleu            { --bg:#06080f; --bg2:#0b0e1c; --bg3:#141828; --bg4:#1e2438; --brd:#2a306040; --tx:#e8eaf8; --tx2:#8890c8; --ac:#4f8ef7; }
     .theme-bleu.day        { --bg:#f4f6ff; --bg2:#eaedff; --bg3:#d8deff; --bg4:#c4ccff; --brd:#8896e840; --tx:#070b24; --tx2:#3040a0; --ac:#1a4fc4; }
+    .theme-dracula         { --bg:#282a36; --bg2:#21222c; --bg3:#44475a; --bg4:#6272a4; --brd:#44475a;   --tx:#f8f8f2; --tx2:#b8bdd9; --ac:#ff79c6; }
+    .theme-dracula.day     { --bg:#fff5fb; --bg2:#f4e8f2; --bg3:#e8d7e6; --bg4:#d7c1d2; --brd:#b58aa8;   --tx:#21121d; --tx2:#65485c; --ac:#9a0060; }
+    .theme-spectre         { --bg:#090c0b; --bg2:#0f1412; --bg3:#161e1b; --bg4:#1e2a26; --brd:#2dd4a022; --tx:#bcccc8; --tx2:#6a9488; --ac:#2dd4a0; }
+    .theme-spectre.day     { --bg:#f0f7f4; --bg2:#e0ede8; --bg3:#cce0d8; --bg4:#b5d0c6; --brd:#1a8c6a30; --tx:#071410; --tx2:#255040; --ac:#1a8c6a; }
+    .theme-win95           { --bg:#1a1a1a; --bg2:#242424; --bg3:#2e2e2e; --bg4:#383838; --brd-l:#707070; --brd-d:#111; --tx:#e8e8e8; --tx2:#a0a0a0; --ac:#5a8fd6; --tf:#1a3a8a; --tt:#2a5ab8; --btnbg:#2a2a2a; --inbg:#1a1a1a; }
+    .theme-win95.day       { --bg:#c8c4bc; --bg2:#d4d0c8; --bg3:#dedad2; --bg4:#e8e4dc; --brd-l:#fff;    --brd-d:#404040; --tx:#000; --tx2:#444; --ac:#000080; --tf:#000080; --tt:#1084d0; --btnbg:#d4d0c8; --inbg:#fff; }
+    .theme-win-vintage     { --bg:#1c1c1c; --bg2:#2a2a2a; --bg3:#333;    --bg4:#404040; --brd-l:#606060; --brd-d:#111; --tx:#e8e8e8; --tx2:#a0a0a0; --ac:#4a7cc4; --tf:#1a3a8a; --tt:#4a8ad4; --btnbg:#2a2a2a; --inbg:#1a1a1a; }
+    .theme-win-vintage.day { --bg:#c8c4bc; --bg2:#d4d0c8; --bg3:#dedad2; --bg4:#e8e4dc; --brd-l:#e8e8e8; --brd-d:#606060; --tx:#000; --tx2:#444; --ac:#2a5ab8; --tf:#000080; --tt:#4a8ad4; --btnbg:#d4d0c8; --inbg:#fff; }
+    .theme-terminal        { --bg:#000;    --bg2:#0a0a0a; --bg3:#111;    --bg4:#1a1a1a; --brd:#2a2a2a;   --tx:#d4d4d4; --tx2:#6a6a6a; --ac:#e0e0e0; }
+    .theme-terminal.day    { --bg:#fff;    --bg2:#fafafa; --bg3:#f0f0f0; --bg4:#e8e8e8; --brd:#d0d0d0;   --tx:#1a1a1a; --tx2:#666;    --ac:#000; }
+    .theme-vt100           { --bg:#050f05; --bg2:#071007; --bg3:#0a1a0a; --bg4:#0d200d; --brd:#1a4a1a;   --tx:#33ff33; --tx2:#1a8c1a; --ac:#33ff33; }
+    .theme-vt100.day       { --bg:#f0fff0; --bg2:#e0f7e0; --bg3:#c8ecc8; --bg4:#b0ddb0; --brd:#1a8c1a40; --tx:#0a240a; --tx2:#1a6a1a; --ac:#0a6a0a; }
+    .theme-ibmpc           { --bg:#0a0700; --bg2:#100e00; --bg3:#181200; --bg4:#201800; --brd:#3a2a00;   --tx:#ffb000; --tx2:#a07000; --ac:#ffb000; }
+    .theme-ibmpc.day       { --bg:#fffaf0; --bg2:#f8f0d8; --bg3:#ece0b8; --bg4:#ddd098; --brd:#a07000;   --tx:#1a1200; --tx2:#6a4a00; --ac:#6a4a00; }
+    .theme-bunker          { --bg:#08080a; --bg2:#10100e; --bg3:#181610; --bg4:#201e14; --brd:#c9a84c30; --tx:#f0ead4; --tx2:#9a8860; --ac:#c9a84c; }
+    .theme-bunker.day      { --bg:#faf8f0; --bg2:#f0ead4; --bg3:#e4d8b4; --bg4:#d4c490; --brd:#c9a84c40; --tx:#1a1408; --tx2:#6a5a30; --ac:#8a6a1a; }
 
-    /* Fond spécial — halos 4 coins (uniquement HiveOS jour) */
+    /* Fonds spéciaux */
     body.theme-hiveos.day {
       background:
         radial-gradient(ellipse 75% 75% at -5% -5%,   rgba(125,32,111,.22) 0%,transparent 60%),
@@ -21,6 +37,19 @@
         radial-gradient(ellipse 50% 50% at 105% -5%,   rgba(176,22,120,.12) 0%,transparent 55%),
         radial-gradient(ellipse 50% 50% at -5% 105%,   rgba(192,23,88,.10)  0%,transparent 55%),
         #fef9f4;
+    }
+    body.theme-spectre {
+      background-image:linear-gradient(rgba(45,212,160,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,160,.13) 1px,transparent 1px);
+      background-size:40px 40px; background-color:#090c0b;
+    }
+    body.theme-spectre.day {
+      background-image:linear-gradient(rgba(26,140,106,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(26,140,106,.18) 1px,transparent 1px);
+      background-size:40px 40px; background-color:#f0f7f4;
+    }
+    body.theme-vt100, body.theme-ibmpc { font-family:'Share Tech Mono',monospace; }
+    body.theme-vt100::before, body.theme-ibmpc::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+      background:repeating-linear-gradient(transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px);
     }
 
     /* ══ BASE ════════════════════════════════════════════════════════════ */
@@ -62,18 +91,14 @@
     }
 
     .hive-logo-wrap {
-      display:flex; align-items:center; gap:.4rem;
-      cursor:default; user-select:none; flex-shrink:0;
+      display:flex; align-items:center; gap:.55rem;
+      cursor:pointer; user-select:none; flex-shrink:0;
     }
     .hive-logo {
       font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
       background:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
       white-space:nowrap;
-    }
-    .badge-lite {
-      font-family:'Caveat',cursive; font-weight:600; font-size:1.05rem;
-      color:var(--tx2); line-height:1; margin-top:3px; white-space:nowrap;
     }
     .hive-sep { width:1px; height:16px; background:var(--brd); flex-shrink:0; }
     .hive-app-name    { font-size:.68rem; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -96,12 +121,12 @@
     }
     .hive-btn:hover::after { opacity:1; }
 
-    /* ══ MENU THÈMES — VERSION LITE (2 thèmes, pas de familles) ════════════ */
+    /* ══ MENU THÈMES ══════════════════════════════════════════════════════ */
     .theme-wrap { position:relative; }
     .theme-menu {
       position:absolute; top:calc(100% + 8px); right:0;
       background:var(--bg2); border:1px solid var(--brd); border-radius:10px;
-      padding:.4rem; min-width:140px;
+      padding:.4rem; min-width:195px;
       box-shadow:0 8px 30px rgba(0,0,0,.35); z-index:600; display:none;
     }
     .theme-menu.open { display:block; }
@@ -113,6 +138,17 @@
       -webkit-tap-highlight-color:transparent;
     }
     .tm-item:hover, .tm-item.on { background:var(--bg3); color:var(--tx); }
+    .tm-item.family::after { content:'▶'; font-size:.58rem; opacity:.4; }
+    .tm-sub { padding-left:.5rem; display:none; }
+    .tm-sub.open { display:block; }
+    .tm-sub-item {
+      display:flex; align-items:center; gap:.5rem;
+      padding:.38rem .7rem; border-radius:7px; cursor:pointer;
+      font-size:.75rem; font-family:'Space Mono',monospace;
+      color:var(--tx2); transition:background .12s,color .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .tm-sub-item:hover, .tm-sub-item.on { background:var(--bg3); color:var(--tx); }
 
     /* ══ LAYOUT ══════════════════════════════════════════════════════════ */
     .app-layout { display:flex; min-height:calc(100vh - 53px); }
@@ -368,6 +404,81 @@
     }
     .reset-warn { text-align:center; font-size:.72rem; color:#E5534B; padding:.3rem; }
 
+    /* ══ ABOUT ════════════════════════════════════════════════════════════ */
+    .about-block { background:var(--bg3); border:1px solid var(--brd); border-radius:8px; padding:.9rem; }
+    .about-block-title { font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ac); margin-bottom:.6rem; }
+    .about-row { display:flex; justify-content:space-between; font-size:.78rem; gap:1rem; margin-bottom:.3rem; }
+    .about-row .lbl { font-weight:700; color:var(--tx); }
+    .about-row .val { color:var(--tx2); }
+    .about-text { font-size:.78rem; color:var(--tx2); line-height:1.65; }
+    .about-link { color:var(--ac); text-decoration:none; }
+    .about-link:hover { text-decoration:underline; }
+
+    /* Onglets À propos */
+    .about-tabs { display:flex; border-bottom:1px solid var(--brd); flex-shrink:0; }
+    .about-tab {
+      flex:1; padding:.65rem .5rem; text-align:center;
+      font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700;
+      color:var(--tx2); background:none; border:none; cursor:pointer;
+      border-bottom:2px solid transparent;
+      transition:color .15s,border-color .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .about-tab:hover  { color:var(--tx); }
+    .about-tab.active { color:var(--ac); border-bottom-color:var(--ac); }
+
+    /* Journal des mises à jour */
+    .cl-entry {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.75rem .9rem; margin-bottom:.65rem;
+    }
+    .cl-entry:last-child { margin-bottom:0; }
+    .cl-head {
+      display:flex; align-items:baseline; justify-content:space-between;
+      gap:.75rem; margin-bottom:.5rem;
+    }
+    .cl-version { font-family:'Syne',sans-serif; font-weight:800; font-size:.82rem; color:var(--tx); }
+    .cl-date    { font-size:.65rem; color:var(--tx2); opacity:.7; white-space:nowrap; }
+    .cl-changes { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.3rem; }
+    .cl-changes li { font-size:.72rem; color:var(--tx2); line-height:1.55; padding-left:1.1rem; position:relative; }
+    .cl-changes li::before { content:'›'; position:absolute; left:0; top:0; color:var(--ac); font-weight:700; }
+    .cl-empty { font-size:.75rem; color:var(--tx2); opacity:.55; font-style:italic; text-align:center; padding:1rem 0; }
+
+    /* ══ VISITE GUIDÉE ════════════════════════════════════════════════════ */
+    .tour-ov { position:fixed; inset:0; z-index:900; display:none; }
+    .tour-ov.open { display:block; }
+    .tour-bg {
+      position:fixed; inset:0; background:transparent; cursor:pointer; z-index:901;
+    }
+    .tour-bg.no-target { background:rgba(0,0,0,.75); }
+    .tour-hl {
+      position:fixed; z-index:902; pointer-events:none; display:none;
+      box-shadow:0 0 0 3px var(--ac), 0 0 0 9999px rgba(0,0,0,.78);
+      border-radius:6px; transition:top .2s,left .2s,width .2s,height .2s;
+    }
+    .tour-card {
+      position:fixed; top:64px; left:50%; transform:translateX(-50%);
+      background:var(--bg2); border:1px solid var(--brd);
+      border-radius:14px; padding:1.5rem; max-width:360px; width:calc(100vw - 2rem);
+      box-shadow:0 20px 60px rgba(0,0,0,.5); z-index:903; pointer-events:all;
+    }
+    .tour-eye   { font-size:.63rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ac); margin-bottom:.4rem; }
+    .tour-title { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800; color:var(--tx); margin-bottom:.65rem; }
+    .tour-text  { font-size:.78rem; line-height:1.7; color:var(--tx2); margin-bottom:1.2rem; }
+    .tour-nav   { display:flex; align-items:center; justify-content:space-between; }
+    .tour-dots  { display:flex; gap:.3rem; }
+    .tour-dot   { width:6px; height:6px; border-radius:50%; background:var(--brd); transition:background .15s; }
+    .tour-dot.on { background:var(--ac); }
+    .tour-btns  { display:flex; gap:.4rem; }
+    .tour-btn {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.4rem .85rem; border-radius:7px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .tour-btn.primary { background:var(--ac); color:var(--bg); border-color:transparent; }
+    .tour-btn:hover { opacity:.85; }
+
     /* ══ MENU SECRET ══════════════════════════════════════════════════════ */
     .secret-ov {
       position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px);
@@ -453,111 +564,83 @@
       .main-wrap, .main-wrap.sidebar-collapsed { margin-left:0; }
       .sv-list { padding:1rem; gap:.5rem; }
     }
-    /* ══════════════════════════════════════════════════════════════════
-       APPLICATION — MAQUETTE → PROMPT IA
-       (styles spécifiques au contenu métier, basés sur les variables
-        de thème existantes — aucune règle système n'est modifiée)
-    ══════════════════════════════════════════════════════════════════ */
-    .mq-app { padding:1.25rem; max-width:1400px; }
-    .mq-intro { margin-bottom:1rem; }
-    .mq-intro kbd {
-      font-family:'Space Mono',monospace; font-size:.68rem;
-      background:var(--bg4); border:1px solid var(--brd); border-radius:4px;
-      padding:.05rem .35rem;
-    }
+  </style>
+  <style>
+  /* ══ CONTENU MÉTIER TCGE (scopé .pl-, utilise les variables de thème) ══ */
+  .pl-wrap { max-width:1440px; margin:0 auto; }
+  .pl-stats { display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:12px; }
+  .pl-chip { display:flex; align-items:center; gap:6px; background:var(--bg2); border:1px solid var(--brd); border-radius:20px; padding:4px 11px; font-size:.68rem; color:var(--tx2); }
+  .pl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 
-    .mq-toolbar {
-      display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end;
-      padding:.9rem 1rem; margin-bottom:1rem;
-      background:var(--bg2); border:1px solid var(--brd); border-radius:10px;
-    }
-    .mq-group { display:flex; flex-direction:column; gap:.3rem; }
-    .mq-group-label {
-      font-size:.62rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; color:var(--tx2);
-    }
-    .mq-group select, .mq-group input[type="number"] {
-      font-family:'Space Mono',monospace; font-size:.78rem;
-      padding:.45rem .55rem; border-radius:6px;
-      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
-      min-width:150px;
-    }
-    .mq-group input[type="number"] { min-width:80px; }
-    .mq-group input[type="color"] {
-      width:46px; height:34px; padding:2px; cursor:pointer;
-      border-radius:6px; border:1px solid var(--brd); background:var(--bg3);
-    }
-    .mq-actions { flex-direction:row; gap:.5rem; margin-left:auto; flex-wrap:wrap; }
-    .mq-btn {
-      font-family:'Space Mono',monospace; font-size:.75rem; font-weight:700;
-      padding:.55rem .9rem; border-radius:7px; cursor:pointer;
-      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
-      transition:all .15s; white-space:nowrap;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .mq-btn:hover { background:var(--bg4); }
-    .mq-btn-danger { border-color:#E5534B44; color:#C0392B; }
-    .mq-btn-danger:hover { background:#E5534B; color:#fff; border-color:#E5534B; }
-    .mq-btn-primary { background:var(--ac); color:var(--bg); border-color:transparent; }
-    .mq-btn-primary:hover { opacity:.85; }
+  .pl-legend { background:var(--bg2); border:1px solid var(--brd); border-radius:8px; margin-bottom:12px; overflow:hidden; }
+  .pl-legend-head { padding:10px 16px; display:flex; justify-content:space-between; align-items:center; font-size:.66rem; color:var(--tx2); letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:background .2s; }
+  .pl-legend-head:hover { background:var(--bg3); }
+  .pl-legend-body { display:none; padding:10px 12px; flex-direction:column; gap:7px; }
+  .pl-legend-body.open { display:flex; }
+  .pl-leg-item { display:flex; align-items:flex-start; gap:9px; background:var(--bg3); border-radius:6px; padding:8px 10px; }
+  .pl-leg-color { width:10px; height:10px; border-radius:3px; flex-shrink:0; margin-top:4px; }
+  .pl-leg-info { flex:1; }
+  .pl-leg-name { font-size:.74rem; font-weight:700; color:var(--tx); }
+  .pl-leg-desc { font-size:.63rem; color:var(--tx2); margin-top:3px; line-height:1.45; }
+  .pl-leg-add { width:100%; padding:7px; background:none; border:1px dashed var(--brd); color:var(--tx2); font-size:.7rem; border-radius:6px; margin-top:4px; cursor:pointer; }
+  .pl-leg-add:hover { background:var(--bg3); color:var(--tx); }
 
-    .mq-canvas-wrap {
-      overflow:auto; border:1px solid var(--brd); border-radius:10px;
-      background:var(--bg3); padding:1.25rem;
-    }
-    .mq-canvas {
-      position:relative; width:1200px; height:800px;
-      background:#ffffff; box-shadow:0 4px 24px rgba(0,0,0,.18);
-      transform-origin:top left; flex-shrink:0;
-    }
+  .pl-filters { display:flex; gap:7px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
+  .pl-search { flex:1; min-width:140px; background:var(--bg2); border:1px solid var(--brd); color:var(--tx); padding:8px 12px; border-radius:6px; font-size:.73rem; outline:none; }
+  .pl-search:focus { border-color:var(--ac); }
+  .pl-search::placeholder { color:var(--tx2); }
+  .pl-select { background:var(--bg2); border:1px solid var(--brd); color:var(--tx); padding:8px 10px; border-radius:6px; font-size:.73rem; outline:none; }
+  .pl-select option { background:var(--bg2); }
+  .pl-reset { background:none; border:1px solid var(--brd); color:var(--tx2); padding:8px 10px; border-radius:6px; font-size:.73rem; cursor:pointer; }
+  .pl-reset:hover { color:var(--ac); border-color:var(--ac); }
+  .pl-filters .pl-btn-prim { margin-left:auto; }
 
-    .mq-shape { position:absolute; box-sizing:border-box; cursor:move; user-select:none; }
-    .mq-rect    { border-radius:2px; }
-    .mq-ellipse { border-radius:50%; }
-    .mq-texte {
-      border:1px dashed rgba(0,0,0,.25);
-      padding:4px; overflow:hidden; white-space:pre-wrap;
-      word-break:break-word; cursor:text; outline:none;
-    }
-    .mq-shape.mq-selected { outline:2px solid var(--ac); outline-offset:1px; }
-    .mq-resize-handle {
-      position:absolute; width:10px; height:10px;
-      background:var(--ac); border:1px solid #fff; border-radius:2px; z-index:10;
-    }
-    .mq-rh-nw { top:-5px;    left:-5px;  cursor:nwse-resize; }
-    .mq-rh-ne { top:-5px;    right:-5px; cursor:nesw-resize; }
-    .mq-rh-sw { bottom:-5px; left:-5px;  cursor:nesw-resize; }
-    .mq-rh-se { bottom:-5px; right:-5px; cursor:nwse-resize; }
-    .mq-ghost {
-      position:absolute; border:2px dashed var(--ac);
-      background:rgba(79,142,247,.12); pointer-events:none;
-    }
+  .pl-btn { background:var(--bg3); border:1px solid var(--brd); color:var(--tx); padding:7px 12px; border-radius:6px; font-size:.72rem; cursor:pointer; transition:background .2s; }
+  .pl-btn:hover { background:var(--bg4); }
+  .pl-btn-prim { background:var(--ac); border-color:var(--ac); color:var(--bg); font-weight:700; }
+  .pl-btn-prim:hover { opacity:.85; }
+  .pl-btn-dngr { background:#E5534B; border-color:#E5534B; color:#fff; font-weight:700; }
+  .pl-btn-dngr:hover { opacity:.85; }
 
-    .mq-sidebar-title {
-      padding:.7rem .85rem .35rem;
-      font-size:.62rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; color:var(--tx2);
-    }
+  .pl-table-wrap { background:var(--bg2); border:1px solid var(--brd); border-radius:8px; overflow:auto; }
+  .pl-table { width:100%; border-collapse:collapse; font-size:.73rem; }
+  .pl-table thead tr { background:var(--bg3); }
+  .pl-table th { padding:10px 12px; text-align:left; color:var(--tx2); font-weight:700; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; border-bottom:1px solid var(--brd); white-space:nowrap; }
+  .pl-table tbody tr { border-bottom:1px solid var(--brd); transition:background .15s; cursor:pointer; }
+  .pl-table tbody tr:last-child { border-bottom:none; }
+  .pl-table tbody tr:hover { background:var(--bg3); }
+  .pl-table tbody tr.sel { background:var(--bg4); box-shadow:inset 3px 0 0 var(--ac); }
+  .pl-table td { padding:9px 12px; vertical-align:middle; color:var(--tx); }
+  .pl-code { font-size:.67rem; color:var(--tx2); white-space:nowrap; }
+  .pl-den { font-weight:700; font-size:.8rem; }
+  .pl-new { color:var(--ac); font-weight:700; }
+  .pl-new:empty::after { content:'—'; color:var(--tx2); font-weight:400; }
+  .pl-time { font-size:.67rem; color:var(--tx2); white-space:nowrap; }
+  .pl-desc { font-size:.7rem; color:var(--tx2); max-width:260px; line-height:1.4; }
+  .pl-badge { display:inline-block; padding:3px 9px; border-radius:12px; font-size:.6rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#fff; }
+  .pl-rbtn { background:none; border:1px solid var(--brd); color:var(--tx2); padding:4px 8px; border-radius:4px; font-size:.65rem; margin-right:3px; cursor:pointer; transition:all .15s; }
+  .pl-rbtn.edit { background:var(--ac); border-color:var(--ac); color:var(--bg); }
+  .pl-rbtn.edit:hover { opacity:.85; }
+  .pl-rbtn.del { background:#30302d; border-color:#46453f; color:#e0e0e0; }
+  .pl-rbtn.del:hover { background:#3a3935; border-color:#E5534B; color:#E5534B; }
+  .pl-empty { text-align:center; padding:46px; color:var(--tx2); font-size:.78rem; }
 
-    .mq-export-label {
-      font-size:.62rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; color:var(--tx2); margin-bottom:.4rem;
-    }
-    .mq-export-img {
-      max-width:100%; border:1px solid var(--brd); border-radius:8px;
-      display:block; margin-bottom:.65rem; background:#fff;
-    }
-    .mq-export-ta {
-      font-family:'Space Mono',monospace; font-size:.75rem;
-      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
-      padding:.75rem; color:var(--tx); resize:vertical;
-      min-height:220px; width:100%; line-height:1.6;
-    }
-
-    @media (max-width:768px) {
-      .mq-canvas-wrap { padding:.6rem; }
-      .mq-actions { margin-left:0; width:100%; }
-    }
+  /* Formulaires des modales métier */
+  .pl-form { display:flex; flex-direction:column; gap:12px; padding:4px 2px; }
+  .pl-row2 { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .pl-lab { display:block; font-size:.58rem; text-transform:uppercase; letter-spacing:.08em; color:var(--tx2); margin-bottom:5px; }
+  .pl-inp { width:100%; background:var(--bg3); border:1px solid var(--brd); color:var(--tx); padding:8px 11px; border-radius:6px; font-size:.78rem; outline:none; font-family:inherit; }
+  .pl-inp:focus { border-color:var(--ac); }
+  .pl-inp option { background:var(--bg2); }
+  .pl-ta { resize:vertical; min-height:64px; }
+  .pl-foot { display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:16px; }
+  .pl-color-row { display:flex; align-items:center; gap:10px; }
+  .pl-color { width:46px; height:34px; padding:2px; background:var(--bg3); border:1px solid var(--brd); border-radius:6px; cursor:pointer; }
+  .pl-type-item { display:flex; align-items:center; gap:8px; background:var(--bg3); border:1px solid var(--brd); border-radius:6px; padding:8px 10px; margin-bottom:7px; }
+  .pl-sw { width:18px; height:18px; border-radius:4px; flex-shrink:0; }
+  .pl-add-dashed { width:100%; padding:8px; background:none; border:1px dashed var(--brd); color:var(--tx2); font-size:.72rem; border-radius:6px; margin-top:4px; cursor:pointer; }
+  .pl-add-dashed:hover { background:var(--bg3); color:var(--tx); }
+  @media (max-width:768px){ .pl-desc { display:none; } }
   </style>
 </head>
 <body class="theme-hiveos">
@@ -565,9 +648,8 @@
 <div class="hive-stripe"></div>
 
 <header class="hive-header" id="hive-header">
-  <div class="hive-logo-wrap">
+  <div class="hive-logo-wrap" id="hive-logo-wrap">
     <span class="hive-logo">HiveOS</span>
-    <span class="badge-lite">lite</span>
     <span class="hive-sep"></span>
     <span class="hive-app-name"    id="hive-app-name"></span>
     <span class="hive-app-version" id="hive-app-version"></span>
@@ -577,12 +659,27 @@
     <div class="theme-wrap">
       <button class="hive-btn" id="btn-theme" data-tip="Thème" onclick="toggleThemeMenu()">🎨</button>
       <div class="theme-menu" id="theme-menu">
-        <div class="tm-item on" data-t="theme-hiveos" onclick="setTheme(this)">🐝 HiveOS</div>
-        <div class="tm-item"    data-t="theme-bleu"   onclick="setTheme(this)">🔵 Bleu</div>
+        <div class="tm-item on" data-t="theme-hiveos"  onclick="setTheme(this)">🐝 HiveOS</div>
+        <div class="tm-item"    data-t="theme-bleu"    onclick="setTheme(this)">🔵 Bleu</div>
+        <div class="tm-item"    data-t="theme-dracula" onclick="setTheme(this)">🧛 Dracula</div>
+        <div class="tm-item"    data-t="theme-spectre" onclick="setTheme(this)">👾 Spectre</div>
+        <div class="tm-item family" onclick="toggleFam('win')">🪟 Windows</div>
+        <div class="tm-sub" id="fam-win">
+          <div class="tm-sub-item" data-t="theme-win95"       onclick="setTheme(this)">Windows 95</div>
+          <div class="tm-sub-item" data-t="theme-win-vintage" onclick="setTheme(this)">Windows Vintage</div>
+        </div>
+        <div class="tm-item family" onclick="toggleFam('term')">💻 Terminal</div>
+        <div class="tm-sub" id="fam-term">
+          <div class="tm-sub-item" data-t="theme-terminal" onclick="setTheme(this)">Terminal</div>
+          <div class="tm-sub-item" data-t="theme-vt100"    onclick="setTheme(this)">VT100</div>
+          <div class="tm-sub-item" data-t="theme-ibmpc"    onclick="setTheme(this)">IBM PC</div>
+        </div>
+        <div class="tm-item" data-t="theme-bunker" onclick="setTheme(this)">🏚 Bunker</div>
       </div>
     </div>
     <button class="hive-btn" id="btn-daynight" data-tip="Jour / Nuit" onclick="toggleDayNight()">☀️</button>
     <button class="hive-btn" id="btn-save"     data-tip="Sauvegarde"  onclick="openSaveModal()">💾</button>
+    <button class="hive-btn" id="btn-help"     data-tip="Aide"        onclick="startTour()">❓</button>
   </div>
 </header>
 
@@ -603,72 +700,141 @@
       <span class="sidebar-title">Menu</span>
     </div>
     <div class="sidebar-content" id="sidebar-content">
-      <div class="mq-sidebar-title">🧩 Éléments de la maquette</div>
-      <div id="mq-layers-list">
-        <div class="sidebar-placeholder">Aucun élément. Dessine une forme sur la zone de travail pour commencer.</div>
+      <!-- NAVIGATION DE L'APP ICI
+           Exemple :
+           <div class="sidebar-item active" onclick="showView('accueil')">
+             <span class="sidebar-icon">🏠</span>
+             <span class="sidebar-label">Accueil</span>
+           </div>
+      -->
+      <div class="sidebar-item active" id="nav-all" onclick="plNav('')">
+        <span class="sidebar-icon">📋</span><span class="sidebar-label">Tous les postes</span>
+      </div>
+      <div class="sidebar-item" onclick="plNav('manoeuvre')">
+        <span class="sidebar-icon">🔧</span><span class="sidebar-label">Manœuvre</span>
+      </div>
+      <div class="sidebar-item" onclick="plNav('coordination')">
+        <span class="sidebar-icon">🎯</span><span class="sidebar-label">Coordination</span>
+      </div>
+      <div class="sidebar-item" onclick="plNav('encadrement')">
+        <span class="sidebar-icon">👔</span><span class="sidebar-label">Management</span>
+      </div>
+      <div class="sidebar-item" onclick="plNav('renfort')">
+        <span class="sidebar-icon">➕</span><span class="sidebar-label">Renfort</span>
+      </div>
+      <div class="sidebar-item" onclick="plNav('technique')">
+        <span class="sidebar-icon">⚙️</span><span class="sidebar-label">Autre</span>
+      </div>
+      <div class="sidebar-item" onclick="document.getElementById('pl-legend').scrollIntoView({behavior:'smooth'})">
+        <span class="sidebar-icon">📖</span><span class="sidebar-label">Légende</span>
       </div>
     </div>
   </aside>
 
   <main class="main-wrap" id="app-content">
-    <div class="mq-app">
+    <div class="pl-wrap">
 
-      <div class="sv-info mq-intro">
-        ℹ️ <strong style="color:var(--tx)">Comment ça marche :</strong>
-        choisis un outil (Rectangle / Ellipse / Zone de texte), puis clique-glisse
-        sur la zone blanche pour dessiner une forme. En mode
-        <strong style="color:var(--tx)">Sélection</strong>, clique une forme pour
-        la sélectionner, glisse-la pour la déplacer, utilise les poignées roses
-        pour la redimensionner, ou double-clique une zone de texte pour écrire
-        dedans. <kbd>Suppr</kbd> efface la forme sélectionnée.
+      <div class="pl-stats" id="pl-stats"></div>
+
+      <div class="pl-legend" id="pl-legend">
+        <div class="pl-legend-head" onclick="plToggleLegend()">
+          <span>📖 Légende des fonctions</span><span id="pl-legend-arrow">▲</span>
+        </div>
+        <div class="pl-legend-body open" id="pl-legend-body"></div>
       </div>
 
-      <div class="mq-toolbar">
-        <div class="mq-group">
-          <label class="mq-group-label" for="mq-tool">Outil</label>
-          <select id="mq-tool">
-            <option value="select">↖ Sélection / Déplacement</option>
-            <option value="rect">▭ Rectangle</option>
-            <option value="ellipse">◯ Ellipse</option>
-            <option value="texte">🔤 Zone de texte</option>
-          </select>
-        </div>
-        <div class="mq-group">
-          <label class="mq-group-label" for="mq-bgcolor">Couleur de fond</label>
-          <input type="color" id="mq-bgcolor" value="#4f8ef7">
-        </div>
-        <div class="mq-group">
-          <label class="mq-group-label" for="mq-textcolor">Couleur du texte</label>
-          <input type="color" id="mq-textcolor" value="#181812">
-        </div>
-        <div class="mq-group">
-          <label class="mq-group-label" for="mq-fontsize">Taille police (px)</label>
-          <input type="number" id="mq-fontsize" value="16" min="8" max="96" step="1">
-        </div>
-        <div class="mq-group">
-          <label class="mq-group-label" for="mq-zoom">Zoom</label>
-          <select id="mq-zoom">
-            <option value="0.5">50 %</option>
-            <option value="0.75">75 %</option>
-            <option value="1" selected>100 %</option>
-            <option value="1.25">125 %</option>
-            <option value="1.5">150 %</option>
-          </select>
-        </div>
-        <div class="mq-group mq-actions">
-          <button class="mq-btn mq-btn-danger" id="mq-delete" data-tip="Suppr">🗑 Supprimer la sélection</button>
-          <button class="mq-btn mq-btn-danger" id="mq-clear">♻️ Effacer tout</button>
-          <button class="mq-btn mq-btn-primary" id="mq-export">🤖 Exporter pour IA</button>
-        </div>
+      <div class="pl-filters">
+        <input class="pl-search" id="pl-search" type="text" placeholder="🔍 Recherche…">
+        <select class="pl-select" id="pl-den"></select>
+        <select class="pl-select" id="pl-type"></select>
+        <button class="pl-btn" onclick="plOpenTypes()">⚙️ Fonctions</button>
+        <button class="pl-reset" onclick="plResetFilters()">✕ Reset</button>
+        <button class="pl-btn pl-btn-prim" id="pl-add" onclick="plOpenAddPost()">+ Ajouter un poste</button>
       </div>
 
-      <div class="mq-canvas-wrap">
-        <div class="mq-canvas" id="mq-canvas"></div>
+      <div class="pl-table-wrap">
+        <table class="pl-table">
+          <thead><tr>
+            <th>Code JS</th><th id="pl-newcols">Nouveau code</th><th>Dénomination</th><th>Nouveau nom</th>
+            <th>Fonction</th><th>Horaires</th><th>Description</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="pl-tbody"></tbody>
+        </table>
+        <div class="pl-empty" id="pl-empty" style="display:none">Aucun poste trouvé.</div>
       </div>
 
     </div>
   </main>
 
+</div>
+
+<!-- ═══ MODALES MÉTIER TCGE ═══ -->
+<div class="modal-ov" id="pl-post-ov">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title" id="pl-post-title">Modifier le poste</span><button class="modal-x" onclick="closeModal('pl-post-ov')">✕</button></div>
+    <div class="pl-form">
+      <div class="pl-row2">
+        <div><label class="pl-lab">Code JS (actuel)</label><input class="pl-inp" id="pf-js" placeholder="ex: M/STG*"></div>
+        <div><label class="pl-lab">Nouveau code</label><input class="pl-inp" id="pf-njs" placeholder="ex: R1"></div>
+      </div>
+      <div class="pl-row2">
+        <div><label class="pl-lab">Dénomination (actuelle)</label><input class="pl-inp" id="pf-den" placeholder="ex: Remiseur"></div>
+        <div><label class="pl-lab">Nouveau nom</label><input class="pl-inp" id="pf-nden" placeholder="ex: Agent de manœuvre"></div>
+      </div>
+      <div><label class="pl-lab">Fonction</label><select class="pl-inp" id="pf-type"></select></div>
+      <div class="pl-row2">
+        <div><label class="pl-lab">Prise de service</label><input class="pl-inp" id="pf-ps" placeholder="05:00"></div>
+        <div><label class="pl-lab">Fin de service</label><input class="pl-inp" id="pf-fs" placeholder="12:30"></div>
+      </div>
+      <div><label class="pl-lab">Description</label><textarea class="pl-inp pl-ta" id="pf-desc" placeholder="Rôle en quelques mots…"></textarea></div>
+    </div>
+    <div class="pl-foot">
+      <button class="pl-btn pl-btn-dngr" id="pf-del" onclick="plDeletePost()" style="margin-right:auto">🗑 Supprimer</button>
+      <button class="pl-btn" onclick="closeModal('pl-post-ov')">Annuler</button>
+      <button class="pl-btn pl-btn-prim" onclick="plSavePost()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="pl-leg-ov">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title" id="pl-leg-title">Modifier la légende</span><button class="modal-x" onclick="closeModal('pl-leg-ov')">✕</button></div>
+    <div class="pl-form">
+      <div><label class="pl-lab">Nom</label><input class="pl-inp" id="lf-name" placeholder="ex: Remiseur"></div>
+      <div><label class="pl-lab">Fonction</label><select class="pl-inp" id="lf-type"></select></div>
+      <div><label class="pl-lab">Description</label><textarea class="pl-inp pl-ta" id="lf-desc" placeholder="Explication du rôle…"></textarea></div>
+    </div>
+    <div class="pl-foot">
+      <button class="pl-btn pl-btn-dngr" id="lf-del" onclick="plDeleteLeg()" style="margin-right:auto">🗑 Supprimer</button>
+      <button class="pl-btn" onclick="closeModal('pl-leg-ov')">Annuler</button>
+      <button class="pl-btn pl-btn-prim" onclick="plSaveLeg()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="pl-types-ov">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">⚙️ Gérer les fonctions</span><button class="modal-x" onclick="closeModal('pl-types-ov')">✕</button></div>
+    <div id="pl-types-list"></div>
+    <button class="pl-btn pl-add-dashed" onclick="plOpenType(null)">＋ Ajouter une fonction</button>
+  </div>
+</div>
+
+<div class="modal-ov" id="pl-type-ov">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title" id="pl-type-title">Modifier la fonction</span><button class="modal-x" onclick="closeModal('pl-type-ov')">✕</button></div>
+    <div class="pl-form">
+      <div><label class="pl-lab">Libellé</label><input class="pl-inp" id="tf-label" placeholder="ex: Sécurité"></div>
+      <div><label class="pl-lab">Couleur du badge</label>
+        <div class="pl-color-row"><input type="color" class="pl-color" id="tf-color" value="#6366f1"><span class="pl-lab" id="tf-hex">#6366f1</span></div>
+      </div>
+    </div>
+    <div class="pl-foot">
+      <button class="pl-btn pl-btn-dngr" id="tf-del" onclick="plDeleteType()" style="margin-right:auto">🗑 Supprimer</button>
+      <button class="pl-btn" onclick="closeModal('pl-type-ov')">Annuler</button>
+      <button class="pl-btn pl-btn-prim" onclick="plSaveType()">💾 Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 <!-- BLOC-NOTES -->
@@ -779,31 +945,59 @@
 <!-- Input file caché — partagé entre les sessions d'import -->
 <input type="file" id="sv-file-inp" accept=".json" style="display:none">
 
-<!-- ═══════════════════════════════════════════════════════════════════
-     EXPORT POUR IA — capture d'écran de la maquette + prompt descriptif
-     ═══════════════════════════════════════════════════════════════════ -->
-<div class="modal-ov" id="mq-export-ov">
-  <div class="modal" style="max-width:680px;">
+<!-- ABOUT -->
+<div class="modal-ov" id="about-ov">
+  <div class="modal">
     <div class="modal-head">
-      <span class="modal-title">🤖 Export pour IA</span>
-      <button class="modal-x" onclick="closeModal('mq-export-ov')">✕</button>
+      <span class="modal-title">À propos</span>
+      <button class="modal-x" onclick="closeModal('about-ov')">✕</button>
     </div>
-    <div class="modal-body">
-      <div>
-        <div class="mq-export-label">Capture d'écran de la maquette</div>
-        <img class="mq-export-img" id="mq-export-img" alt="Capture de la maquette">
-        <a class="sv-btn" id="mq-export-dl" download="maquette.png">⬇️ Télécharger la capture (.png)</a>
+    <div class="about-tabs">
+      <button class="about-tab active" data-page="info" onclick="showAboutPage('info')">ℹ️ Infos</button>
+      <button class="about-tab"        data-page="log"  onclick="showAboutPage('log')">📋 Journal des mises à jour</button>
+    </div>
+    <div class="modal-body" id="about-page-info">
+      <div class="about-block">
+        <div class="about-block-title">L'application</div>
+        <div class="about-row"><span class="lbl">Nom</span>     <span class="val" id="ab-name"></span></div>
+        <div class="about-row"><span class="lbl">Version</span> <span class="val" id="ab-version"></span></div>
+        <div class="about-text" id="ab-desc" style="margin:.4rem 0"></div>
+        <a class="about-link" id="ab-url" href="#" target="_blank"></a>
       </div>
-      <div>
-        <div class="mq-export-label">Prompt généré pour l'IA</div>
-        <textarea class="mq-export-ta" id="mq-export-prompt" readonly></textarea>
-        <button class="sv-btn sv-prim" id="mq-export-copy" style="margin-top:.65rem;">📋 Copier le prompt</button>
+      <div class="about-block">
+        <div class="about-block-title">HiveOS</div>
+        <div class="about-text">
+          HiveOS est un système d'interface développé par Hive (Quentin).<br>
+          Toutes les apps sur <a class="about-link" href="https://hivetools.netlify.app" target="_blank">hivetools.netlify.app</a><br>
+          Aucun compte requis. Vos données restent sur votre appareil.
+        </div>
+      </div>
+    </div>
+    <div class="modal-body" id="about-page-log" style="display:none;">
+      <div id="about-changelog-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VISITE GUIDÉE -->
+<div class="tour-ov" id="tour-ov">
+  <div class="tour-bg"  id="tour-bg"></div>
+  <div class="tour-hl"  id="tour-hl"></div>
+  <div class="tour-card" id="tour-card">
+    <div class="tour-eye"   id="tour-eye"></div>
+    <div class="tour-title" id="tour-title"></div>
+    <div class="tour-text"  id="tour-text"></div>
+    <div class="tour-nav">
+      <div class="tour-dots" id="tour-dots"></div>
+      <div class="tour-btns">
+        <button class="tour-btn" id="tour-prev" onclick="tNav(-1)">←</button>
+        <button class="tour-btn primary" id="tour-next" onclick="tNav(1)">Suivant →</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MENU SECRET (Ctrl+Shift+D) -->
+<!-- MENU SECRET (Ctrl+Shift+D ou appui long 3s sur logo) -->
 <div class="secret-ov" id="secret-ov">
   <div class="secret-modal">
     <div class="secret-head">
@@ -846,35 +1040,114 @@
   </div>
 </div>
 
-<!-- Librairie de capture d'écran pour l'export IA -->
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
 <script>
 
 /* ════════════════════════════════════════════════════════════════════════
    SEED APP — Modifier pour chaque application
 ════════════════════════════════════════════════════════════════════════ */
 const APP = {
-  name:        "Maquette → Prompt IA",
+  name:        "Postes Logistique TCGE",
   version:     "v1.0",
-  description: "Dessine une maquette de page (rectangles, ellipses, zones de texte), puis exporte une capture d'écran et un prompt descriptif prêts à coller dans une IA de codage.",
+  description: "Référentiel des postes du service logistique TCGE : codes, fonctions, horaires, et refonte de nomenclature (ancien → nouveau).",
   author:      "HiveOS — Hive (Quentin)",
-  url:         "https://hivetools.netlify.app"
+  url:         "https://hivetools.netlify.app",
+  mailto:      "quentin.broll@sncf.fr"
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   SEED DATA — Données initiales (remplacer le contenu)
-   /SEED_START/
-   const DATA = [];
-   /SEED_END/
+   SEED DATA — Données initiales TCGE.
+   Le bloc entre /SEED_START/ et /SEED_END/ est réécrit par « Télécharger HTML ».
 ════════════════════════════════════════════════════════════════════════ */
+/SEED_START/
+const SAVED_DATA = {
+  types: [
+    {"id":1,"key":"manoeuvre","label":"Manœuvre","color":"#3b82f6"},
+    {"id":2,"key":"coordination","label":"Coordination","color":"#16a34a"},
+    {"id":3,"key":"encadrement","label":"Management","color":"#ff00ff"},
+    {"id":4,"key":"technique","label":"Autre","color":"#155e75"},
+    {"id":5,"key":"renfort","label":"Renfort","color":"#f59e0b"},
+    {"id":6,"key":"inconnu","label":"Inconnu","color":"#888888"}
+  ],
+  posts: [
+    {"id":1,"js":"M","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"05:00","fs":"12:30","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":2,"js":"M/STG*","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"05:00","fs":"12:30","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":3,"js":"MASUPG","njs":"","den":"GEOPS","nden":"","type":"coordination","ps":"06:00","fs":"13:02","desc":"Gestionnaire Opérateur de Site — coordonne sorties et manœuvres"},
+    {"id":4,"js":"m111","njs":"","den":"CMV","nden":"","type":"coordination","ps":"06:30","fs":"14:32","desc":"Coordinateur Mouvement — donne les ordres de manœuvre aux remiseurs"},
+    {"id":5,"js":"p251","njs":"","den":"Renfort journée","nden":"","type":"renfort","ps":"07:00","fs":"14:45","desc":"Renfort opérationnel en journée"},
+    {"id":6,"js":"p214","njs":"","den":"Renfort journée","nden":"","type":"renfort","ps":"07:00","fs":"14:45","desc":"Renfort opérationnel en journée"},
+    {"id":7,"js":"*501","njs":"","den":"BG jour","nden":"","type":"technique","ps":"07:00","fs":"14:45","desc":"Bon Graphique — pose, retrait et remplacement des enregistreurs de bord"},
+    {"id":8,"js":"SUD7","njs":"","den":"Dispo","nden":"","type":"renfort","ps":"07:00","fs":"14:45","desc":"Renfort polyvalent ou mission journalière"},
+    {"id":9,"js":"n200","njs":"","den":"ADPX","nden":"","type":"encadrement","ps":"07:18","fs":"16:18","desc":"Adjoint du Dirigeant de Proximité"},
+    {"id":10,"js":"o600","njs":"","den":"Formateur","nden":"","type":"inconnu","ps":"07:45","fs":"16:30","desc":"?"},
+    {"id":11,"js":"X100","njs":"","den":"DPX","nden":"","type":"encadrement","ps":"07:45","fs":"16:30","desc":"Dirigeant de Proximité — responsable et encadrant de l'équipe terrain"},
+    {"id":12,"js":"p700","njs":"","den":"BHM","nden":"","type":"manoeuvre","ps":"08:00","fs":"15:45","desc":"Ravitaillement des engins sur le site de Bischheim"},
+    {"id":13,"js":"p250","njs":"","den":"Titulaire station 50","nden":"","type":"technique","ps":"08:00","fs":"15:45","desc":"Ravitaillement complet — carburant, eau, sable, huile, WC"},
+    {"id":14,"js":"SUD8","njs":"","den":"Dispo","nden":"","type":"renfort","ps":"08:00","fs":"15:45","desc":"Renfort polyvalent ou mission journalière"},
+    {"id":15,"js":"FOR","njs":"","den":"Formation","nden":"","type":"inconnu","ps":"08:00","fs":"15:45","desc":"Formation"},
+    {"id":16,"js":"REF/LOG","njs":"","den":"Référent logistique","nden":"","type":"encadrement","ps":"08:00","fs":"15:45","desc":"Contrôle terrain des bonnes pratiques métier + suivi de formation"},
+    {"id":17,"js":"SUD","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"08:00","fs":"15:45","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":18,"js":"S","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"12:30","fs":"20:36","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":19,"js":"S/STG*","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"12:30","fs":"20:36","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":20,"js":"SOSUPG","njs":"","den":"GEOPS","nden":"","type":"coordination","ps":"13:00","fs":"21:32","desc":"Gestionnaire Opérateur de Site — coordonne sorties et manœuvres"},
+    {"id":21,"js":"m112","njs":"","den":"CMV","nden":"","type":"coordination","ps":"14:30","fs":"22:32","desc":"Coordinateur Mouvement — donne les ordres de manœuvre aux remiseurs"},
+    {"id":22,"js":"p215","njs":"","den":"Renfort après-midi","nden":"","type":"renfort","ps":"14:45","fs":"22:30","desc":"Renfort opérationnel en après-midi"},
+    {"id":23,"js":"p216","njs":"","den":"Renfort après-midi","nden":"","type":"renfort","ps":"14:45","fs":"22:30","desc":"Renfort opérationnel en après-midi"},
+    {"id":24,"js":"N","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"20:30","fs":"05:00","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":25,"js":"N/STG*","njs":"","den":"Remiseur","nden":"","type":"manoeuvre","ps":"20:30","fs":"05:00","desc":"Manœuvres, ravitaillement et déplacement des engins sur le parc"},
+    {"id":26,"js":"N/BGATE","njs":"","den":"BG nuit","nden":"","type":"technique","ps":"20:30","fs":"04:32","desc":"Bon Graphique nuit — pose, retrait et remplacement des enregistreurs de bord"},
+    {"id":27,"js":"NUSUPG","njs":"","den":"GEOPS","nden":"","type":"coordination","ps":"21:30","fs":"06:02","desc":"Gestionnaire Opérateur de Site — coordonne sorties et manœuvres"},
+    {"id":28,"js":"m113","njs":"","den":"CMV","nden":"","type":"coordination","ps":"22:30","fs":"06:32","desc":"Coordinateur Mouvement — donne les ordres de manœuvre aux remiseurs"},
+    {"id":29,"js":"Renf nuit","njs":"","den":"Renfort nuit","nden":"","type":"renfort","ps":"22:15","fs":"06:00","desc":"Renfort opérationnel en nuit"}
+  ],
+  legend: [
+    {"id":1,"type":"encadrement","name":"DPX","desc":"Dirigeant de Proximité — responsable de l'équipe terrain."},
+    {"id":2,"type":"encadrement","name":"ADPX","desc":"Adjoint DPX — assiste le Dirigeant de Proximité."},
+    {"id":3,"type":"encadrement","name":"Référent logistique","desc":"Contrôle des bonnes pratiques métier et suivi de formation des agents."},
+    {"id":4,"type":"coordination","name":"GEOPS (R 3x8)","desc":"Gestionnaire Opérateur de Site — coordonne les sorties et manœuvres, interface avec les autres services."},
+    {"id":5,"type":"coordination","name":"CMV (R 3x8)","desc":"Coordinateur Mouvement — donne les ordres de manœuvre aux remiseurs en temps réel."},
+    {"id":6,"type":"technique","name":"BG (N)","desc":"Gestion des K7 (enregistreurs de bord)."},
+    {"id":7,"type":"manoeuvre","name":"Remiseur (R 3x8)","desc":"Manœuvres des engins, ravitaillement et déplacements. Noms historiques : gareur / sud."},
+    {"id":8,"type":"manoeuvre","name":"Remiseur renfort (R 3x8)","desc":"Renfort opérationnel (journée / après-midi / nuit) ou dispo polyvalente — couvre les aléas et remplace au pied levé."},
+    {"id":9,"type":"manoeuvre","name":"Pompiste 50","desc":"Ravitaillement complet en station : carburant, eau, sable, huile, WC."},
+    {"id":10,"type":"manoeuvre","name":"BHM","desc":"Ravitaillement des engins sur le site de Bischheim."}
+  ]
+};
+/SEED_END/
 
-/* État de la maquette (formes dessinées par l'utilisateur) */
-let shapes      = [];    // tableau des formes : {id,type,x,y,width,height,bgColor,textColor,fontSize,text}
-let nextId      = 1;     // prochain identifiant de forme
-let selectedId  = null;  // id de la forme actuellement sélectionnée
-let currentTool = 'select'; // outil actif : select | rect | ellipse | texte
-let currentZoom = 1;        // niveau de zoom de la zone de travail
+/* ════════════════════════════════════════════════════════════════════════
+   SEED TOUR — Étapes de visite spécifiques à l'app
+   /SEED_TOUR_START/
+   const TOUR_APP = [
+     { target:'#mon-element', eye:'Étape X', title:'Titre', text:'Explication', position:'bottom' },
+   ];
+   /SEED_TOUR_END/
+════════════════════════════════════════════════════════════════════════ */
+const TOUR_APP = [
+  { target:'#pl-search',   eye:'Recherche', title:'Rechercher un poste', text:"Filtre par code, nom, nouveau nom ou description.", position:'bottom' },
+  { target:'#pl-add',      eye:'Ajouter',   title:'Ajouter un poste',    text:"Renseigne l'ancien et le nouveau code/nom proposés.", position:'bottom' },
+  { target:'#pl-newcols',  eye:'Refonte',   title:'Ancien → Nouveau',    text:"Les colonnes en couleur portent la nouvelle nomenclature proposée à ton chef.", position:'bottom' },
+  { target:'#pl-legend',   eye:'Légende',   title:'Fonctions & rôles',   text:"La description de chaque fonction — c'est là que se joue la perception des rôles (Dispo / Renfort).", position:'top' },
+];
+
+/* ════════════════════════════════════════════════════════════════════════
+   SEED CHANGELOG — Journal des mises à jour (visible dans À propos)
+   Ajouter une nouvelle entrée EN HAUT du tableau à chaque nouvelle version.
+   /SEED_CHANGELOG_START/
+   const CHANGELOG = [
+     { version:'v1.0', date:'13/06/2026', changes:[
+       "Version initiale de l'application.",
+     ]},
+   ];
+   /SEED_CHANGELOG_END/
+════════════════════════════════════════════════════════════════════════ */
+const CHANGELOG = [
+  { version:'v1.0', date:'15/06/2026', changes:[
+    "Portage sur le framework HiveOS Pro (header, thèmes, sauvegarde, bloc-notes, visite guidée).",
+    "Référentiel des postes TCGE : code JS, fonction, horaires, description.",
+    "Refonte de nomenclature : colonnes « Nouveau code » et « Nouveau nom » (ancien → nouveau).",
+    "Bloc-notes : envoi configuré vers quentin.broll@sncf.fr.",
+  ]},
+];
 
 /* ════════════════════════════════════════════════════════════════════════
    UTILITAIRES
@@ -925,6 +1198,7 @@ function toggleDayNight() {
   applyTheme();
 }
 function toggleThemeMenu() { $('theme-menu').classList.toggle('open'); }
+function toggleFam(id)     { $('fam-'+id).classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!e.target.closest('.theme-wrap')) $('theme-menu').classList.remove('open');
 });
@@ -1021,7 +1295,8 @@ $('np-close-btn').addEventListener('touchend',e => { e.stopPropagation(); e.prev
 $('np-copy-btn').addEventListener('click', () => copyText($('np-ta').value, $('np-copy-btn'), '✓ Copié'));
 $('np-send-btn').addEventListener('click', () => {
   const t = $('np-ta').value.trim(); if (!t) return;
-  window.location.href = `mailto:systemhiveos@gmail.com?subject=${encodeURIComponent(`[${APP.name} ${APP.version}] — Notes & Retours`)}&body=${encodeURIComponent(t)}`;
+  const to = APP.mailto || 'systemhiveos@gmail.com';
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(`[${APP.name} ${APP.version}] — Notes & Retours`)}&body=${encodeURIComponent(t)}`;
 });
 $('np-improve-toggle').addEventListener('click', () => {
   $('np-improve-menu').classList.toggle('show');
@@ -1106,17 +1381,172 @@ $('np-ta').addEventListener('input', () => localStorage.setItem(NP_KEY, $('np-ta
    ─ setAppState() doit mettre à jour l'affichage.
    ─ La persistance localStorage est gérée par les fonctions ci-dessous.
 ════════════════════════════════════════════════════════════════════════ */
-/* Sauvegarde : on stocke la liste des formes + le compteur d'identifiants */
+/* ════════════════════════════════════════════════════════════════════════
+   MÉTIER TCGE — état, rendu, CRUD  (branché sur getAppState/setAppState)
+════════════════════════════════════════════════════════════════════════ */
+let plPosts  = JSON.parse(JSON.stringify(SAVED_DATA.posts));
+let plLegend = JSON.parse(JSON.stringify(SAVED_DATA.legend));
+let plTypes  = JSON.parse(JSON.stringify(SAVED_DATA.types));
+let plEditPost = null, plEditLeg = null, plEditType = null;
+
 function getAppState() {
-  return { shapes: shapes, nextId: nextId };
+  return JSON.parse(JSON.stringify({ posts:plPosts, legend:plLegend, types:plTypes }));
 }
 function setAppState(s) {
-  shapes     = (s && Array.isArray(s.shapes)) ? s.shapes : [];
-  nextId     = (s && typeof s.nextId === 'number') ? s.nextId : (shapes.reduce((m,e)=>Math.max(m,e.id||0),0) + 1);
-  selectedId = null;
-  renderShapes();
-  renderLayers();
+  s = s || {};
+  plPosts  = Array.isArray(s.posts)  ? s.posts  : JSON.parse(JSON.stringify(SAVED_DATA.posts));
+  plLegend = Array.isArray(s.legend) ? s.legend : JSON.parse(JSON.stringify(SAVED_DATA.legend));
+  plTypes  = Array.isArray(s.types)  ? s.types  : JSON.parse(JSON.stringify(SAVED_DATA.types));
+  plRenderAll();
 }
+function plPersist() { localStorage.setItem('app_data_state', JSON.stringify(getAppState())); }
+
+/* — Helpers — */
+const plEsc   = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plGetT  = k => plTypes.find(t => t.key === k) || { key:k, label:k, color:'#888' };
+const plColor = k => plGetT(k).color;
+const plLabel = k => plGetT(k).label;
+const plNextId = arr => Math.max(0, ...arr.map(x => x.id)) + 1;
+function plTypeSelect(elId, cur) {
+  $(elId).innerHTML = plTypes.map(t => `<option value="${t.key}"${t.key===cur?' selected':''}>${plEsc(t.label)}</option>`).join('');
+}
+
+/* — Rendu — */
+function plRenderStats() {
+  const c = {}; plPosts.forEach(p => c[p.type] = (c[p.type]||0)+1);
+  $('pl-stats').innerHTML = Object.entries(c).map(([k,n]) =>
+    `<div class="pl-chip"><span class="pl-dot" style="background:${plColor(k)}"></span>${plEsc(plLabel(k))} · ${n}</div>`).join('');
+}
+function plRenderLegend() {
+  $('pl-legend-body').innerHTML = plLegend.map(l => `
+    <div class="pl-leg-item">
+      <span class="pl-leg-color" style="background:${plColor(l.type)}"></span>
+      <div class="pl-leg-info"><div class="pl-leg-name">${plEsc(l.name)}</div><div class="pl-leg-desc">${plEsc(l.desc)}</div></div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="pl-rbtn edit" onclick="plOpenEditLeg(${l.id});event.stopPropagation()">✏️</button>
+        <button class="pl-rbtn del" onclick="plDeleteLegQuick(${l.id});event.stopPropagation()">🗑</button>
+      </div>
+    </div>`).join('') + `<button class="pl-leg-add" onclick="plOpenAddLeg()">＋ Ajouter une entrée</button>`;
+}
+function plRenderDen() {
+  const sel = $('pl-den'), cur = sel.value;
+  const u = [...new Set(plPosts.map(p => p.den))].sort();
+  sel.innerHTML = `<option value="">— Tous les postes —</option>` + u.map(d => `<option value="${plEsc(d)}"${d===cur?' selected':''}>${plEsc(d)}</option>`).join('');
+}
+function plRenderType() {
+  const sel = $('pl-type'), cur = sel.value;
+  sel.innerHTML = `<option value="">— Toutes les fonctions —</option>` + plTypes.map(t => `<option value="${t.key}"${t.key===cur?' selected':''}>${plEsc(t.label)}</option>`).join('');
+}
+function plRenderTable() {
+  const srch = $('pl-search').value.toLowerCase().trim();
+  const den = $('pl-den').value, typ = $('pl-type').value;
+  const rows = plPosts.filter(p =>
+    (!den || p.den === den) && (!typ || p.type === typ) &&
+    (!srch || [p.js, p.njs||'', p.den, p.nden||'', p.desc||'', plLabel(p.type)].some(s => String(s).toLowerCase().includes(srch))));
+  const tb = $('pl-tbody'), em = $('pl-empty');
+  if (!rows.length) { tb.innerHTML=''; em.style.display='block'; return; }
+  em.style.display='none';
+  tb.innerHTML = rows.map(p => `
+    <tr data-id="${p.id}"${den && p.den===den?' class="sel"':''}>
+      <td class="pl-code">${plEsc(p.js)}</td>
+      <td class="pl-new pl-code">${plEsc(p.njs)}</td>
+      <td class="pl-den">${plEsc(p.den)}</td>
+      <td class="pl-new pl-den">${plEsc(p.nden)}</td>
+      <td><span class="pl-badge" style="background:${plColor(p.type)}">${plEsc(plLabel(p.type))}</span></td>
+      <td class="pl-time">${plEsc(p.ps)} → ${plEsc(p.fs)}</td>
+      <td class="pl-desc">${plEsc(p.desc)||'—'}</td>
+      <td style="white-space:nowrap">
+        <button class="pl-rbtn edit" onclick="plOpenEditPost(${p.id});event.stopPropagation()">✏️</button>
+        <button class="pl-rbtn del" onclick="plDeletePostQuick(${p.id});event.stopPropagation()">🗑</button>
+      </td>
+    </tr>`).join('');
+  tb.querySelectorAll('tr').forEach(tr => tr.addEventListener('click', () => {
+    const p = plPosts.find(x => x.id === +tr.dataset.id); if (!p) return;
+    const s = $('pl-den'); s.value = (s.value === p.den) ? '' : p.den; plRenderTable();
+  }));
+}
+function plRenderAll() { plRenderStats(); plRenderLegend(); plRenderDen(); plRenderType(); plRenderTable(); }
+function plResetFilters() { ['pl-search','pl-den','pl-type'].forEach(id => $(id).value=''); plSyncNav(''); plRenderTable(); }
+function plToggleLegend() { const b=$('pl-legend-body'), a=$('pl-legend-arrow'); b.classList.toggle('open'); a.textContent=b.classList.contains('open')?'▲':'▼'; }
+function plNav(type) { $('pl-type').value = type; plSyncNav(type); plRenderTable(); if(window.innerWidth<=768 && typeof mobileOpen!=='undefined'){ mobileOpen=false; applySidebar(); } }
+function plSyncNav(type) {
+  document.querySelectorAll('#sidebar-content .sidebar-item').forEach(it => it.classList.remove('active'));
+  const map = { '':'nav-all' };
+  const id = map[type];
+  if (id) { const el=$(id); if(el) el.classList.add('active'); }
+  else { document.querySelectorAll('#sidebar-content .sidebar-item').forEach(it => { if(it.getAttribute('onclick')===`plNav('${type}')`) it.classList.add('active'); }); }
+}
+
+/* — CRUD postes — */
+function plOpenAddPost() {
+  plEditPost = null; $('pl-post-title').textContent='Ajouter un poste'; $('pf-del').style.display='none';
+  ['pf-js','pf-njs','pf-den','pf-nden','pf-ps','pf-fs','pf-desc'].forEach(id => $(id).value='');
+  plTypeSelect('pf-type', plTypes[0]?.key||''); openModal('pl-post-ov');
+}
+function plOpenEditPost(id) {
+  const p = plPosts.find(x=>x.id===id); if(!p) return; plEditPost=id;
+  $('pl-post-title').textContent='Modifier le poste'; $('pf-del').style.display='block';
+  $('pf-js').value=p.js; $('pf-njs').value=p.njs||''; $('pf-den').value=p.den; $('pf-nden').value=p.nden||'';
+  $('pf-ps').value=p.ps; $('pf-fs').value=p.fs; $('pf-desc').value=p.desc||''; plTypeSelect('pf-type', p.type);
+  openModal('pl-post-ov');
+}
+function plSavePost() {
+  const js=$('pf-js').value.trim(), den=$('pf-den').value.trim();
+  if(!js||!den){ alert('Code JS et dénomination requis'); return; }
+  const o={ js, njs:$('pf-njs').value.trim(), den, nden:$('pf-nden').value.trim(), type:$('pf-type').value, ps:$('pf-ps').value.trim(), fs:$('pf-fs').value.trim(), desc:$('pf-desc').value.trim() };
+  if(plEditPost!==null){ const i=plPosts.findIndex(x=>x.id===plEditPost); if(i>-1) plPosts[i]={...plPosts[i],...o}; }
+  else plPosts.push({ id:plNextId(plPosts), ...o });
+  plPersist(); plRenderAll(); closeModal('pl-post-ov');
+}
+function plDeletePost() { if(!confirm('Supprimer ce poste ?'))return; plPosts=plPosts.filter(x=>x.id!==plEditPost); plPersist(); plRenderAll(); closeModal('pl-post-ov'); }
+function plDeletePostQuick(id) { if(!confirm('Supprimer ce poste ?'))return; plPosts=plPosts.filter(x=>x.id!==id); plPersist(); plRenderAll(); }
+
+/* — CRUD légende — */
+function plOpenAddLeg() { plEditLeg=null; $('pl-leg-title').textContent='Ajouter à la légende'; $('lf-del').style.display='none'; $('lf-name').value=''; $('lf-desc').value=''; plTypeSelect('lf-type', plTypes[0]?.key||''); openModal('pl-leg-ov'); }
+function plOpenEditLeg(id) { const l=plLegend.find(x=>x.id===id); if(!l)return; plEditLeg=id; $('pl-leg-title').textContent='Modifier la légende'; $('lf-del').style.display='block'; $('lf-name').value=l.name; $('lf-desc').value=l.desc; plTypeSelect('lf-type', l.type); openModal('pl-leg-ov'); }
+function plSaveLeg() {
+  const name=$('lf-name').value.trim(); if(!name){ alert('Nom requis'); return; }
+  const o={ name, type:$('lf-type').value, desc:$('lf-desc').value.trim() };
+  if(plEditLeg!==null){ const i=plLegend.findIndex(x=>x.id===plEditLeg); if(i>-1) plLegend[i]={...plLegend[i],...o}; }
+  else plLegend.push({ id:plNextId(plLegend), ...o });
+  plPersist(); plRenderAll(); closeModal('pl-leg-ov');
+}
+function plDeleteLeg() { if(!confirm('Supprimer cette entrée ?'))return; plLegend=plLegend.filter(x=>x.id!==plEditLeg); plPersist(); plRenderAll(); closeModal('pl-leg-ov'); }
+function plDeleteLegQuick(id) { if(!confirm('Supprimer cette entrée ?'))return; plLegend=plLegend.filter(x=>x.id!==id); plPersist(); plRenderAll(); }
+
+/* — CRUD fonctions (types) — */
+function plOpenTypes() { plRenderTypesList(); openModal('pl-types-ov'); }
+function plRenderTypesList() {
+  $('pl-types-list').innerHTML = plTypes.map(t => `
+    <div class="pl-type-item">
+      <span class="pl-sw" style="background:${t.color}"></span>
+      <div style="flex:1"><div style="font-size:.78rem;font-weight:600;color:var(--tx)">${plEsc(t.label)}</div><div style="font-size:.6rem;color:var(--tx2)">${plEsc(t.key)}</div></div>
+      <button class="pl-rbtn edit" onclick="plOpenType(${t.id})">✏️</button>
+      <button class="pl-rbtn del" onclick="plDeleteTypeQuick(${t.id})">🗑</button>
+    </div>`).join('');
+}
+function plOpenType(id) {
+  plEditType=id; const t=id?plTypes.find(x=>x.id===id):null;
+  $('pl-type-title').textContent=t?'Modifier la fonction':'Ajouter une fonction'; $('tf-del').style.display=t?'block':'none';
+  $('tf-label').value=t?t.label:''; const col=t?t.color:'#6366f1'; $('tf-color').value=col; $('tf-hex').textContent=col;
+  openModal('pl-type-ov');
+}
+function plSaveType() {
+  const label=$('tf-label').value.trim(); if(!label){ alert('Libellé requis'); return; }
+  const color=$('tf-color').value;
+  if(plEditType){ const i=plTypes.findIndex(x=>x.id===plEditType); if(i>-1) plTypes[i]={...plTypes[i],label,color}; }
+  else { const key=label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_'); plTypes.push({ id:plNextId(plTypes), key, label, color }); }
+  plPersist(); plRenderAll(); plRenderTypesList(); closeModal('pl-type-ov');
+}
+function plDeleteType() { if(!confirm('Supprimer cette fonction ?'))return; plTypes=plTypes.filter(x=>x.id!==plEditType); plPersist(); plRenderAll(); plRenderTypesList(); closeModal('pl-type-ov'); }
+function plDeleteTypeQuick(id) { if(!confirm('Supprimer cette fonction ?'))return; plTypes=plTypes.filter(x=>x.id!==id); plPersist(); plRenderAll(); plRenderTypesList(); }
+
+/* — Listeners + rendu initial — */
+$('pl-search').addEventListener('input', plRenderTable);
+$('pl-den').addEventListener('change', plRenderTable);
+$('pl-type').addEventListener('change', plRenderTable);
+$('tf-color').addEventListener('input', function(){ $('tf-hex').textContent=this.value; });
+plRenderAll();
 
 let svImportData = null;
 
@@ -1257,7 +1687,155 @@ function buildSvReset(p) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   MENU SECRET — Ctrl+Shift+D
+   ABOUT (clic simple sur logo)
+════════════════════════════════════════════════════════════════════════ */
+function openAbout() {
+  $('ab-name').textContent    = APP.name;
+  $('ab-version').textContent = APP.version;
+  $('ab-desc').textContent    = APP.description;
+  $('ab-url').textContent     = APP.url;
+  $('ab-url').href            = APP.url;
+  renderChangelog();
+  showAboutPage('info');
+  openModal('about-ov');
+}
+
+/* Bascule entre la page Infos et le Journal des mises à jour */
+function showAboutPage(page) {
+  $('about-page-info').style.display = page === 'info' ? '' : 'none';
+  $('about-page-log').style.display  = page === 'log'  ? '' : 'none';
+  document.querySelectorAll('.about-tab').forEach(t => t.classList.toggle('active', t.dataset.page === page));
+}
+
+/* Construit la liste du journal des mises à jour depuis CHANGELOG */
+function renderChangelog() {
+  const el = $('about-changelog-list');
+  if (!CHANGELOG.length) { el.innerHTML = '<p class="cl-empty">Aucune entrée pour le moment.</p>'; return; }
+  el.innerHTML = CHANGELOG.map(e => `
+    <div class="cl-entry">
+      <div class="cl-head">
+        <span class="cl-version">${e.version}</span>
+        <span class="cl-date">${e.date}</span>
+      </div>
+      <ul class="cl-changes">${e.changes.map(c => `<li>${c}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   LOGO — clic simple = About / appui long 3s = Menu secret
+════════════════════════════════════════════════════════════════════════ */
+let logoTimer=null, logoTriggered=false;
+
+function logoStart() {
+  logoTriggered = false;
+  $('hive-logo-wrap').style.opacity = '.6';
+  logoTimer = setTimeout(() => {
+    logoTriggered = true;
+    $('hive-logo-wrap').style.opacity = '';
+    openSecret();
+  }, 3000);
+}
+function logoEnd() {
+  clearTimeout(logoTimer);
+  $('hive-logo-wrap').style.opacity = '';
+  if (!logoTriggered) openAbout();
+  logoTriggered = false;
+}
+function logoCancel() {
+  clearTimeout(logoTimer);
+  $('hive-logo-wrap').style.opacity = '';
+  logoTriggered = false;
+}
+
+$('hive-logo-wrap').addEventListener('mousedown',   () => logoStart());
+$('hive-logo-wrap').addEventListener('mouseup',     () => logoEnd());
+$('hive-logo-wrap').addEventListener('mouseleave',  () => logoCancel());
+$('hive-logo-wrap').addEventListener('touchstart',  () => logoStart(), {passive:true});
+$('hive-logo-wrap').addEventListener('touchend',    e  => { e.preventDefault(); logoEnd(); });
+$('hive-logo-wrap').addEventListener('touchcancel', () => logoCancel());
+
+/* ════════════════════════════════════════════════════════════════════════
+   VISITE GUIDÉE
+════════════════════════════════════════════════════════════════════════ */
+const TOUR_SYSTEM = [
+  { target:null,
+    eye:'Bienvenue',
+    title:`Bienvenue dans ${APP.name} 👋`,
+    text:APP.description },
+  { target:'#hive-logo-wrap',
+    eye:'Étape 1/6',
+    title:'Le logo HiveOS',
+    text:'Appuie sur le logo pour ouvrir une fenêtre d\'explication du logiciel.' },
+  { target:'#btn-notepad',
+    eye:'Étape 2/6',
+    title:'📝 Bloc-notes',
+    text:'Enregistre tes notes perso. Améliore avec l\'IA directement dans le bloc-notes, transforme-les en prompt ou remonte directement les améliorations, ajouts ou bugs de l\'application au développeur — le tout en un seul clic.' },
+  { target:'#btn-theme',
+    eye:'Étape 3/6',
+    title:'🎨 Thème',
+    text:'Plusieurs thèmes possibles car un environnement qui donne envie est un environnement productif.' },
+  { target:'#btn-daynight',
+    eye:'Étape 4/6',
+    title:'☀️/🌙 Jour / Nuit',
+    text:'Bascule entre mode sombre et mode clair, dans l\'identité visuelle du thème actif.' },
+  { target:'#btn-save',
+    eye:'Étape 5/6',
+    title:'💾 Sauvegarde',
+    text:'Exportez, importez, partagez par URL ou réinitialisez vos données.' },
+  { target:'#btn-help',
+    eye:'Étape 6/6',
+    title:'❓ Aide',
+    text:'Cliquez ici à tout moment pour revoir cette présentation depuis le début.' },
+  ...TOUR_APP
+];
+let tourIdx = 0;
+
+function startTour() { tourIdx=0; renderTour(); $('tour-ov').classList.add('open'); }
+function closeTour() { $('tour-ov').classList.remove('open'); $('tour-hl').style.display='none'; localStorage.setItem('hiveos_tour_done','true'); }
+
+$('tour-bg').addEventListener('click', () => tNav(1));
+document.addEventListener('keydown', e => {
+  if (!$('tour-ov').classList.contains('open')) return;
+  if (e.key==='Escape')     { closeTour(); return; }
+  if (e.key==='ArrowLeft')  { tNav(-1);   return; }
+  tNav(1);
+});
+
+function tNav(dir) {
+  if (dir===-1) { tourIdx=Math.max(0,tourIdx-1); renderTour(); return; }
+  if (tourIdx>=TOUR_SYSTEM.length-1) { closeTour(); return; }
+  tourIdx++; renderTour();
+}
+
+function renderTour() {
+  const s = TOUR_SYSTEM[tourIdx];
+  $('tour-eye').textContent   = s.eye   || '';
+  $('tour-title').textContent = s.title || '';
+  $('tour-text').textContent  = s.text  || '';
+  $('tour-prev').style.visibility = tourIdx===0 ? 'hidden' : 'visible';
+  $('tour-next').textContent = tourIdx===TOUR_SYSTEM.length-1 ? 'Terminer ✓' : 'Suivant →';
+
+  const dots=$('tour-dots'); dots.innerHTML='';
+  TOUR_SYSTEM.forEach((_,i)=>{ const d=document.createElement('div'); d.className='tour-dot'+(i===tourIdx?' on':''); dots.appendChild(d); });
+
+  const hl=$('tour-hl'), bg=$('tour-bg');
+  if (s.target) {
+    const el=document.querySelector(s.target);
+    if (el) {
+      const r=el.getBoundingClientRect();
+      hl.style.top=    (r.top-5)    +'px';
+      hl.style.left=   (r.left-5)   +'px';
+      hl.style.width=  (r.width+10) +'px';
+      hl.style.height= (r.height+10)+'px';
+      hl.style.display='block';
+      bg.classList.remove('no-target');
+    } else { hl.style.display='none'; bg.classList.add('no-target'); }
+  } else { hl.style.display='none'; bg.classList.add('no-target'); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MENU SECRET — Ctrl+Shift+D ou appui long 3s sur le logo
 ════════════════════════════════════════════════════════════════════════ */
 function openSecret()     { $('timelog-ta').value=localStorage.getItem('hiveos_timelog')||''; $('secret-ov').classList.add('open'); updateLogTotal(); }
 function closeSecret()    { $('secret-ov').classList.remove('open'); }
@@ -1361,376 +1939,6 @@ async function downloadHTML() {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   APPLICATION — MAQUETTE → PROMPT IA
-   Dessin, sélection, déplacement, redimensionnement des formes,
-   panneau "Éléments de la maquette" et export pour IA (capture + prompt)
-════════════════════════════════════════════════════════════════════════ */
-const mqCanvas = $('mq-canvas');
-
-/* ── Outil actif ────────────────────────────────────────────────────── */
-$('mq-tool').addEventListener('change', () => {
-  currentTool = $('mq-tool').value;
-  mqCanvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
-});
-
-/* ── Zoom de la zone de travail ─────────────────────────────────────── */
-function applyZoom() {
-  currentZoom = parseFloat($('mq-zoom').value);
-  mqCanvas.style.transform = `scale(${currentZoom})`;
-}
-$('mq-zoom').addEventListener('change', applyZoom);
-
-/* ── Création d'une forme à partir des réglages courants de la barre d'outils ── */
-function createShape(type, x, y, w, h) {
-  const shape = {
-    id: nextId++,
-    type,
-    x: Math.round(x),
-    y: Math.round(y),
-    width:  Math.max(20, Math.round(w)),
-    height: Math.max(20, Math.round(h)),
-    bgColor:   type === 'texte' ? 'transparent' : $('mq-bgcolor').value,
-    textColor: $('mq-textcolor').value,
-    fontSize:  parseInt($('mq-fontsize').value, 10) || 16,
-    text:      type === 'texte' ? 'Texte' : ''
-  };
-  shapes.push(shape);
-  return shape;
-}
-
-/* ── Adapte la hauteur de la zone de travail au contenu (min. 800px) ── */
-function updateCanvasSize() {
-  let maxBottom = 800;
-  shapes.forEach(s => { maxBottom = Math.max(maxBottom, s.y + s.height + 40); });
-  mqCanvas.style.height = maxBottom + 'px';
-}
-
-/* ── Affiche toutes les formes dans la zone de travail ─────────────── */
-function renderShapes() {
-  mqCanvas.innerHTML = '';
-  shapes.forEach(s => {
-    const el = document.createElement('div');
-    el.className = 'mq-shape mq-' + s.type + (s.id === selectedId ? ' mq-selected' : '');
-    el.dataset.id = s.id;
-    el.style.left   = s.x + 'px';
-    el.style.top    = s.y + 'px';
-    el.style.width  = s.width + 'px';
-    el.style.height = s.height + 'px';
-
-    if (s.type !== 'texte') {
-      el.style.background = s.bgColor;
-    } else {
-      el.style.color    = s.textColor;
-      el.style.fontSize = s.fontSize + 'px';
-      el.textContent    = s.text;
-    }
-
-    el.addEventListener('mousedown', e => startDragShape(e, s));
-    if (s.type === 'texte') {
-      el.addEventListener('dblclick', () => editText(s.id));
-    }
-
-    if (s.id === selectedId) {
-      ['nw','ne','sw','se'].forEach(pos => {
-        const handle = document.createElement('div');
-        handle.className = 'mq-resize-handle mq-rh-' + pos;
-        handle.addEventListener('mousedown', e => startResize(e, s, pos));
-        el.appendChild(handle);
-      });
-    }
-
-    mqCanvas.appendChild(el);
-  });
-  updateCanvasSize();
-}
-
-/* ── Sélection / désélection ────────────────────────────────────────── */
-function selectShape(id) {
-  selectedId = id;
-  renderShapes();
-  renderLayers();
-  const s = shapes.find(x => x.id === id);
-  if (!s) return;
-  if (s.type !== 'texte') $('mq-bgcolor').value = s.bgColor;
-  if (s.type === 'texte') {
-    $('mq-textcolor').value = s.textColor;
-    $('mq-fontsize').value  = s.fontSize;
-  }
-}
-function deselectAll() {
-  if (selectedId === null) return;
-  selectedId = null;
-  renderShapes();
-  renderLayers();
-}
-
-/* ── Déplacement d'une forme existante (glisser-déposer) ───────────── */
-function startDragShape(e, s) {
-  if (e.target.classList.contains('mq-resize-handle')) return;
-  e.stopPropagation();
-  selectShape(s.id);
-  if (currentTool !== 'select') return;
-  if (e.target.isContentEditable) return; // édition de texte en cours
-
-  const startMouseX = e.clientX, startMouseY = e.clientY;
-  const startX = s.x, startY = s.y;
-
-  function onMove(e2) {
-    const dx = (e2.clientX - startMouseX) / currentZoom;
-    const dy = (e2.clientY - startMouseY) / currentZoom;
-    s.x = Math.max(0, Math.round(startX + dx));
-    s.y = Math.max(0, Math.round(startY + dy));
-    const el = mqCanvas.querySelector(`[data-id="${s.id}"]`);
-    if (el) { el.style.left = s.x + 'px'; el.style.top = s.y + 'px'; }
-  }
-  function onUp() {
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    updateCanvasSize();
-    renderLayers();
-  }
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
-}
-
-/* ── Redimensionnement via les poignées (coins) ────────────────────── */
-function startResize(e, s, pos) {
-  e.stopPropagation();
-  e.preventDefault();
-  const startMouseX = e.clientX, startMouseY = e.clientY;
-  const start = { x: s.x, y: s.y, w: s.width, h: s.height };
-
-  function onMove(e2) {
-    const dx = (e2.clientX - startMouseX) / currentZoom;
-    const dy = (e2.clientY - startMouseY) / currentZoom;
-    let { x, y, w, h } = start;
-    if (pos.includes('e')) w = Math.max(20, start.w + dx);
-    if (pos.includes('s')) h = Math.max(20, start.h + dy);
-    if (pos.includes('w')) { w = Math.max(20, start.w - dx); x = start.x + (start.w - w); }
-    if (pos.includes('n')) { h = Math.max(20, start.h - dy); y = start.y + (start.h - h); }
-    s.x = Math.round(x); s.y = Math.round(y); s.width = Math.round(w); s.height = Math.round(h);
-    const el = mqCanvas.querySelector(`[data-id="${s.id}"]`);
-    if (el) {
-      el.style.left   = s.x + 'px';
-      el.style.top    = s.y + 'px';
-      el.style.width  = s.width + 'px';
-      el.style.height = s.height + 'px';
-    }
-  }
-  function onUp() {
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    updateCanvasSize();
-    renderLayers();
-  }
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
-}
-
-/* ── Création d'une nouvelle forme par cliquer-glisser sur le canvas ── */
-mqCanvas.addEventListener('mousedown', e => {
-  if (e.target !== mqCanvas) return; // clic sur une forme existante : géré ailleurs
-
-  if (currentTool === 'select') {
-    deselectAll();
-    return;
-  }
-
-  const rect   = mqCanvas.getBoundingClientRect();
-  const startX = (e.clientX - rect.left) / currentZoom;
-  const startY = (e.clientY - rect.top)  / currentZoom;
-
-  const ghost = document.createElement('div');
-  ghost.className = 'mq-ghost';
-  mqCanvas.appendChild(ghost);
-
-  function onMove(e2) {
-    const curX = (e2.clientX - rect.left) / currentZoom;
-    const curY = (e2.clientY - rect.top)  / currentZoom;
-    const x = Math.min(startX, curX), y = Math.min(startY, curY);
-    const w = Math.abs(curX - startX), h = Math.abs(curY - startY);
-    ghost.style.left   = x + 'px';
-    ghost.style.top    = y + 'px';
-    ghost.style.width  = w + 'px';
-    ghost.style.height = h + 'px';
-  }
-  function onUp() {
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    const x = parseFloat(ghost.style.left)   || 0;
-    const y = parseFloat(ghost.style.top)    || 0;
-    const w = parseFloat(ghost.style.width)  || 0;
-    const h = parseFloat(ghost.style.height) || 0;
-    ghost.remove();
-    if (w < 10 || h < 10) return; // forme trop petite : on ignore
-
-    const shape = createShape(currentTool, x, y, w, h);
-    renderShapes();
-    renderLayers();
-    selectShape(shape.id);
-
-    // Retour automatique en mode sélection après la création
-    $('mq-tool').value = 'select';
-    currentTool = 'select';
-    mqCanvas.style.cursor = 'default';
-
-    if (shape.type === 'texte') setTimeout(() => editText(shape.id), 50);
-  }
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
-});
-
-/* ── Édition du texte d'une zone de texte (double-clic) ────────────── */
-function editText(id) {
-  const s  = shapes.find(x => x.id === id);
-  const el = mqCanvas.querySelector(`[data-id="${id}"]`);
-  if (!s || !el) return;
-
-  el.setAttribute('contenteditable', 'true');
-  el.focus();
-  document.execCommand('selectAll', false, null);
-
-  function onBlur() {
-    s.text = el.textContent.trim() || 'Texte';
-    el.setAttribute('contenteditable', 'false');
-    el.removeEventListener('blur', onBlur);
-    renderShapes();
-    renderLayers();
-  }
-  el.addEventListener('blur', onBlur);
-}
-
-/* ── Suppression de la sélection / nettoyage complet ───────────────── */
-function deleteSelected() {
-  if (selectedId === null) return;
-  shapes = shapes.filter(s => s.id !== selectedId);
-  selectedId = null;
-  renderShapes();
-  renderLayers();
-}
-$('mq-delete').addEventListener('click', deleteSelected);
-
-$('mq-clear').addEventListener('click', () => {
-  if (!shapes.length) return;
-  if (!confirm('Effacer toutes les formes de la maquette ?')) return;
-  shapes = [];
-  selectedId = null;
-  renderShapes();
-  renderLayers();
-});
-
-/* Suppression au clavier (Suppr / Retour arrière), sauf pendant l'édition de texte */
-document.addEventListener('keydown', e => {
-  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId !== null) {
-    const active = document.activeElement;
-    if (active && active.isContentEditable) return;
-    e.preventDefault();
-    deleteSelected();
-  }
-});
-
-/* ── Synchronisation barre d'outils ↔ forme sélectionnée ───────────── */
-$('mq-bgcolor').addEventListener('input', () => {
-  const s = shapes.find(x => x.id === selectedId);
-  if (s && s.type !== 'texte') { s.bgColor = $('mq-bgcolor').value; renderShapes(); }
-});
-$('mq-textcolor').addEventListener('input', () => {
-  const s = shapes.find(x => x.id === selectedId);
-  if (s && s.type === 'texte') { s.textColor = $('mq-textcolor').value; renderShapes(); }
-});
-$('mq-fontsize').addEventListener('input', () => {
-  const s = shapes.find(x => x.id === selectedId);
-  if (s && s.type === 'texte') { s.fontSize = parseInt($('mq-fontsize').value, 10) || 16; renderShapes(); }
-});
-
-/* ── Panneau "Éléments de la maquette" (sidebar) ───────────────────── */
-function renderLayers() {
-  const list = $('mq-layers-list');
-  if (!shapes.length) {
-    list.innerHTML = '<div class="sidebar-placeholder">Aucun élément. Dessine une forme sur la zone de travail pour commencer.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  shapes.forEach(s => {
-    const item  = document.createElement('div');
-    item.className = 'sidebar-item' + (s.id === selectedId ? ' active' : '');
-    const icon  = s.type === 'rect' ? '▭' : s.type === 'ellipse' ? '◯' : '🔤';
-    const label = s.type === 'texte' ? (s.text || 'Zone de texte')
-                 : s.type === 'rect'  ? 'Rectangle' : 'Ellipse';
-    item.innerHTML = `<span class="sidebar-icon">${icon}</span><span class="sidebar-label">${label} (#${s.id})</span>`;
-    item.addEventListener('click', () => selectShape(s.id));
-    list.appendChild(item);
-  });
-}
-
-/* ── Génère le prompt descriptif destiné à une IA de codage ────────── */
-function buildPrompt() {
-  if (!shapes.length) {
-    return "Aucun élément n'a été placé sur la maquette. Ouvre l'outil de maquette, dessine quelques blocs, puis exporte à nouveau.";
-  }
-  let txt = "Crée une page web dont la largeur de référence est 1200px, en respectant la mise en page "
-          + "ci-dessous (les coordonnées x,y correspondent au coin supérieur gauche de chaque élément, "
-          + "en pixels, par rapport à la page) ainsi que la capture d'écran jointe :\n\n";
-
-  shapes
-    .slice()
-    .sort((a, b) => (a.y - b.y) || (a.x - b.x))
-    .forEach((s, i) => {
-      if (s.type === 'rect') {
-        txt += `${i + 1}. Rectangle (bloc / section) de ${s.width}×${s.height}px, `
-             + `positionné à (${s.x}, ${s.y}), couleur de fond ${s.bgColor}.\n`;
-      } else if (s.type === 'ellipse') {
-        txt += `${i + 1}. Élément ovale/rond de ${s.width}×${s.height}px, `
-             + `positionné à (${s.x}, ${s.y}), couleur de fond ${s.bgColor}.\n`;
-      } else if (s.type === 'texte') {
-        txt += `${i + 1}. Zone de texte contenant « ${s.text} », `
-             + `positionnée à (${s.x}, ${s.y}), taille ${s.width}×${s.height}px, `
-             + `couleur du texte ${s.textColor}, taille de police ${s.fontSize}px.\n`;
-      }
-    });
-
-  txt += "\nRespecte au mieux les positions, dimensions, couleurs et le contenu textuel indiqués "
-       + "pour reproduire fidèlement cette mise en page (mise en page responsive bienvenue, "
-       + "en conservant les proportions et l'ordre des éléments).";
-  return txt;
-}
-
-/* ── Export pour IA : capture d'écran (html2canvas) + prompt ───────── */
-$('mq-export').addEventListener('click', async () => {
-  const savedZoom    = currentZoom;
-  const wasSelected  = selectedId;
-
-  // Capture propre : zoom à 100 % et aucune sélection/poignée visible
-  if (currentZoom !== 1) { $('mq-zoom').value = '1'; applyZoom(); }
-  deselectAll();
-
-  try {
-    const rendu   = await html2canvas(mqCanvas, { backgroundColor: '#ffffff', scale: 1 });
-    const imgData = rendu.toDataURL('image/png');
-
-    // Restaure le zoom et la sélection précédente
-    if (savedZoom !== 1) { $('mq-zoom').value = String(savedZoom); applyZoom(); }
-    if (wasSelected !== null && shapes.some(s => s.id === wasSelected)) selectShape(wasSelected);
-
-    $('mq-export-img').src      = imgData;
-    $('mq-export-dl').href      = imgData;
-    $('mq-export-prompt').value = buildPrompt();
-
-    openModal('mq-export-ov');
-  } catch (err) {
-    alert("Erreur lors de la capture de la maquette : " + err.message);
-  }
-});
-
-$('mq-export-copy').addEventListener('click', () =>
-  copyText($('mq-export-prompt').value, $('mq-export-copy'), '✓ Copié !')
-);
-
-/* ── Premier affichage (zone de travail vide tant qu'aucune sauvegarde n'est chargée) ── */
-renderShapes();
-renderLayers();
-
-/* ════════════════════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════════════════════ */
 (function init() {
@@ -1745,6 +1953,8 @@ renderLayers();
   const hash=window.location.hash;
   if (hash.startsWith('#d=')) { try{setAppState(JSON.parse(decodeURIComponent(escape(atob(hash.slice(3))))))}catch(e){} }
   else { const ls=localStorage.getItem('app_data_state'); if(ls) try{setAppState(JSON.parse(ls))}catch(e){} }
+
+  if (!localStorage.getItem('hiveos_tour_done')) startTour();
 })();
 
 </script>

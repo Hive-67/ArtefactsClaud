@@ -2,65 +2,1027 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>GenerateurPromptMail — HiveOS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Workflow IA — HiveOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0e0e0e;--tx:#f0f0f0;--tx2:#888;--brd:rgba(255,255,255,0.07);--body-bg:linear-gradient(to top left,#080810,#02000e);--card-bg:linear-gradient(to bottom right,rgba(12,12,20,0.75),rgba(6,6,14,0.75));--grad:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);--card-border:1px solid rgba(255,255,255,0.08);--card-glow:0 4px 15px rgba(194,23,88,0.15),0 1px 2px rgba(0,0,0,0.3)}
-    body.light{--bg:#fff;--tx:#111;--tx2:#555;--brd:rgba(0,0,0,0.08);--body-bg:linear-gradient(to top left,#fff,#f0f0f0);--card-bg:linear-gradient(to bottom right,rgba(255,255,255,0.75),rgba(245,245,245,0.75));--card-border:1px solid rgba(0,0,0,0.06);--card-glow:0 4px 15px rgba(194,23,88,0.08),0 1px 2px rgba(0,0,0,0.05)}
-    html{scroll-behavior:smooth}
-    body{font-family:'Space Mono',monospace;background:var(--body-bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-    .hive-bar{height:3px;background:var(--grad)}
-    header{background:rgba(8,8,16,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-    body.light header{background:rgba(255,255,255,0.92)}
-    .header-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
-    .back-link{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);text-decoration:none;transition:color .15s}
-    .back-link:hover{color:var(--tx)}
-    .header-theme-toggle{background:none;border:1px solid var(--brd);color:var(--tx);font-size:1.1rem;cursor:pointer;padding:.3rem .55rem;border-radius:8px;transition:background .2s;line-height:1}
-    .header-theme-toggle:hover{background:var(--brd)}
-    main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem}
-    .wip-card{background:var(--card-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:var(--card-border);border-radius:20px;padding:3rem 2.5rem;max-width:460px;width:100%;box-shadow:var(--card-glow);text-align:center;position:relative;overflow:hidden}
-    .wip-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--grad)}
-    .wip-icon{font-size:3rem;margin-bottom:1.5rem;display:block}
-    .wip-name{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx);margin-bottom:.75rem}
-    .wip-desc{font-size:.8rem;color:var(--tx2);line-height:1.7;margin-bottom:2rem}
-    .wip-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(218,29,51,0.12);border:1px solid rgba(218,29,51,0.25);border-radius:100px;padding:.4rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#da1d33;margin-bottom:2rem}
-    .wip-back{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:.45rem 1.2rem;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--tx);cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
-    .wip-back:hover{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-    footer{border-top:1px solid var(--brd);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(8,8,16,0.95)}
-    body.light footer{background:rgba(245,245,245,0.95)}
-    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .footer-copy{font-size:.68rem;color:var(--tx2)}
+    /* ── 10 THÈMES × 2 MODES ─────────────────────────────────── */
+    .theme-hiveos        { --bg:#111;     --bg2:#1c1c1c; --bg3:#262626; --bg4:#303030; --brd:#7d206f44; --tx:#f5f5f5; --tx2:#b8a7b5; --ac:#b01678; }
+    .theme-hiveos.day    { --bg:#fff7fb;  --bg2:#f8eaf2; --bg3:#efd7e6; --bg4:#e4c3d7; --brd:#7d206f33; --tx:#180812; --tx2:#5f4057; --ac:#9a145f; }
+    .theme-pro-bleu      { --bg:#08080f;  --bg2:#0e0e18; --bg3:#171728; --bg4:#2a2a42; --brd:#1f1f35;   --tx:#e4e4f4; --tx2:#9a9abc; --ac:#5865f2; }
+    .theme-pro-bleu.day  { --bg:#f6f7ff;  --bg2:#eceeff; --bg3:#dde2ff; --bg4:#cbd2ff; --brd:#b9c0f5;   --tx:#0d1024; --tx2:#39405f; --ac:#3e4fd8; }
+    .theme-bleu          { --bg:#080810;  --bg2:#0f0f1c; --bg3:#181828; --bg4:#22223a; --brd:#2a2a48;   --tx:#e2e2f4; --tx2:#9ca0c8; --ac:#5b8dee; }
+    .theme-bleu.day      { --bg:#f4f8ff;  --bg2:#e8f0ff; --bg3:#d8e6ff; --bg4:#c4d8ff; --brd:#9db9ee;   --tx:#071428; --tx2:#385070; --ac:#2f68c8; }
+    .theme-dracula       { --bg:#282a36;  --bg2:#21222c; --bg3:#44475a; --bg4:#6272a4; --brd:#44475a;   --tx:#f8f8f2; --tx2:#b8bdd9; --ac:#ff79c6; }
+    .theme-dracula.day   { --bg:#fff5fb;  --bg2:#f4e8f2; --bg3:#e8d7e6; --bg4:#d7c1d2; --brd:#b58aa8;   --tx:#21121d; --tx2:#65485c; --ac:#9a0060; }
+    .theme-picsou        { --bg:#140d00;  --bg2:#201300; --bg3:#301c00; --bg4:#402600; --brd:#c89600;   --tx:#ffd700; --tx2:#b07800; --ac:#ffd700; }
+    .theme-picsou.day    { --bg:#fff8df;  --bg2:#f8edbd; --bg3:#eedc91; --bg4:#dfc760; --brd:#b88a00;   --tx:#2a1c00; --tx2:#6a4a00; --ac:#8a6000; }
+    .theme-cyberpunk     { --bg:#02000e;  --bg2:#060018; --bg3:#0c0028; --bg4:#120036; --brd:#ff006650; --tx:#eeeeff; --tx2:#a394ff; --ac:#ff0066; }
+    .theme-cyberpunk.day { --bg:#fff3f8;  --bg2:#f7e3ef; --bg3:#ebcadf; --bg4:#dcaacb; --brd:#99003d55; --tx:#210011; --tx2:#66334b; --ac:#99003d; }
+    .theme-spectre       { --bg:#0a0a0f;  --bg2:#0f0f16; --bg3:#16161f; --bg4:#1e1e2a; --brd:#2a2a3a;   --tx:#e8e8f0; --tx2:#9ba0aa; --ac:#4df0a0; }
+    .theme-spectre.day   { --bg:#f0f7f4;  --bg2:#e0eee8; --bg3:#cfddd8; --bg4:#bdd0cb; --brd:#1a6e5040; --tx:#0a1412; --tx2:#2e4a44; --ac:#1a6e50; }
+    .theme-win95         { --bg:#1f1f1f;  --bg2:#2b2b2b; --bg3:#3a3a3a; --bg4:#4a4a4a; --brd:#808080;   --tx:#f2f2f2; --tx2:#c0c0c0; --ac:#3b6ea5; }
+    .theme-win95.day     { --bg:#c0c0c0;  --bg2:#c0c0c0; --bg3:#d4d0c8; --bg4:#e8e4dc; --brd:#808080;   --tx:#000;    --tx2:#444;    --ac:#000080; }
+    .theme-terminal      { --bg:#020200;  --bg2:#070700; --bg3:#0f0f00; --bg4:#181800; --brd:#2bd90040; --tx:#2bd900; --tx2:#1e9900; --ac:#2bd900; }
+    .theme-terminal.day  { --bg:#f3fff0;  --bg2:#e3f7df; --bg3:#d0ebc9; --bg4:#b9ddb0; --brd:#197a0040; --tx:#10240a; --tx2:#315d24; --ac:#197a00; }
+    .theme-matrix        { --bg:#050805;  --bg2:#081008; --bg3:#0d180d; --bg4:#132013; --brd:#2bd90030; --tx:#2bd900; --tx2:#1e9900; --ac:#2bd900; }
+    .theme-matrix.day    { --bg:#f1faef;  --bg2:#e1f2dc; --bg3:#cce6c5; --bg4:#b2d6aa; --brd:#197a0035; --tx:#10240a; --tx2:#315d24; --ac:#197a00; }
+
+    /* ── BASE ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--bg);
+      color: var(--tx);
+      min-height: 100vh;
+      transition: background .3s, color .3s;
+    }
+
+    /* ── HEADER ───────────────────────────────────────────────── */
+    .hive-header {
+      position: sticky;
+      top: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      height: 50px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--brd);
+      transition: transform .3s, background .3s;
+      gap: 1rem;
+    }
+
+    .hive-header.hidden { transform: translateY(-100%); }
+
+    .hive-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .hive-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      background: linear-gradient(90deg, #7d206f, #b01678, #c21758, #da1d33, #eb1925);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .hive-sep {
+      width: 1px;
+      height: 16px;
+      background: var(--brd);
+      flex-shrink: 0;
+    }
+
+    .hive-app-label {
+      font-size: 0.7rem;
+      color: var(--tx2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hive-btns {
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+      flex-shrink: 0;
+    }
+
+    .hive-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.05rem;
+      padding: 0.3rem 0.38rem;
+      border-radius: 6px;
+      color: var(--tx);
+      transition: background .15s;
+      position: relative;
+      line-height: 1;
+    }
+
+    .hive-btn:hover { background: var(--bg3); }
+
+    .hive-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--bg4);
+      color: var(--tx);
+      font-size: 0.65rem;
+      font-family: 'Space Mono', monospace;
+      white-space: nowrap;
+      padding: 0.25rem 0.55rem;
+      border-radius: 5px;
+      border: 1px solid var(--brd);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 999;
+    }
+
+    .hive-btn:hover::after { opacity: 1; }
+
+    /* ── MENU THÈMES ──────────────────────────────────────────── */
+    .theme-wrap { position: relative; }
+
+    .theme-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 0.4rem;
+      min-width: 185px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+      z-index: 600;
+      display: none;
+    }
+
+    .theme-menu.open { display: block; }
+
+    .tm-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: 'Space Mono', monospace;
+      color: var(--tx2);
+      transition: background .12s, color .12s;
+      white-space: nowrap;
+    }
+
+    .tm-item:hover, .tm-item.on { background: var(--bg3); color: var(--tx); }
+
+    /* ── BLOC-NOTES ───────────────────────────────────────────── */
+    .notepad {
+      position: fixed;
+      top: 64px;
+      right: 1.25rem;
+      width: 320px;
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.4);
+      z-index: 400;
+      display: none;
+      flex-direction: column;
+    }
+
+    .notepad.open { display: flex; }
+
+    .np-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg3);
+      border-radius: 12px 12px 0 0;
+      border-bottom: 1px solid var(--brd);
+      cursor: move;
+      user-select: none;
+    }
+
+    .np-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--tx);
+    }
+
+    .np-x {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--tx2);
+      padding: 0 0.2rem;
+      transition: color .15s;
+    }
+
+    .np-x:hover { color: var(--tx); }
+
+    .np-ta {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      background: transparent;
+      border: none;
+      padding: 0.9rem;
+      color: var(--tx);
+      resize: none;
+      height: 190px;
+      outline: none;
+      width: 100%;
+      line-height: 1.6;
+    }
+
+    .np-foot {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.65rem 0.9rem;
+      border-top: 1px solid var(--brd);
+    }
+
+    .np-btn {
+      flex: 1;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.38rem 0.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--brd);
+      background: var(--bg3);
+      color: var(--tx);
+      transition: all .15s;
+    }
+
+    .np-btn:hover { background: var(--bg4); }
+
+    .np-btn.send {
+      background: var(--ac);
+      color: var(--bg);
+      border-color: var(--ac);
+    }
+
+    .np-btn.send:hover { opacity: 0.85; }
+
+    /* ── VISITE GUIDÉE ────────────────────────────────────────── */
+    .tour-ov {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: none;
+    }
+
+    .tour-ov.open { display: block; }
+
+    .tour-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px);
+    }
+
+    .tour-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 1.5rem;
+      max-width: 380px;
+      width: calc(100vw - 2rem);
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      z-index: 1;
+    }
+
+    .tour-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ac);
+      margin-bottom: 0.45rem;
+    }
+
+    .tour-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--tx);
+      margin-bottom: 0.7rem;
+    }
+
+    .tour-text {
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--tx2);
+      margin-bottom: 1.25rem;
+    }
+
+    .tour-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tour-dots {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .tour-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brd);
+      transition: background .15s;
+    }
+
+    .tour-dot.on { background: var(--ac); }
+
+    .tour-btns { display: flex; gap: 0.5rem; }
+
+    .tour-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.42rem 0.9rem;
+      border-radius: 7px;
+      cursor: pointer;
+      border: 1px solid var(--brd);
+      background: var(--bg3);
+      color: var(--tx);
+      transition: all .15s;
+    }
+
+    .tour-btn.primary {
+      background: var(--ac);
+      color: var(--bg);
+      border-color: transparent;
+    }
+
+    .tour-btn:hover { opacity: 0.85; }
+
+    /* ── MAIN ─────────────────────────────────────────────────── */
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1rem 5rem;
+    }
+
+    /* ── PAGE HEADER ──────────────────────────────────────────── */
+    .page-header {
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 1.6rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .ph-pill {
+      display: inline-block;
+      background: var(--ac);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.6rem;
+      border-radius: 20px;
+      margin-bottom: 0.6rem;
+      /* couleur du texte selon luminance de --ac */
+      color: var(--bg);
+    }
+
+    .ph-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--tx);
+      margin-bottom: 0.3rem;
+    }
+
+    .ph-sub {
+      font-size: 0.76rem;
+      color: var(--tx2);
+    }
+
+    /* ── Q-BLOCK ──────────────────────────────────────────────── */
+    .qb {
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 1.35rem 1.4rem;
+      margin-bottom: 0.85rem;
+      transition: background .3s, border-color .3s;
+    }
+
+    .ql {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--tx);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .qn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--ac);
+      color: var(--bg);
+      font-size: 0.7rem;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 1.45rem;
+      height: 1.45rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .hint {
+      font-size: 0.73rem;
+      color: var(--tx2);
+      margin-bottom: 0.65rem;
+      margin-top: -0.45rem;
+    }
+
+    input[type="text"], textarea {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--bg3);
+      border: 1px solid var(--brd);
+      border-radius: 7px;
+      padding: 0.55rem 0.8rem;
+      color: var(--tx);
+      width: 100%;
+      transition: border-color .15s, background .15s;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--ac);
+      background: var(--bg4);
+    }
+
+    textarea { resize: vertical; min-height: 72px; line-height: 1.55; }
+
+    /* pills */
+    .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+    .pills label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      border: 1px solid var(--brd);
+      border-radius: 22px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: 'Space Mono', monospace;
+      color: var(--tx2);
+      background: var(--bg3);
+      transition: all .15s;
+      user-select: none;
+    }
+
+    .pills input { accent-color: var(--ac); }
+    .pills label:has(input:checked) {
+      border-color: var(--ac);
+      background: var(--bg4);
+      color: var(--tx);
+      font-weight: 700;
+    }
+
+    /* ── CTA ──────────────────────────────────────────────────── */
+    .cta { text-align: center; margin: 1.75rem 0; }
+
+    .btn-gen {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      background: var(--ac);
+      color: var(--bg);
+      border: none;
+      border-radius: 10px;
+      padding: 0.85rem 2.25rem;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+
+    .btn-gen:hover  { opacity: 0.88; }
+    .btn-gen:active { transform: scale(.98); }
+
+    /* ── OUTPUT ───────────────────────────────────────────────── */
+    #output { display: none; margin-top: 1.75rem; }
+
+    .out-label {
+      font-size: 0.67rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--tx2);
+      margin-bottom: 0.9rem;
+    }
+
+    .pcard {
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      margin-bottom: 0.85rem;
+      overflow: hidden;
+    }
+
+    .pcard-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.7rem 1.1rem;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .pcard-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--tx);
+    }
+
+    .btn-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--ac);
+      color: var(--bg);
+      border: none;
+      border-radius: 5px;
+      padding: 0.27rem 0.7rem;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+
+    .btn-copy:hover   { opacity: 0.85; }
+    .btn-copy.copied  { background: #16a34a; color: #fff; }
+
+    .pcard-usage {
+      padding: 0.45rem 1.1rem 0.5rem;
+      font-size: 0.72rem;
+      color: var(--tx2);
+      font-style: italic;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .pcard-body {
+      padding: 0.9rem 1.1rem;
+      font-size: 0.78rem;
+      line-height: 1.78;
+      white-space: pre-wrap;
+      color: var(--tx);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .btn-reset {
+      display: block;
+      margin: 1.5rem auto 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      background: transparent;
+      border: 1px solid var(--brd);
+      border-radius: 7px;
+      padding: 0.42rem 1rem;
+      cursor: pointer;
+      color: var(--tx2);
+      transition: all .15s;
+    }
+
+    .btn-reset:hover { border-color: #e5534b; color: #c0392b; }
+
+    @media (max-width: 480px) {
+      .hive-app-label { display: none; }
+      .notepad { width: calc(100vw - 2rem); right: 1rem; }
+    }
   </style>
 </head>
-<body class="dark">
-<div class="hive-bar"></div>
-<header>
-  <a href="../../" class="header-logo">HiveOS</a>
-  <a href="../../" class="back-link">← Retour</a>
-  <button id="themeToggle" class="header-theme-toggle" aria-label="Changer le thème">🌙</button>
-</header>
-<main>
-  <div class="wip-card">
-    <span class="wip-icon">✉️</span>
-    <div class="wip-name">GenerateurPromptMail</div>
-    <p class="wip-desc">Génération automatique de prompts pour emails personnalisés. Bientôt disponible.</p>
-    <div class="wip-badge">⚙️ En développement</div><br>
-    <a href="../../" class="wip-back">← Retour à l'accueil</a>
+<body class="theme-hiveos">
+
+<!-- ── HEADER ──────────────────────────────────────────────────── -->
+<header class="hive-header" id="H">
+  <div class="hive-logo-wrap">
+    <span class="hive-logo">HiveOS</span>
+    <span class="hive-sep"></span>
+    <span class="hive-app-label">Setup Workflow IA</span>
   </div>
+  <div class="hive-btns">
+
+    <!-- 📝 Bloc-notes -->
+    <button class="hive-btn" data-tip="Bloc-notes" onclick="toggleNP()">📝</button>
+
+    <!-- 🎨 Thème -->
+    <div class="theme-wrap">
+      <button class="hive-btn" data-tip="Thème" onclick="toggleTM()">🎨</button>
+      <div class="theme-menu" id="TM">
+        <div class="tm-item on"  data-t="theme-hiveos"    onclick="setTheme(this)">🐝 HiveOS</div>
+        <div class="tm-item"     data-t="theme-pro-bleu"  onclick="setTheme(this)">🔷 Pro Bleu</div>
+        <div class="tm-item"     data-t="theme-bleu"      onclick="setTheme(this)">🔵 Bleu</div>
+        <div class="tm-item"     data-t="theme-dracula"   onclick="setTheme(this)">🧛 Dracula</div>
+        <div class="tm-item"     data-t="theme-picsou"    onclick="setTheme(this)">🪙 Picsou</div>
+        <div class="tm-item"     data-t="theme-cyberpunk" onclick="setTheme(this)">⚡ Cyberpunk</div>
+        <div class="tm-item"     data-t="theme-spectre"   onclick="setTheme(this)">👾 Spectre</div>
+        <div class="tm-item"     data-t="theme-win95"     onclick="setTheme(this)">🪟 Windows 95</div>
+        <div class="tm-item"     data-t="theme-terminal"  onclick="setTheme(this)">💻 Terminal</div>
+        <div class="tm-item"     data-t="theme-matrix"    onclick="setTheme(this)">🟢 Matrix</div>
+      </div>
+    </div>
+
+    <!-- ☀️/🌙 Jour/Nuit -->
+    <button class="hive-btn" id="DN" data-tip="Jour / Nuit" onclick="toggleDN()">☀️</button>
+
+    <!-- ❓ Aide -->
+    <button class="hive-btn" data-tip="Aide / Tuto" onclick="startTour()">❓</button>
+
+  </div>
+</header>
+
+<!-- ── BLOC-NOTES ───────────────────────────────────────────────── -->
+<div class="notepad" id="NP">
+  <div class="np-head" id="NP-drag">
+    <span class="np-title">📝 Bloc-notes</span>
+    <button class="np-x" onclick="toggleNP()">✕</button>
+  </div>
+  <textarea class="np-ta" id="NP-ta" placeholder="Tes notes ici..."></textarea>
+  <div class="np-foot">
+    <button class="np-btn" onclick="npCopy()">📋 Copier</button>
+    <button class="np-btn send" onclick="npSend()">📨 Envoyer</button>
+  </div>
+</div>
+
+<!-- ── VISITE GUIDÉE ────────────────────────────────────────────── -->
+<div class="tour-ov" id="TOUR">
+  <div class="tour-bg" onclick="closeTour()"></div>
+  <div class="tour-card">
+    <div class="tour-eyebrow" id="T-eye"></div>
+    <div class="tour-title"   id="T-tit"></div>
+    <div class="tour-text"    id="T-txt"></div>
+    <div class="tour-nav">
+      <div class="tour-dots" id="T-dots"></div>
+      <div class="tour-btns">
+        <button class="tour-btn" id="T-prev" onclick="tNav(-1)">←</button>
+        <button class="tour-btn primary" id="T-next" onclick="tNav(1)">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENU ──────────────────────────────────────────────────── -->
+<main class="main">
+
+  <div class="page-header">
+    <div class="ph-pill">Setup IA</div>
+    <div class="ph-title">Configurons ton workflow IA</div>
+    <div class="ph-sub">Réponds aux questions — on génère des prompts prêts à l'emploi pour ChatGPT, DeepSeek ou Mistral.</div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">1</span>Comment tu t'appelles ?</div>
+    <input type="text" id="q1" placeholder="Ton prénom">
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">2</span>Ton poste exact ?</div>
+    <input type="text" id="q2" placeholder="ex : Adjoint Chef d'Équipe — Logistique">
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">3</span>Qu'est-ce que tu veux faire avec l'IA ?</div>
+    <div class="hint">Coche tout ce qui t'intéresse</div>
+    <div class="pills">
+      <label><input type="checkbox" class="c3" value="mails">         ✉️ Rédiger des mails</label>
+      <label><input type="checkbox" class="c3" value="reformat">      ✏️ Reformuler un brouillon</label>
+      <label><input type="checkbox" class="c3" value="resume">        📋 Résumer des échanges</label>
+      <label><input type="checkbox" class="c3" value="cr">            📝 Comptes-rendus</label>
+      <label><input type="checkbox" class="c3" value="note">          📌 Notes de service</label>
+      <label><input type="checkbox" class="c3" value="relance">       🔔 Relancer des prestataires</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">4</span>Quel type de mails tu veux écrire surtout ?</div>
+    <div class="hint">Coche tes situations les plus fréquentes</div>
+    <div class="pills">
+      <label><input type="checkbox" class="c4" value="incident">   🚨 Signaler un incident</label>
+      <label><input type="checkbox" class="c4" value="reporting">  📊 Reporting hiérarchie</label>
+      <label><input type="checkbox" class="c4" value="consigne">   👥 Consignes à l'équipe</label>
+      <label><input type="checkbox" class="c4" value="relpresta">  📦 Relancer un prestataire</label>
+      <label><input type="checkbox" class="c4" value="reclam">     ⚠️ Réclamation / litige</label>
+      <label><input type="checkbox" class="c4" value="formel">     💼 Réponse formelle</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">5</span>Quelle messagerie tu utilises ?</div>
+    <div class="pills">
+      <label><input type="radio" name="r5" value="Outlook">               📧 Outlook / Exchange</label>
+      <label><input type="radio" name="r5" value="Gmail">                 📧 Gmail</label>
+      <label><input type="radio" name="r5" value="une autre messagerie">  📧 Autre</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">6</span>C'est uniquement des mails professionnels ?</div>
+    <div class="pills">
+      <label><input type="radio" name="r6" value="oui"> ✅ Oui, uniquement pro</label>
+      <label><input type="radio" name="r6" value="non"> 🔄 Non, parfois perso aussi</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">7</span>Quel est ton ton habituel à l'écrit ?</div>
+    <div class="pills">
+      <label><input type="radio" name="r7" value="formel">                        🎩 Formel</label>
+      <label><input type="radio" name="r7" value="semi-formel">                   👔 Semi-formel</label>
+      <label><input type="radio" name="r7" value="direct et cash">                ⚡ Direct / cash</label>
+      <label><input type="radio" name="r7" value="variable selon le destinataire">🔀 Ça dépend</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">8</span>Tu vouvoies ou tutoies ?</div>
+    <div class="pills">
+      <label><input type="radio" name="r8" value="vouvoiement systématique">                        Vouvoiement toujours</label>
+      <label><input type="radio" name="r8" value="vouvoiement ou tutoiement selon le destinataire"> Selon le destinataire</label>
+      <label><input type="radio" name="r8" value="tutoiement systématique">                         Tutoiement toujours</label>
+    </div>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">9</span>Tu as des formules habituelles ? <small style="font-weight:400;opacity:.55;font-size:.75rem;margin-left:.3rem">(optionnel)</small></div>
+    <div class="hint">Ouverture, clôture, expressions récurrentes</div>
+    <textarea id="q9" placeholder="ex : Je commence par « Bonjour à tous, » et termine par « Cordialement, [Prénom] »"></textarea>
+  </div>
+
+  <div class="qb">
+    <div class="ql"><span class="qn">10</span>Des trucs à ne jamais mettre ? <small style="font-weight:400;opacity:.55;font-size:.75rem;margin-left:.3rem">(optionnel)</small></div>
+    <textarea id="q10" placeholder="ex : Pas de « Veuillez agréer... », pas de phrases trop longues"></textarea>
+  </div>
+
+  <div class="cta">
+    <button class="btn-gen" onclick="generate()">⚡ Générer mes prompts</button>
+  </div>
+
+  <div id="output">
+    <div class="out-label">Tes prompts prêts à l'emploi</div>
+    <div id="cards"></div>
+    <button class="btn-reset" onclick="resetAll()">↺ Recommencer</button>
+  </div>
+
 </main>
-<footer>
-  <span class="footer-logo">HiveOS</span>
-  <span class="footer-copy">Outils faits maison — pas de tracking, pas de compte.</span>
-</footer>
+
 <script>
-  (function(){
-    const t=document.getElementById('themeToggle'),b=document.body;
-    function s(l){if(l){b.classList.add('light');b.classList.remove('dark');t.textContent='☀️';localStorage.setItem('hiveTheme','light')}else{b.classList.remove('light');b.classList.add('dark');t.textContent='🌙';localStorage.setItem('hiveTheme','dark')}}
-    s(localStorage.getItem('hiveTheme')==='light');
-    t.addEventListener('click',()=>s(!b.classList.contains('light')));
-  })();
+/* ── UTILITAIRES ──────────────────────────────────────── */
+const $   = id => document.getElementById(id);
+const val = id => ($( id )?.value||'').trim();
+const rad = n  => document.querySelector(`input[name="${n}"]:checked`)?.value||'';
+const chk = c  => [...document.querySelectorAll(`.${c}:checked`)].map(e=>e.value);
+const esc = s  => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ── THÈMES ───────────────────────────────────────────── */
+let theme = localStorage.getItem('app-theme')    || 'theme-hiveos';
+let day   = localStorage.getItem('app-day-mode') === '1';
+
+function applyTheme(){
+  document.body.className = theme + (day ? ' day' : '');
+  $('DN').textContent = day ? '🌙' : '☀️';
+  document.querySelectorAll('.tm-item').forEach(el =>
+    el.classList.toggle('on', el.dataset.t === theme));
+}
+
+function setTheme(el){
+  theme = el.dataset.t;
+  localStorage.setItem('app-theme', theme);
+  applyTheme();
+  $('TM').classList.remove('open');
+}
+
+function toggleDN(){
+  day = !day;
+  localStorage.setItem('app-day-mode', day?'1':'0');
+  applyTheme();
+}
+
+function toggleTM(){ $('TM').classList.toggle('open'); }
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.theme-wrap')) $('TM').classList.remove('open');
+});
+
+/* ── SCROLL HEADER ────────────────────────────────────── */
+let lastY = 0;
+window.addEventListener('scroll',()=>{
+  const y = window.scrollY;
+  $('H').classList.toggle('hidden', y > lastY && y > 80);
+  lastY = y;
+},{passive:true});
+
+/* ── BLOC-NOTES ───────────────────────────────────────── */
+const NP_KEY = 'hiveos_notepad';
+
+function toggleNP(){ $('NP').classList.toggle('open'); }
+
+function npCopy(){
+  const t = $('NP-ta').value; if(!t) return;
+  navigator.clipboard.writeText(t).then(()=>{
+    const b = $('NP').querySelector('.np-btn');
+    const o = b.textContent; b.textContent='✓ Copié !';
+    setTimeout(()=>b.textContent=o, 2000);
+  });
+}
+
+function npSend(){
+  const t = $('NP-ta').value.trim(); if(!t) return;
+  window.location.href =
+    `mailto:quentin.broll@gmail.com`+
+    `?subject=${encodeURIComponent('Notes — Setup Workflow IA')}`+
+    `&body=${encodeURIComponent(t)}`;
+}
+
+$('NP-ta').addEventListener('input', ()=>
+  localStorage.setItem(NP_KEY, $('NP-ta').value));
+
+const sn = localStorage.getItem(NP_KEY);
+if(sn) $('NP-ta').value = sn;
+
+/* drag */
+(()=>{
+  const w=$('NP'), h=$('NP-drag'); let ox,oy;
+  h.addEventListener('mousedown', e=>{
+    ox=e.clientX-w.offsetLeft; oy=e.clientY-w.offsetTop;
+    w.style.right='unset';
+    const mv=e2=>{w.style.left=(e2.clientX-ox)+'px';w.style.top=(e2.clientY-oy)+'px';};
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',mv),{once:true});
+  });
+})();
+
+/* ── VISITE GUIDÉE ────────────────────────────────────── */
+const STEPS=[
+  {eye:'Bienvenue',      tit:'Bienvenue sur ton Setup IA 👋',      txt:'Cet outil te génère des prompts personnalisés prêts à copier-coller dans ChatGPT, DeepSeek ou Mistral. En 2 minutes, ton profil d\'écriture est configuré.'},
+  {eye:'Étape 1 / 4',   tit:'Remplis le questionnaire',            txt:'Réponds aux 10 questions : ton prénom, ton poste, ce que tu veux faire avec l\'IA, ton ton habituel… Les questions 9 et 10 sont optionnelles.'},
+  {eye:'Étape 2 / 4',   tit:'Génère tes prompts',                  txt:'Clique sur "⚡ Générer mes prompts" en bas. L\'outil crée un prompt système (ton profil complet) + des prompts rapides pour chaque usage coché.'},
+  {eye:'Étape 3 / 4',   tit:'Le Prompt Système en premier',        txt:'Colle le Prompt Système une seule fois au début d\'une nouvelle conversation IA. Il configure l\'assistant avec ton style. Ensuite, utilise les prompts rapides selon le besoin.'},
+  {eye:'Étape 4 / 4',   tit:'Le bloc-notes 📝',                   txt:'Le bouton 📝 en haut ouvre ton bloc-notes. Note ce que tu veux, copie le contenu ou envoie-le directement par mail via le bouton "Envoyer".'},
+];
+let ti=0;
+
+function startTour(){ ti=0; renderTour(); $('TOUR').classList.add('open'); }
+function closeTour(){ $('TOUR').classList.remove('open'); }
+
+function tNav(d){
+  ti = Math.max(0, Math.min(STEPS.length-1, ti+d));
+  renderTour();
+  if(d===1 && ti===STEPS.length-1){ setTimeout(closeTour,350); }
+}
+
+function renderTour(){
+  const s=STEPS[ti];
+  $('T-eye').textContent=s.eye;
+  $('T-tit').textContent=s.tit;
+  $('T-txt').textContent=s.txt;
+  const dots=$('T-dots'); dots.innerHTML='';
+  STEPS.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='tour-dot'+(i===ti?' on':'');
+    dots.appendChild(d);
+  });
+  $('T-prev').style.visibility = ti===0?'hidden':'visible';
+  $('T-next').textContent = ti===STEPS.length-1 ? 'Fermer ✕' : 'Suivant →';
+}
+
+document.addEventListener('keydown', e=>{
+  if(!$('TOUR').classList.contains('open')) return;
+  if(e.key==='ArrowRight') tNav(1);
+  if(e.key==='ArrowLeft')  tNav(-1);
+  if(e.key==='Escape')     closeTour();
+});
+
+/* ── GÉNÉRATEUR ───────────────────────────────────────── */
+function generate(){
+  const prenom = val('q1') || 'l\'utilisateur';
+  const poste  = val('q2') || 'Adjoint Chef d\'Équipe — Logistique';
+  const msg    = rad('r5'), pro=rad('r6'), ton=rad('r7')||'semi-formel';
+  const vvt    = rad('r8')||'vouvoiement ou tutoiement selon le destinataire';
+  const form   = val('q9'), evit=val('q10');
+  const u3=chk('c3'), u4=chk('c4'), cards=[];
+
+  /* Prompt Système */
+  let sys=`Tu es l'assistant de rédaction de ${prenom}, ${poste}.\n\n`;
+  sys+=`PROFIL D'ÉCRITURE DE ${prenom.toUpperCase()} :\n`;
+  sys+=`- Ton : ${ton}\n`;
+  sys+=`- Vouvoiement : ${vvt}\n`;
+  if(msg)  sys+=`- Messagerie : ${msg}\n`;
+  if(form) sys+=`- Formules habituelles : ${form}\n`;
+  if(evit) sys+=`- À éviter : ${evit}\n`;
+  if(pro==='oui') sys+=`- Contexte : uniquement professionnel\n`;
+  sys+=`\nQuand ${prenom} te demande de rédiger ou reformuler un texte, respecte ce profil. Pas de formulations génériques ou robotiques. Adapte la formalité si le destinataire est précisé.`;
+
+  cards.push({i:'⚙️',t:'Prompt Système — Profil de '+prenom,
+    u:'→ Colle ce prompt une seule fois au début d\'une nouvelle conversation sur ChatGPT, DeepSeek ou Mistral.',b:sys});
+
+  if(u3.includes('mails')||u4.length>0){
+    const tl=u4.length>0?u4.join(', '):'général';
+    cards.push({i:'✉️',t:'Rédiger un mail',
+      u:'→ Pour qu\'on rédige un mail from scratch selon ton profil.',
+      b:`Rédige un mail professionnel pour moi.\n\nType de mail : [${tl}] — précise lequel\nDestinataire : [ex : mon N+1 / l'équipe / le prestataire Dupont]\nContexte : [décris la situation en 2-3 phrases]\nTon : [rappel si besoin, sinon garde mon profil]\n\nRespecte mon profil d'écriture.`});
+  }
+
+  if(u3.includes('reformat')){
+    cards.push({i:'✏️',t:'Reformuler un brouillon',
+      u:'→ T\'as quelque chose d\'écrit mais ça sonne pas bien ? Colle ce prompt + ton texte.',
+      b:`Reformule ce texte en respectant mon profil d'écriture. Améliore la clarté, corrige les fautes, garde mon ton naturel. Ne change pas le fond.\n\n[COLLE TON TEXTE ICI]`});
+  }
+
+  if(u3.includes('resume')){
+    cards.push({i:'📋',t:'Résumer un échange de mails',
+      u:'→ Pour digérer rapidement un long fil ou une discussion.',
+      b:`Résume cet échange en points clés.\nFormat :\n- Contexte (1 phrase)\n- Points d'action\n- Décisions prises\n- Suite à donner\n\n[COLLE L'ÉCHANGE ICI]`});
+  }
+
+  if(u3.includes('cr')){
+    cards.push({i:'📝',t:'Rédiger un compte-rendu',
+      u:'→ Pour transformer des notes de réunion en CR propre.',
+      b:`Rédige un compte-rendu de réunion à partir de mes notes.\n\nFormat : Date — Participants — Points abordés — Décisions — Actions (responsable + délai).\n\nNotes :\n[COLLE TES NOTES ICI]`});
+  }
+
+  if(u3.includes('note')){
+    cards.push({i:'📌',t:'Rédiger une note de service',
+      u:'→ Pour une consigne ou info officielle à l\'équipe.',
+      b:`Rédige une note de service pour mon équipe.\n\nObjet : [ex : Nouvelles consignes zone B]\nMessage : [résume ce que tu veux dire]\nPriorité : [info / important / urgent]\n\nTon : direct, clair, pro. Respecte mon profil.`});
+  }
+
+  if(u3.includes('relance')||u4.includes('relpresta')){
+    cards.push({i:'🔔',t:'Relancer un prestataire',
+      u:'→ Pour une relance ferme mais pro quand un presta ne répond pas.',
+      b:`Rédige un mail de relance à un prestataire / transporteur.\n\nContexte : [ex : Livraison prévue le 10/06, aucun retour depuis 3 jours]\nRelances déjà envoyées : [0 / 1 / plusieurs]\nUrgence : [faible / moyen / urgent]\n\nTon : ferme mais pro. Respecte mon profil.`});
+  }
+
+  if(u4.includes('incident')){
+    cards.push({i:'🚨',t:'Signaler un incident',
+      u:'→ Pour remonter un incident à la hiérarchie de façon claire.',
+      b:`Rédige un mail de signalement d'incident.\n\nNature : [décris en 2-3 phrases]\nDate/heure : [quand]\nImpact : [sur quoi / qui]\nActions déjà prises : [ce qui a été fait]\nDestinataire : [ex : mon N+1]\n\nTon : factuel, orienté solutions. Respecte mon profil.`});
+  }
+
+  if(u4.includes('reporting')){
+    cards.push({i:'📊',t:'Reporting hiérarchie',
+      u:'→ Pour un point régulier ou rapport de situation.',
+      b:`Rédige un mail de reporting à ma hiérarchie.\n\nPériode : [ex : semaine du 10 au 14 juin]\nPoints positifs : [ce qui s'est bien passé]\nVigilance : [problèmes ou risques]\nActions en cours : [ce qui est traité]\nBesoin : [décision / info / aucun]\n\nTon : concis, factuel. Respecte mon profil.`});
+  }
+
+  if(u4.includes('reclam')){
+    cards.push({i:'⚠️',t:'Réclamation / litige',
+      u:'→ Pour formuler une réclamation formelle sans perdre en pro.',
+      b:`Rédige un mail de réclamation formelle.\n\nDestinataire : [prestataire / transporteur / autre]\nObjet du litige : [décris précisément]\nPréjudice : [impact opérationnel, financier…]\nCe que tu attends : [remboursement / correction / plan d'action]\nDélai : [ex : sous 48h]\n\nTon : ferme, factuel, sans ambiguïté. Respecte mon profil.`});
+  }
+
+  const C=$('cards'); C.innerHTML='';
+  if(cards.length===0){
+    C.innerHTML='<div class="qb" style="text-align:center;color:var(--tx2)">Coche au moins un usage (Q3 ou Q4).</div>';
+  } else {
+    cards.forEach((c,i)=>{
+      const el=document.createElement('div');
+      el.className='pcard';
+      el.innerHTML=`
+        <div class="pcard-head">
+          <div class="pcard-title">${c.i} ${c.t}</div>
+          <button class="btn-copy" onclick="doCopy(this,${i})">Copier</button>
+        </div>
+        <div class="pcard-usage">${c.u}</div>
+        <div class="pcard-body" id="P${i}">${esc(c.b)}</div>`;
+      C.appendChild(el);
+    });
+  }
+
+  $('output').style.display='block';
+  $('output').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function doCopy(btn,i){
+  navigator.clipboard.writeText($('P'+i).textContent).then(()=>{
+    const o=btn.textContent; btn.textContent='✓ Copié'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('copied');},2000);
+  });
+}
+
+function resetAll(){
+  document.querySelectorAll('input[type="checkbox"],input[type="radio"]').forEach(e=>e.checked=false);
+  document.querySelectorAll('input[type="text"],textarea:not(.np-ta)').forEach(e=>e.value='');
+  $('output').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── INIT ─────────────────────────────────────────────── */
+applyTheme();
 </script>
 </body>
 </html>

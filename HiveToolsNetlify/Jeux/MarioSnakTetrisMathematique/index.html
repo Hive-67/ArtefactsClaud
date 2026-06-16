@@ -1,66 +1,2809 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>MarioSnakTetrisMathematique — HiveOS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0e0e0e;--tx:#f0f0f0;--tx2:#888;--brd:rgba(255,255,255,0.07);--body-bg:linear-gradient(to top left,#080810,#02000e);--card-bg:linear-gradient(to bottom right,rgba(12,12,20,0.75),rgba(6,6,14,0.75));--grad:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);--card-border:1px solid rgba(255,255,255,0.08);--card-glow:0 4px 15px rgba(194,23,88,0.15),0 1px 2px rgba(0,0,0,0.3)}
-    body.light{--bg:#fff;--tx:#111;--tx2:#555;--brd:rgba(0,0,0,0.08);--body-bg:linear-gradient(to top left,#fff,#f0f0f0);--card-bg:linear-gradient(to bottom right,rgba(255,255,255,0.75),rgba(245,245,245,0.75));--card-border:1px solid rgba(0,0,0,0.06);--card-glow:0 4px 15px rgba(194,23,88,0.08),0 1px 2px rgba(0,0,0,0.05)}
-    html{scroll-behavior:smooth}
-    body{font-family:'Space Mono',monospace;background:var(--body-bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-    .hive-bar{height:3px;background:var(--grad)}
-    header{background:rgba(8,8,16,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-    body.light header{background:rgba(255,255,255,0.92)}
-    .header-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
-    .back-link{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);text-decoration:none;transition:color .15s}
-    .back-link:hover{color:var(--tx)}
-    .header-theme-toggle{background:none;border:1px solid var(--brd);color:var(--tx);font-size:1.1rem;cursor:pointer;padding:.3rem .55rem;border-radius:8px;transition:background .2s;line-height:1}
-    .header-theme-toggle:hover{background:var(--brd)}
-    main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem}
-    .wip-card{background:var(--card-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:var(--card-border);border-radius:20px;padding:3rem 2.5rem;max-width:460px;width:100%;box-shadow:var(--card-glow);text-align:center;position:relative;overflow:hidden}
-    .wip-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--grad)}
-    .wip-icon{font-size:3rem;margin-bottom:1.5rem;display:block}
-    .wip-name{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx);margin-bottom:.75rem}
-    .wip-desc{font-size:.8rem;color:var(--tx2);line-height:1.7;margin-bottom:2rem}
-    .wip-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(218,29,51,0.12);border:1px solid rgba(218,29,51,0.25);border-radius:100px;padding:.4rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#da1d33;margin-bottom:2rem}
-    .wip-back{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:.45rem 1.2rem;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--tx);cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
-    .wip-back:hover{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-    footer{border-top:1px solid var(--brd);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(8,8,16,0.95)}
-    body.light footer{background:rgba(245,245,245,0.95)}
-    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .footer-copy{font-size:.68rem;color:var(--tx2)}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mission Multiplication – Nolan</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2d1b4e, #1b0e2c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            padding: 20px;
+            overscroll-behavior: none;
+        }
+
+        .game-wrapper {
+            max-width: 800px;
+            width: 100%;
+            background: #3b2b5c;
+            border-radius: 40px;
+            padding: 25px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 20px #c49bff;
+            border: 3px solid #c49bff;
+            color: #fff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .dragon-emoji {
+            font-size: 70px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #ffdd99;
+            text-shadow: 2px 2px 0 #5e3a8c;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0d0ff;
+        }
+
+        .sound-toggle {
+            background: #444;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+            z-index: 10;
+        }
+
+        .sound-toggle:hover {
+            background: #666;
+        }
+
+        .sound-toggle.muted {
+            background: #822;
+        }
+
+        .quiz-section {
+            background: #5e4b8b;
+            border-radius: 25px;
+            padding: 20px 15px;
+            width: 100%;
+            border: 2px dashed #ffdd99;
+            box-shadow: 0 8px 0 #2d1b4e;
+            transition: 0.3s;
+        }
+
+        .progress {
+            background: #1e1236;
+            border-radius: 20px;
+            height: 25px;
+            width: 80%;
+            margin: 0 auto 15px;
+            border: 2px solid #c49bff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffb347, #ffdd57);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #2d1b4e;
+            white-space: nowrap;
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin: 5px 0;
+            min-height: 2rem;
+        }
+
+        .question-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffebcc;
+            margin: 10px 0;
+        }
+
+        .answer-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="number"] {
+            font-size: 2rem;
+            width: 110px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 3px solid #c49bff;
+            border-radius: 20px;
+            background: #fff;
+            color: #2d1b4e;
+            font-family: inherit;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            border-color: #ffdd57;
+            box-shadow: 0 0 15px #ffdd57;
+        }
+
+        .btn {
+            background: #ffb347;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d1b4e;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #cc8e2a;
+            transition: 0.1s;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: #ffa01c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #cc8e2a;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #cc8e2a;
+        }
+
+        .feedback {
+            font-size: 1.3rem;
+            margin-top: 15px;
+            min-height: 2.5rem;
+            font-weight: bold;
+            color: #ffdd99;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            background: #111;
+            display: block;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #c49bff;
+            width: 100%;
+            height: auto;
+            border: 3px solid #c49bff;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            color: #fff;
+            font-size: 2.5rem;
+            z-index: 2;
+            transition: 0.3s;
+        }
+
+        .lock-overlay span {
+            font-size: 4rem;
+        }
+
+        .lock-overlay p {
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .snake-score {
+            font-size: 1.2rem;
+            margin-top: 5px;
+            color: #ffdd99;
+        }
+
+        .fullscreen-btn {
+            background: #6c5ce7;
+            box-shadow: 0 4px 0 #4a3abf;
+            font-size: 1rem;
+            padding: 8px 20px;
+            margin-top: 10px;
+        }
+
+        .unlock-msg {
+            color: #ffdd57;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+            font-family: 'Press Start 2P', 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #e74c3c, #c0392b);
+            border: 5px solid #f1c40f;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(241, 196, 15, 0.6);
+            animation: popIn 0.5s ease;
+        }
+
+        /* Style spécial pour le modal d'énigme */
+        .modal-content.riddle-modal {
+            background: linear-gradient(180deg, #1a3a5c, #0d2137);
+            border-color: #00e5ff;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.5);
+        }
+
+        .modal-content.riddle-modal h2 {
+            color: #00e5ff;
+            text-shadow: 2px 2px 0 #000, 0 0 15px #00e5ff;
+        }
+
+        .modal-content.riddle-modal .riddle-box {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #00e5ff;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            font-size: 1rem;
+            color: #e0f7ff;
+            line-height: 1.7;
+            text-shadow: none;
+        }
+
+        .modal-content.riddle-modal .riddle-input-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0 5px;
+            flex-wrap: wrap;
+        }
+
+        .riddle-number-input {
+            font-size: 1.8rem;
+            width: 100px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid #00e5ff;
+            border-radius: 15px;
+            background: #fff;
+            color: #0d2137;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .riddle-number-input:focus {
+            box-shadow: 0 0 15px #00e5ff;
+        }
+
+        .btn-luigi {
+            background: #00c853;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #007b33;
+            font-family: inherit;
+            letter-spacing: 1px;
+            transition: 0.1s;
+        }
+
+        .btn-luigi:hover {
+            background: #00e676;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #007b33;
+        }
+
+        .btn-luigi:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #007b33;
+        }
+
+        .riddle-feedback {
+            min-height: 2rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-top: 8px;
+            color: #ffdd57;
+        }
+
+        .riddle-hint {
+            font-size: 0.85rem;
+            color: #aad4e8;
+            margin-top: 8px;
+            font-style: italic;
+            min-height: 1.2rem;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-size: 1.3rem;
+            color: #f1c40f;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .modal-content .mario-emoji {
+            font-size: 3rem;
+            display: block;
+            margin: 10px 0;
+        }
+
+        .btn-mario {
+            background: #f1c40f;
+            color: #c0392b;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #d4a017;
+            font-family: inherit;
+            letter-spacing: 2px;
+        }
+
+        .btn-mario:hover {
+            background: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #d4a017;
+        }
+
+        .btn-mario:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #d4a017;
+        }
+
+        /* Terminal modal – étape 4 */
+        .modal-content.terminal-modal {
+            background: #0a0a0a;
+            border-color: #00ff41;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.5);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .modal-content.terminal-modal h2 {
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+            font-size: 1rem;
+            letter-spacing: 3px;
+        }
+
+        .terminal-screen {
+            background: #000;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px 18px;
+            text-align: left;
+            font-size: 0.85rem;
+            color: #00ff41;
+            line-height: 1.9;
+            margin: 12px 0;
+            box-shadow: inset 0 0 15px rgba(0,255,65,0.15);
+        }
+
+        .terminal-screen .t-dim { color: #007a20; }
+        .terminal-screen .t-hi  { color: #fff; font-weight: bold; }
+        .terminal-screen .t-code {
+            color: #ffff00;
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+
+        .terminal-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            margin: 12px 0 6px;
+            flex-wrap: wrap;
+        }
+
+        .terminal-prompt {
+            color: #00ff41;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+        }
+
+        .terminal-number-input {
+            font-size: 1.5rem;
+            width: 130px;
+            padding: 8px 10px;
+            text-align: center;
+            border: 2px solid #00ff41;
+            border-radius: 6px;
+            background: #000;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            letter-spacing: 2px;
+        }
+
+        .terminal-number-input:focus {
+            box-shadow: 0 0 12px #00ff41;
+        }
+
+        .btn-terminal {
+            background: #00ff41;
+            color: #000;
+            border: none;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #007a20;
+            transition: 0.1s;
+        }
+
+        .btn-terminal:hover { background: #33ff66; transform: translateY(-1px); }
+        .btn-terminal:active { transform: translateY(3px); box-shadow: 0 1px 0 #007a20; }
+
+        .terminal-feedback {
+            min-height: 1.8rem;
+            font-size: 0.9rem;
+            color: #ffff00;
+            font-family: 'Courier New', monospace;
+            margin-top: 6px;
+        }
+
+        /* Tetris easter – overlay objectif */
+        .tetris-target-bar {
+            font-size: 1.1rem;
+            color: #c49bff;
+            font-weight: bold;
+        }
+
+        /* ==================== INTRO CINÉMATIQUE ==================== */
+        #introOverlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 0.7s ease;
+            background: #050510;
+        }
+
+        #introOverlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #introBg {
+            position: absolute;
+            inset: 0;
+            transition: background 1.1s ease;
+        }
+
+        #starCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #introContent {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+            max-width: 700px;
+            width: 90%;
+        }
+
+        .intro-enter {
+            animation: introSceneIn 0.5s ease forwards;
+        }
+
+        .intro-exit {
+            animation: introSceneOut 0.35s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes introSceneIn {
+            from { opacity: 0; transform: scale(0.88) translateY(28px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes introSceneOut {
+            from { opacity: 1; transform: scale(1); }
+            to   { opacity: 0; transform: scale(1.07); }
+        }
+
+        @keyframes introShake {
+            0%,100% { transform: translateX(0) rotate(0deg); }
+            15%     { transform: translateX(-10px) rotate(-4deg); }
+            35%     { transform: translateX(10px) rotate(4deg); }
+            55%     { transform: translateX(-7px) rotate(-3deg); }
+            75%     { transform: translateX(7px) rotate(3deg); }
+        }
+
+        @keyframes introPulse {
+            0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,220,80,0.4)); }
+            50%      { transform: scale(1.12); filter: drop-shadow(0 0 40px rgba(255,220,80,0.9)); }
+        }
+
+        #introEmoji {
+            font-size: clamp(70px, 14vw, 100px);
+            line-height: 1.2;
+            margin-bottom: 18px;
+            filter: drop-shadow(0 0 22px rgba(255,255,255,0.3));
+            display: block;
+        }
+
+        #introTitle {
+            font-size: clamp(1.5rem, 4vw, 2.4rem);
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 28px rgba(255,255,255,0.5), 2px 2px 0 rgba(0,0,0,0.6);
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        #introSubtitle {
+            font-size: clamp(0.9rem, 2.4vw, 1.15rem);
+            color: rgba(255,255,255,0.87);
+            line-height: 1.65;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.9);
+            max-width: 520px;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        #introDots {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 10px;
+            margin-top: 26px;
+        }
+
+        .i-dot {
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.22);
+            border: 2px solid rgba(255,255,255,0.38);
+            transition: all 0.35s;
+        }
+
+        .i-dot.i-active {
+            background: #ffdd57;
+            border-color: #ffdd57;
+            box-shadow: 0 0 10px #ffdd57;
+            transform: scale(1.35);
+        }
+
+        .i-dot.i-done {
+            background: rgba(255,255,255,0.5);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        #introActions {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 15px;
+            margin-top: 22px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        #introSkipBtn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.32);
+            border-radius: 25px;
+            padding: 9px 18px;
+            color: rgba(255,255,255,0.52);
+            font-size: 0.88rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        #introSkipBtn:hover {
+            border-color: rgba(255,255,255,0.75);
+            color: #fff;
+        }
+
+        #introStartBtn {
+            background: linear-gradient(135deg, #ffb347, #ffdd57);
+            border: none;
+            border-radius: 40px;
+            padding: 18px 42px;
+            color: #2d1b4e;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 0 #a06000, 0 0 35px rgba(255,220,80,0.45);
+            animation: startGlow 2s ease infinite;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+
+        @keyframes startGlow {
+            0%,100% { box-shadow: 0 8px 0 #a06000, 0 0 30px rgba(255,220,80,0.4); }
+            50%      { box-shadow: 0 8px 0 #a06000, 0 0 60px rgba(255,220,80,0.8); }
+        }
+
+        #introStartBtn:hover  { transform: translateY(-3px); }
+        #introStartBtn:active { transform: translateY(5px); box-shadow: 0 3px 0 #a06000; }
+
+        .intro-hint {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.38);
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* ==================== TOUCH CONTROLS ==================== */
+        button, input, .btn, .btn-mario, .btn-luigi, .btn-terminal, .sound-toggle, .fullscreen-btn {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        canvas {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #touchControls {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* D-pad Snake */
+        .dpad-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dpad-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dpad-btn {
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+            background: rgba(100, 80, 180, 0.85);
+            border: 2px solid #c49bff;
+            border-radius: 16px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.4);
+            transition: 0.08s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .dpad-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+        }
+
+        .dpad-center {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            opacity: 0.5;
+        }
+
+        /* Tetris touch buttons */
+        .tetris-ctrl-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .tetris-ctrl-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tctrl-btn {
+            min-width: 90px;
+            height: 60px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: rgba(100, 80, 180, 0.85);
+            border: 2px solid #c49bff;
+            border-radius: 14px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.4);
+            transition: 0.08s;
+            padding: 0 12px;
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .tctrl-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+        }
+
+        .tctrl-rotate {
+            background: rgba(160, 60, 200, 0.9);
+            border-color: #e080ff;
+            min-width: 100px;
+        }
+
+        .tctrl-hard {
+            background: rgba(200, 80, 80, 0.9);
+            border-color: #ff9090;
+            min-width: 160px;
+        }
+
+        .tctrl-soft {
+            background: rgba(60, 130, 60, 0.9);
+            border-color: #80e080;
+            min-width: 100px;
+        }
+
+        /* Restart button (tetris game over) */
+        #restartTetrisBtn {
+            margin-top: 5px;
+            font-size: 1rem;
+            padding: 10px 22px;
+            background: #6c5ce7;
+            box-shadow: 0 4px 0 #4a3abf;
+        }
+
+        /* Tap hint on intro */
+        #introTapHint {
+            position: relative;
+            z-index: 2;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+            margin-top: 8px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        /* Show touch hint only on real touch devices */
+        @media (hover: hover) {
+            #introTapHint { display: none; }
+        }
+        @media (hover: none) {
+            .intro-hint { display: none; }
+        }
+    </style>
 </head>
-<body class="dark">
-<div class="hive-bar"></div>
-<header>
-  <a href="../../" class="header-logo">HiveOS</a>
-  <a href="../../" class="back-link">← Retour</a>
-  <button id="themeToggle" class="header-theme-toggle" aria-label="Changer le thème">🌙</button>
-</header>
-<main>
-  <div class="wip-card">
-    <span class="wip-icon">🕹️</span>
-    <div class="wip-name">MarioSnakTetrisMathematique</div>
-    <p class="wip-desc">Mini-jeux éducatifs mélangeant réflexion et maths. Bientôt disponible.</p>
-    <div class="wip-badge">⚙️ En développement</div><br>
-    <a href="../../" class="wip-back">← Retour à l'accueil</a>
-  </div>
-</main>
-<footer>
-  <span class="footer-logo">HiveOS</span>
-  <span class="footer-copy">Outils faits maison — pas de tracking, pas de compte.</span>
-</footer>
-<script>
-  (function(){
-    const t=document.getElementById('themeToggle'),b=document.body;
-    function s(l){if(l){b.classList.add('light');b.classList.remove('dark');t.textContent='☀️';localStorage.setItem('hiveTheme','light')}else{b.classList.remove('light');b.classList.add('dark');t.textContent='🌙';localStorage.setItem('hiveTheme','dark')}}
-    s(localStorage.getItem('hiveTheme')==='light');
-    t.addEventListener('click',()=>s(!b.classList.contains('light')));
-  })();
-</script>
+<body>
+    <div id="introOverlay">
+        <div id="introBg"></div>
+        <canvas id="starCanvas"></canvas>
+        <div id="introContent">
+            <div id="introEmoji"></div>
+            <div id="introTitle"></div>
+            <div id="introSubtitle"></div>
+        </div>
+        <div id="introDots"></div>
+        <div id="introActions">
+            <button id="introSkipBtn">Passer l'intro →</button>
+            <button id="introStartBtn">⭐ Partir en mission !</button>
+        </div>
+        <p class="intro-hint">Entrée ou Espace pour avancer · Échap pour passer</p>
+        <p id="introTapHint">Appuie n'importe où pour avancer</p>
+    </div>
+
+    <div class="game-wrapper" id="gameWrapper" style="display:none">
+        <div class="dragon-emoji">🐉</div>
+        <h1>L'Épée du Dragon Doux</h1>
+        <div class="subtitle">L'aventure de <strong>Nolan</strong> 🗡️</div>
+        <button class="sound-toggle" id="soundToggle">🔊 Son ON</button>
+
+        <div class="quiz-section" id="quizSection">
+            <div class="progress">
+                <div class="progress-fill" id="progressBar">0/10</div>
+            </div>
+            <div class="timer-display hidden" id="timerDisplay">⏱️ Temps restant : 2:00</div>
+            <div class="question-text" id="questionDisplay">3 × 4 = ?</div>
+            <div class="answer-row">
+                <input type="number" id="answerInput" placeholder="?" autofocus>
+                <button class="btn" id="validateBtn">Valider</button>
+            </div>
+            <div class="feedback" id="feedbackMsg"></div>
+            <div id="unlockMessage" class="unlock-msg hidden"></div>
+        </div>
+
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <div class="lock-overlay" id="lockOverlay">
+                <span>🔒</span>
+                <p id="lockText">Réponds aux 10 multiplications<br>pour débloquer le jeu Snake !</p>
+            </div>
+        </div>
+        <div class="snake-score" id="gameScoreDisplay">🐍 Score : 0</div>
+
+        <!-- Touch controls -->
+        <div id="touchControls" class="hidden">
+            <!-- D-pad Snake -->
+            <div id="snakeDpad" class="dpad-container hidden">
+                <div class="dpad-row">
+                    <button class="dpad-btn" id="dpadUp">▲</button>
+                </div>
+                <div class="dpad-row dpad-middle">
+                    <button class="dpad-btn" id="dpadLeft">◄</button>
+                    <div class="dpad-center">🐍</div>
+                    <button class="dpad-btn" id="dpadRight">►</button>
+                </div>
+                <div class="dpad-row">
+                    <button class="dpad-btn" id="dpadDown">▼</button>
+                </div>
+            </div>
+            <!-- Tetris controls -->
+            <div id="tetrisCtrl" class="tetris-ctrl-container hidden">
+                <div class="tetris-ctrl-row">
+                    <button class="tctrl-btn" id="tLeft">◄</button>
+                    <button class="tctrl-btn tctrl-rotate" id="tRotate">↻ Tourner</button>
+                    <button class="tctrl-btn" id="tRight">►</button>
+                </div>
+                <div class="tetris-ctrl-row">
+                    <button class="tctrl-btn tctrl-soft" id="tSoft">▼ Bas</button>
+                    <button class="tctrl-btn tctrl-hard" id="tHard">⬇⬇ DROP</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn fullscreen-btn" id="fullscreenBtn">📺 Plein écran</button>
+        <button class="btn fullscreen-btn hidden" id="restartTetrisBtn">🔄 Rejouer Tetris</button>
+    </div>
+
+    <div class="modal-overlay hidden" id="easterModal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        const questionDisplay = document.getElementById('questionDisplay');
+        const answerInput = document.getElementById('answerInput');
+        const validateBtn = document.getElementById('validateBtn');
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        const progressBar = document.getElementById('progressBar');
+        const unlockMessage = document.getElementById('unlockMessage');
+        const lockOverlay = document.getElementById('lockOverlay');
+        const lockText = document.getElementById('lockText');
+        const gameScoreDisplay = document.getElementById('gameScoreDisplay');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const easterModal = document.getElementById('easterModal');
+        const modalContent = document.getElementById('modalContent');
+
+        const TOTAL_QUESTIONS = 10;
+        let correctAnswer = 0;
+        let quizScore = 0;
+        let quizActive = true;
+        let quizFinished = false;
+        let appState = 'initial';
+        let soundEnabled = true;
+
+        let easterActive = false;
+        let easterStep = 0;
+        let marioTimer = null;
+        let marioTimeLeft = 120;
+        let marioQuizScore = 0;
+        let snakeTargetScore = 1500;
+        let snakeEasterMode = false;
+
+        // Étape 4 – code terminal
+        let step4QuizScore = 0;
+        let step4CodeSum = 0;
+        let step4CorrectAnswer = 0;
+
+        // Étape 5 – Tetris easter
+        let tetrisEasterMode = false;
+        const TETRIS_EASTER_TARGET = 2000;
+
+        // Guard : true dès que la victoire snake easter est détectée
+        let snakeEasterWon = false;
+
+        // =====================
+        // ÉNIGME LUIGI (étape 3)
+        // =====================
+        // La réponse est 7 : 4 salles × 3 ennemis = 12, moins 5 vaincus = 7
+        const RIDDLE_TEXT = `Dans le château de Bowser, il y a <strong>4 salles</strong>.<br>
+Dans chaque salle se cachent <strong>3 ennemis</strong>.<br>
+Mario a déjà vaincu <strong>5 ennemis</strong> en chemin.<br><br>
+Combien reste-t-il d'ennemis à vaincre pour atteindre Bowser ?`;
+        const RIDDLE_ANSWER = 7;
+        const RIDDLE_HINT_1 = '💡 Indice : commence par compter TOUS les ennemis du château (4 × 3)...';
+        const RIDDLE_HINT_2 = '💡 Indice 2 : 4 × 3 = 12 ennemis au total. Mario en a déjà vaincu 5. Il reste donc 12 − 5 = ?';
+        let riddleAttempts = 0;
+
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playNote(frequency, duration, type = 'square', gainValue = 0.15) {
+            if (!soundEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = frequency;
+            gain.gain.value = gainValue;
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playCorrectSound() {
+            playNote(523, 0.1, 'square', 0.12);
+            setTimeout(() => playNote(659, 0.1, 'square', 0.12), 80);
+            setTimeout(() => playNote(784, 0.15, 'square', 0.12), 160);
+        }
+
+        function playWrongSound() {
+            playNote(200, 0.2, 'sawtooth', 0.15);
+            setTimeout(() => playNote(150, 0.3, 'sawtooth', 0.15), 150);
+        }
+
+        function playValidateSound() {
+            playNote(440, 0.05, 'square', 0.08);
+        }
+
+        function playAppleEatSound() {
+            playNote(880, 0.08, 'square', 0.1);
+            setTimeout(() => playNote(1100, 0.08, 'square', 0.1), 60);
+            setTimeout(() => playNote(1320, 0.1, 'square', 0.1), 120);
+        }
+
+        function playMarioWinSound() {
+            const melody = [523, 659, 784, 1047, 784, 1047];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.15, 'square', 0.12), i * 100);
+            });
+        }
+
+        function playMarioFailSound() {
+            const melody = [400, 350, 300, 200];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.3, 'sawtooth', 0.15), i * 200);
+            });
+        }
+
+        function playEasterActivateSound() {
+            const melody = [262, 330, 392, 523, 392, 523, 659];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.12, 'square', 0.1), i * 90);
+            });
+        }
+
+        function playRiddleSolvedSound() {
+            // Mélodie de révélation mystérieuse puis victoire
+            const melody = [330, 392, 440, 523, 659, 784, 1047];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.18, 'sine', 0.12), i * 110);
+            });
+        }
+
+        function playFinalVictorySound() {
+            const melody = [523, 659, 784, 1047, 784, 1047, 1047, 1319, 1047];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.18, 'square', 0.13), i * 90);
+            });
+        }
+
+        function playTerminalBeep() {
+            playNote(440, 0.06, 'square', 0.08);
+            setTimeout(() => playNote(880, 0.06, 'square', 0.08), 80);
+        }
+
+        function playTerminalUnlockSound() {
+            const melody = [262, 330, 392, 523, 659, 784, 1047, 1319];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playNote(freq, 0.12, 'square', 0.1), i * 70);
+            });
+        }
+
+        // =====================
+        // TETRIS MUSIC & SFX
+        // =====================
+        const TETRIS_MELODY = [
+            659,0,494,523,587,0,523,494,
+            440,0,440,523,659,0,587,523,
+            494,0,523,587,659,0,659,659,
+            587,0,523,494,440,0,440,440
+        ];
+        let tetrisMusicPlaying = false;
+        let tetrisMusicTimeout = null;
+        let tetrisMelodyIdx = 0;
+
+        function startTetrisMusic() {
+            if (tetrisMusicPlaying) return;
+            initAudio();
+            tetrisMusicPlaying = true;
+            tetrisMelodyIdx = 0;
+            scheduleTetrisNote();
+        }
+
+        function scheduleTetrisNote() {
+            if (!tetrisMusicPlaying) return;
+            const freq = TETRIS_MELODY[tetrisMelodyIdx];
+            if (freq > 0 && soundEnabled && audioCtx) {
+                playNote(freq, 0.11, 'square', 0.055);
+                if (tetrisMelodyIdx % 8 === 0) {
+                    playNote(freq / 2, 0.10, 'triangle', 0.04);
+                }
+            }
+            tetrisMelodyIdx = (tetrisMelodyIdx + 1) % TETRIS_MELODY.length;
+            tetrisMusicTimeout = setTimeout(scheduleTetrisNote, 140);
+        }
+
+        function stopTetrisMusic() {
+            tetrisMusicPlaying = false;
+            if (tetrisMusicTimeout) { clearTimeout(tetrisMusicTimeout); tetrisMusicTimeout = null; }
+        }
+
+        function playPieceLockSound() {
+            playNote(180, 0.08, 'square', 0.07);
+            setTimeout(() => playNote(140, 0.07, 'square', 0.06), 60);
+        }
+
+        function playLineClearSound() {
+            [523, 659, 784, 1047].forEach((f, i) =>
+                setTimeout(() => playNote(f, 0.1, 'square', 0.1), i * 55)
+            );
+        }
+
+        function playHardDropSound() {
+            [400, 300, 200].forEach((f, i) =>
+                setTimeout(() => playNote(f, 0.06, 'sawtooth', 0.08), i * 35)
+            );
+        }
+
+        function playUltimateVictorySound() {
+            // Fanfare finale épique
+            const melody = [523,523,523,415,523,0,659,523,0,415,392,0,349,370,392,0,415,523,659,784];
+            melody.forEach((freq, i) => {
+                if (freq > 0) setTimeout(() => playNote(freq, 0.2, 'square', 0.13), i * 80);
+            });
+        }
+
+        soundToggle.addEventListener('click', () => {
+            initAudio();
+            soundEnabled = !soundEnabled;
+            if (soundEnabled) {
+                soundToggle.textContent = '🔊 Son ON';
+                soundToggle.classList.remove('muted');
+            } else {
+                soundToggle.textContent = '🔇 Son OFF';
+                soundToggle.classList.add('muted');
+            }
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        });
+
+        // =====================
+        // EASTER EGG : CTRL + MAJ
+        // =====================
+        function showEasterModal(title, message, emoji, buttonText, callback) {
+            modalContent.className = 'modal-content';
+            modalContent.innerHTML = `
+                <span class="mario-emoji">${emoji}</span>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <button class="btn-mario" id="modalBtn">${buttonText}</button>
+            `;
+            easterModal.classList.remove('hidden');
+
+            function dismiss() {
+                document.removeEventListener('keydown', enterDismiss);
+                easterModal.classList.add('hidden');
+                if (callback) callback();
+            }
+            function enterDismiss(e) {
+                if (e.key === 'Enter') { e.preventDefault(); dismiss(); }
+            }
+            document.getElementById('modalBtn').addEventListener('click', dismiss);
+            document.addEventListener('keydown', enterDismiss);
+        }
+
+        // Modal spécial pour l'énigme de Luigi (étape 3)
+        function showRiddleModal() {
+            riddleAttempts = 0;
+            modalContent.className = 'modal-content riddle-modal';
+            modalContent.innerHTML = `
+                <span class="mario-emoji">🟢🔍</span>
+                <h2>L'ÉNIGME DE LUIGI POUR NOLAN</h2>
+                <p style="color:#aad4e8; text-shadow:none;">
+                    Luigi murmure : <em>"Nolan, tu es le seul assez malin pour résoudre ça.
+                    Sans cette réponse, la porte secrète reste fermée pour toujours !"</em>
+                </p>
+                <div class="riddle-box">${RIDDLE_TEXT}</div>
+                <div class="riddle-input-row">
+                    <input type="number" class="riddle-number-input" id="riddleInput" placeholder="?" min="0" max="99">
+                    <button class="btn-luigi" id="riddleValidateBtn">Répondre !</button>
+                </div>
+                <div class="riddle-feedback" id="riddleFeedback"></div>
+                <div class="riddle-hint" id="riddleHint"></div>
+            `;
+            easterModal.classList.remove('hidden');
+
+            const riddleInput = document.getElementById('riddleInput');
+            const riddleValidateBtn = document.getElementById('riddleValidateBtn');
+
+            riddleInput.focus();
+
+            riddleValidateBtn.addEventListener('click', checkRiddleAnswer);
+            riddleInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkRiddleAnswer();
+            });
+        }
+
+        function checkRiddleAnswer() {
+            const riddleInput = document.getElementById('riddleInput');
+            const riddleFeedback = document.getElementById('riddleFeedback');
+            const riddleHint = document.getElementById('riddleHint');
+            if (!riddleInput) return;
+
+            const val = riddleInput.value.trim();
+            if (val === '') {
+                riddleFeedback.textContent = 'Nolan, écris un nombre pour répondre ! 😊';
+                return;
+            }
+            const num = parseInt(val, 10);
+            if (isNaN(num)) {
+                riddleFeedback.textContent = 'Un nombre, pas une lettre ! Tu peux le faire 😉';
+                return;
+            }
+
+            riddleAttempts++;
+
+            if (num === RIDDLE_ANSWER) {
+                playRiddleSolvedSound();
+                riddleFeedback.style.color = '#00e676';
+                riddleFeedback.textContent = '✅ EXACT ! Tu es un génie Nolan ! 🧠⭐';
+                riddleHint.textContent = '';
+                document.getElementById('riddleValidateBtn').disabled = true;
+                riddleInput.disabled = true;
+
+                setTimeout(() => {
+                    easterModal.classList.add('hidden');
+                    startCodeTerminalChallenge();
+                }, 1500);
+            } else {
+                playWrongSound();
+                riddleFeedback.style.color = '#ff6b6b';
+
+                if (riddleAttempts === 1) {
+                    riddleFeedback.textContent = '❌ Pas tout à fait… Réfléchis bien, tu vas y arriver ! 💪';
+                    riddleHint.textContent = RIDDLE_HINT_1;
+                } else if (riddleAttempts === 2) {
+                    riddleFeedback.textContent = '❌ Presque ! Je t\'aide un peu… 🍀';
+                    riddleHint.textContent = RIDDLE_HINT_2;
+                } else {
+                    riddleFeedback.textContent = `❌ La réponse était <strong>${RIDDLE_ANSWER}</strong>. Mais tu as tout essayé, bravo pour le courage ! 💪`;
+                    riddleFeedback.innerHTML = `❌ La réponse était <strong>${RIDDLE_ANSWER}</strong>. Mais tu as tout essayé, bravo pour le courage ! 💪`;
+                    riddleHint.textContent = '';
+                    document.getElementById('riddleValidateBtn').disabled = true;
+                    riddleInput.disabled = true;
+                    setTimeout(() => {
+                        easterModal.classList.add('hidden');
+                        startCodeTerminalChallenge();
+                    }, 2500);
+                }
+
+                riddleInput.value = '';
+                if (!document.getElementById('riddleValidateBtn').disabled) {
+                    riddleInput.focus();
+                }
+            }
+        }
+
+        // =====================
+        // ÉTAPE 4 : CODE DU TERMINAL
+        // =====================
+        function startCodeTerminalChallenge() {
+            easterStep = 4;
+            step4QuizScore = 0;
+            step4CodeSum = 0;
+            quizActive = true;
+            quizFinished = false;
+            answerInput.disabled = false;
+            validateBtn.disabled = false;
+            answerInput.value = '';
+            answerInput.focus();
+
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0/10';
+            generateCodeQuestion();
+            feedbackMsg.innerHTML = '💻 <strong>Mario :</strong> "Nolan, réponds aux 10 additions pour générer le code secret !" 🔐';
+            unlockMessage.innerHTML = '🔐 Code en cours de calcul… <span id="codeRunning">0</span> (0/10)';
+            unlockMessage.classList.remove('hidden');
+            lockOverlay.classList.add('hidden');
+            lockOverlay.style.display = 'none';
+
+            showEasterModal(
+                '🔐 LE CODE DE LA PORTE SECRÈTE 🔐',
+                'Mario et Luigi sont enfin réunis devant la grande porte du donjon !<br><br>' +
+                'Mais la porte est verrouillée par un <strong>code numérique</strong>.<br>' +
+                'Le code = la somme de tes 10 réponses aux additions.<br><br>' +
+                'Réponds correctement et ton code s\'affichera en direct ! 💻',
+                '👨‍💻🔢',
+                'Calculer le code ! 🚀',
+                () => { answerInput.focus(); }
+            );
+        }
+
+        function generateCodeQuestion() {
+            const a = Math.floor(Math.random() * 30) + 10;
+            const b = Math.floor(Math.random() * 30) + 10;
+            step4CorrectAnswer = a + b;
+            questionDisplay.textContent = `${a} + ${b} = ?`;
+        }
+
+        function checkCodeAnswer() {
+            if (!quizActive || quizFinished || easterStep !== 4) return;
+
+            const userAnswer = answerInput.value.trim();
+            if (userAnswer === '') {
+                feedbackMsg.innerHTML = 'Nolan, écris un nombre ! 😊';
+                return;
+            }
+            const answerNum = parseInt(userAnswer, 10);
+            if (isNaN(answerNum)) {
+                feedbackMsg.innerHTML = 'Un chiffre, pas une lettre ! 😉';
+                return;
+            }
+
+            playValidateSound();
+
+            if (answerNum === step4CorrectAnswer) {
+                playCorrectSound();
+                step4QuizScore++;
+                step4CodeSum += step4CorrectAnswer;
+                progressBar.style.width = (step4QuizScore / TOTAL_QUESTIONS * 100) + '%';
+                progressBar.textContent = step4QuizScore + '/10';
+
+                const codeEl = document.getElementById('codeRunning');
+                if (codeEl) codeEl.textContent = step4CodeSum;
+                unlockMessage.innerHTML = `🔐 Code en cours… <strong>${step4CodeSum}</strong> (${step4QuizScore}/10)`;
+
+                const encouragements = [
+                    '✅ Parfait Nolan ! Le code progresse ! 💻',
+                    '✅ Exact ! La machine enregistre ta réponse… 🖥️',
+                    '✅ Brillant ! Continue champion ! ⚡',
+                    '✅ Oui ! Le terminal t\'adore Nolan ! 🌟'
+                ];
+                feedbackMsg.innerHTML = encouragements[Math.floor(Math.random() * encouragements.length)];
+
+                if (step4QuizScore >= TOTAL_QUESTIONS) {
+                    quizActive = false;
+                    quizFinished = true;
+                    answerInput.disabled = true;
+                    validateBtn.disabled = true;
+                    setTimeout(step4QuizComplete, 900);
+                } else {
+                    setTimeout(() => {
+                        if (easterStep === 4 && !quizFinished) {
+                            answerInput.value = '';
+                            answerInput.focus();
+                            generateCodeQuestion();
+                            feedbackMsg.innerHTML = `💻 Code actuel : <strong>${step4CodeSum}</strong> — Encore ${TOTAL_QUESTIONS - step4QuizScore} addition(s) !`;
+                        }
+                    }, 900);
+                }
+            } else {
+                playWrongSound();
+                feedbackMsg.innerHTML = `❌ Pas tout à fait… La réponse était <strong>${step4CorrectAnswer}</strong>. Nouvelle question !`;
+                setTimeout(() => {
+                    if (easterStep === 4 && !quizFinished) {
+                        answerInput.value = '';
+                        answerInput.focus();
+                        generateCodeQuestion();
+                        feedbackMsg.innerHTML = `💻 Code actuel : <strong>${step4CodeSum}</strong> — Continue Nolan ! 💪`;
+                    }
+                }, 1500);
+            }
+        }
+
+        function step4QuizComplete() {
+            unlockMessage.classList.add('hidden');
+            playTerminalBeep();
+            showEasterModal(
+                '💾 CODE GÉNÉRÉ ! 💾',
+                `Incroyable Nolan !<br><br>
+                Tu as résolu les 10 additions.<br>
+                Le système a calculé ton code secret : <br><br>
+                <span style="font-size:2rem;font-weight:bold;color:#ffff00;letter-spacing:6px;">${step4CodeSum}</span><br><br>
+                Maintenant, saisis ce code dans le terminal pour ouvrir la porte ! 🚪`,
+                '💾🔑',
+                'Ouvrir le terminal ! 💻',
+                showTerminalModal
+            );
+        }
+
+        function showTerminalModal() {
+            easterStep = 4; // reste 4 jusqu'à validation du code
+            modalContent.className = 'modal-content terminal-modal';
+            modalContent.innerHTML = `
+                <h2>⬛ TERMINAL DU CHÂTEAU BOWSER ⬛</h2>
+                <div class="terminal-screen">
+                    <span class="t-dim">BOWSER_CASTLE_SECURITY v2.0</span><br>
+                    <span class="t-dim">══════════════════════════════</span><br>
+                    <span class="t-dim">&gt;</span> Système de verrouillage actif…<br>
+                    <span class="t-dim">&gt;</span> Authentification requise.<br>
+                    <span class="t-dim">&gt;</span> Code calculé par l'opérateur :<br>
+                    &nbsp;&nbsp;<span class="t-code">${step4CodeSum}</span><br>
+                    <span class="t-dim">&gt;</span> <span class="t-hi">Entrez le code pour déverrouiller.</span>
+                </div>
+                <div class="terminal-input-row">
+                    <span class="terminal-prompt">root@bowser:~$</span>
+                    <input type="number" class="terminal-number-input" id="terminalInput" placeholder="____">
+                    <button class="btn-terminal" id="terminalValidateBtn">ENTER ↵</button>
+                </div>
+                <div class="terminal-feedback" id="terminalFeedback"></div>
+            `;
+            easterModal.classList.remove('hidden');
+
+            const terminalInput = document.getElementById('terminalInput');
+            const terminalValidateBtn = document.getElementById('terminalValidateBtn');
+            terminalInput.focus();
+
+            terminalValidateBtn.addEventListener('click', checkTerminalCode);
+            terminalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkTerminalCode();
+            });
+        }
+
+        function checkTerminalCode() {
+            const terminalInput = document.getElementById('terminalInput');
+            const terminalFeedback = document.getElementById('terminalFeedback');
+            if (!terminalInput) return;
+
+            const val = terminalInput.value.trim();
+            if (val === '') { terminalFeedback.textContent = '> Erreur : code vide.'; return; }
+            const num = parseInt(val, 10);
+            if (isNaN(num)) { terminalFeedback.textContent = '> Erreur : saisie invalide.'; return; }
+
+            playTerminalBeep();
+
+            if (num === step4CodeSum) {
+                playTerminalUnlockSound();
+                terminalFeedback.innerHTML = '> <span style="color:#00ff41">ACCÈS ACCORDÉ ✅ — Porte déverrouillée !</span>';
+                document.getElementById('terminalValidateBtn').disabled = true;
+                terminalInput.disabled = true;
+                setTimeout(() => {
+                    easterModal.classList.add('hidden');
+                    startPeachTetrisChallenge();
+                }, 1800);
+            } else {
+                terminalFeedback.innerHTML = `> <span style="color:#ff4444">ACCÈS REFUSÉ ❌ — Code incorrect. Réessaie !</span>`;
+                terminalInput.value = '';
+                terminalInput.focus();
+            }
+        }
+
+        // =====================
+        // ÉTAPE 5 : TETRIS SAUVETAGE PEACH
+        // =====================
+        function startPeachTetrisChallenge() {
+            easterStep = 5;
+            tetrisEasterMode = true;
+            stopSnake();
+
+            progressBar.style.width = '0%';
+            progressBar.textContent = 'Objectif : 2 000 pts';
+            feedbackMsg.innerHTML = '';
+            unlockMessage.innerHTML = '👸 <strong>Peach :</strong> "Nolan, casse les briques pour ouvrir ma cage ! 2 000 points !" 🧱';
+            unlockMessage.classList.remove('hidden');
+            gameScoreDisplay.textContent = '🧱 Score : 0 / Objectif : 2 000';
+
+            showEasterModal(
+                '🧱 DERNIÈRE ÉPREUVE : LIBÈRE PEACH ! 🧱',
+                'La porte s\'est ouverte ! Mais Peach est enfermée dans une cage de briques magiques !<br><br>' +
+                'Mario crie : <em>"Nolan, utilise les flèches pour jouer au Tetris ! ' +
+                'Atteins <strong>2 000 points</strong> et les briques s\'effondreront !"</em><br><br>' +
+                '⬆️ Tourner &nbsp; ⬅️➡️ Déplacer &nbsp; ⬇️ Descendre &nbsp; Espace = Drop 💥',
+                '👸🧱',
+                'Je libère Peach ! 🧱',
+                () => { startTetrisEasterGame(); }
+            );
+        }
+
+        function startTetrisEasterGame() {
+            stopTetrisMusic();
+            tetrisBoard = createBoard();
+            tetrisScore = 0;
+            gameScoreDisplay.textContent = '🧱 Score : 0 / Objectif : 2 000';
+            currentPiece = randomPiece();
+            tetrisRunning = true;
+            drawTetris();
+            if (tetrisInterval) clearInterval(tetrisInterval);
+            tetrisInterval = setInterval(moveDown, 700);
+            startTetrisMusic();
+        }
+
+        function checkTetrisEasterVictory() {
+            if (tetrisEasterMode && easterStep === 5 && tetrisScore >= TETRIS_EASTER_TARGET) {
+                tetrisEasterMode = false;
+                tetrisRunning = false;
+                clearInterval(tetrisInterval);
+                tetrisInterval = null;
+                drawTetris();
+                setTimeout(showUltimateVictory, 600);
+            }
+        }
+
+        function showUltimateVictory() {
+            playUltimateVictorySound();
+            const riddlePerfect = riddleAttempts <= 1;
+            showEasterModal(
+                '👑 VICTOIRE ABSOLUE ! PEACH EST LIBRE ! 👑',
+                `<strong>NOLAN, TU ES LE HÉROS LÉGENDAIRE DU ROYAUME CHAMPIGNON !</strong><br><br>
+                ✅ Tu as résolu les 10 multiplications chronométrées<br>
+                ✅ Tu as atteint 1500 points au Snake pour Luigi<br>
+                ✅ Tu as résolu l'énigme logique de la porte${riddlePerfect ? ' <em>(du premier coup !)</em>' : ''}<br>
+                ✅ Tu as calculé le code secret du terminal<br>
+                ✅ Tu as atteint 2 000 points au Tetris pour libérer Peach !<br><br>
+                Mario et Luigi te saluent. Peach t'envoie un cœur 💜.<br>
+                Bowser s'est enfui en pleurant 😭.<br><br>
+                <strong>Nolan, tu es INCROYABLE. 🌟👑</strong>`,
+                '👸🌟',
+                '🎉 À bientôt, héros ! 🎉',
+                () => {
+                    easterActive = false;
+                    tetrisEasterMode = false;
+                    resetNormalMode();
+                }
+            );
+        }
+
+        function activateEasterEgg() {
+            if (easterActive) return;
+            initAudio();
+            playEasterActivateSound();
+            easterActive = true;
+            easterStep = 0;
+
+            stopQuiz();
+            stopSnake();
+            stopTetris();
+
+            showEasterModal(
+                '🚨 ALERTE ROYAUME CHAMPIGNON 🚨',
+                'Nolan ! La princesse Peach a été kidnappée par Bowser et sa bande de losers !<br><br>Mario et Luigi ont besoin de TOI. Tu es le seul capable de résoudre les énigmes assez vite pour les mettre sur la bonne piste.<br><br>Tu te sens prêt, champion ? 🍄',
+                '👸🍄',
+                'J\'arrive Mario ! ⭐',
+                startMarioChallenge
+            );
+        }
+
+        function startMarioChallenge() {
+            easterStep = 1;
+            marioQuizScore = 0;
+            marioTimeLeft = 120;
+            quizActive = true;
+            quizFinished = false;
+            answerInput.disabled = false;
+            validateBtn.disabled = false;
+            answerInput.value = '';
+            answerInput.focus();
+
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0/' + TOTAL_QUESTIONS;
+            timerDisplay.classList.remove('hidden');
+            updateTimerDisplay();
+            generateMarioQuestion();
+            feedbackMsg.innerHTML = '🍄 <strong>Mario :</strong> "Nolan, vite ! Aide-moi avec ces calculs, chaque seconde compte !" ⏱️';
+            lockOverlay.classList.add('hidden');
+            lockOverlay.style.display = 'none';
+
+            if (marioTimer) clearInterval(marioTimer);
+            marioTimer = setInterval(() => {
+                marioTimeLeft--;
+                updateTimerDisplay();
+                if (marioTimeLeft <= 0) {
+                    clearInterval(marioTimer);
+                    marioTimer = null;
+                    marioTimeUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(marioTimeLeft / 60);
+            const seconds = marioTimeLeft % 60;
+            timerDisplay.textContent = `⏱️ Temps restant : ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            if (marioTimeLeft <= 30) {
+                timerDisplay.style.color = '#ff4444';
+            } else if (marioTimeLeft <= 60) {
+                timerDisplay.style.color = '#ffaa00';
+            }
+        }
+
+        function generateMarioQuestion() {
+            const a = Math.floor(Math.random() * 8) + 2;
+            const b = Math.floor(Math.random() * 8) + 2;
+            correctAnswer = a * b;
+            questionDisplay.textContent = `${a} × ${b} = ?`;
+        }
+
+        function marioTimeUp() {
+            quizActive = false;
+            quizFinished = true;
+            answerInput.disabled = true;
+            validateBtn.disabled = true;
+            timerDisplay.classList.add('hidden');
+            playMarioFailSound();
+
+            showEasterModal(
+                '💀 MINCE, LE TEMPS EST ÉCOULÉ... 💀',
+                'Nolan, Mario n\'a pas réussi à temps...<br>Bowser est en train de se moquer de nous !<br><br>Mais je te connais, tu n\'abandonnes jamais. Tu veux retenter ta chance ?',
+                '🐢💨',
+                'Je réessaye ! 🔄',
+                () => {
+                    easterActive = false;
+                    resetNormalMode();
+                }
+            );
+        }
+
+        function checkMarioAnswer() {
+            if (!quizActive || quizFinished || easterStep !== 1) return;
+
+            const userAnswer = answerInput.value.trim();
+            if (userAnswer === '') {
+                feedbackMsg.innerHTML = 'Nolan, écris un nombre ! Je sais que tu peux le faire 😊';
+                return;
+            }
+
+            const answerNum = parseInt(userAnswer, 10);
+            if (isNaN(answerNum)) {
+                feedbackMsg.innerHTML = 'Hé hé, mets un chiffre, pas une lettre Nolan ! 😉';
+                return;
+            }
+
+            playValidateSound();
+
+            if (answerNum === correctAnswer) {
+                playCorrectSound();
+                marioQuizScore++;
+                progressBar.style.width = (marioQuizScore / TOTAL_QUESTIONS * 100) + '%';
+                progressBar.textContent = marioQuizScore + '/' + TOTAL_QUESTIONS;
+
+                const encouragements = [
+                    '✅ Magnifique Nolan ! Tu gères ! 🌟',
+                    '✅ Yes ! Continue comme ça champion ! 🚀',
+                    '✅ Parfait ! Mario serait fier de toi ! ⭐',
+                    '✅ Excellent ! Tu es un vrai génie des maths ! 🧠',
+                    '✅ Waw, même pas peur ! Continue ! 💪'
+                ];
+                feedbackMsg.innerHTML = encouragements[Math.floor(Math.random() * encouragements.length)];
+
+                if (marioQuizScore >= TOTAL_QUESTIONS) {
+                    marioChallengeComplete();
+                } else {
+                    setTimeout(() => {
+                        if (!quizFinished && easterStep === 1) {
+                            answerInput.value = '';
+                            answerInput.focus();
+                            generateMarioQuestion();
+                            feedbackMsg.innerHTML = '🍄 <strong>Mario :</strong> "Nolan, t\'es mon héros ! Encore un petit effort !"';
+                        }
+                    }, 800);
+                }
+            } else {
+                playWrongSound();
+                feedbackMsg.innerHTML = `❌ Pas grave Nolan, la réponse était <strong>${correctAnswer}</strong>.<br>Tu apprends, c'est comme ça qu'on devient plus fort ! 💪😊`;
+                setTimeout(() => {
+                    if (!quizFinished && easterStep === 1) {
+                        answerInput.value = '';
+                        answerInput.focus();
+                        generateMarioQuestion();
+                        feedbackMsg.innerHTML = '🍄 <strong>Mario :</strong> "Ne lâche rien Nolan, tu vas y arriver !"';
+                    }
+                }, 1500);
+            }
+        }
+
+        function marioChallengeComplete() {
+            quizActive = false;
+            quizFinished = true;
+            answerInput.disabled = true;
+            validateBtn.disabled = true;
+            timerDisplay.classList.add('hidden');
+            clearInterval(marioTimer);
+            marioTimer = null;
+            playMarioWinSound();
+
+            showEasterModal(
+                '⭐ INCROYABLE NOLAN ! MARIO EST SAUVÉ ! ⭐',
+                'Tu as réussi les 10 calculs dans le temps imparti !<br>Grâce à toi, Mario a trouvé le chemin du château de Bowser !<br><br>Mais maintenant, c\'est Luigi qui a besoin de toi. Il doit obtenir <strong>plus de 1500 points</strong> au jeu Snake pour ouvrir la grande porte.<br><br>Tu vas l\'aider, hein ? Je sais que tu adores les défis ! 🐍',
+                '👦🍄',
+                'Go Luigi ! 🐍',
+                startLuigiSnakeChallenge
+            );
+        }
+
+        function startLuigiSnakeChallenge() {
+            easterStep = 2;
+            snakeEasterMode = true;
+            snakeTargetScore = 1500;
+            feedbackMsg.innerHTML = '';
+            progressBar.style.width = '0%';
+            progressBar.textContent = 'Objectif : 1500 points';
+
+            lockOverlay.classList.add('hidden');
+            lockOverlay.style.display = 'none';
+            unlockMessage.classList.remove('hidden');
+            unlockMessage.innerHTML = '👦 <strong>Luigi :</strong> "Nolan ! Aide-moi à atteindre 1500 points au Snake ! Je compte sur toi !" 🐍';
+            gameScoreDisplay.textContent = '🐍 Score : 0 / Objectif : 1500';
+
+            startSnakeGame();
+        }
+
+        function checkLuigiSnakeVictory() {
+            if (easterStep === 2 && snakeEasterMode && snakeScore >= snakeTargetScore && !snakeEasterWon) {
+                snakeEasterWon = true;
+                snakeEasterMode = false;
+                snakeRunning = false;
+                clearInterval(snakeInterval);
+                snakeInterval = null;
+                drawSnake();
+
+                setTimeout(() => {
+                    playMarioWinSound();
+                    showEasterModal(
+                        '🎉 1500 POINTS ! LA PORTE S\'OUVRE... PRESQUE ! 🎉',
+                        'INCROYABLE Nolan ! Tu as atteint les 1500 points !<br><br>' +
+                        'La porte du château commence à s\'ouvrir, mais il reste <strong>un dernier verrou</strong>.<br><br>' +
+                        'Luigi chuchote : <em>"Il y a une inscription gravée sur la porte. C\'est une énigme logique. ' +
+                        'Seul Nolan peut la résoudre, il est le plus fort !"</em> 🔐',
+                        '👦🔐',
+                        'Je résous l\'énigme ! 🧠',
+                        startLuigiRiddleChallenge
+                    );
+                }, 800);
+            }
+        }
+
+        // =====================
+        // ÉTAPE 3 : ÉNIGME DE LUIGI
+        // =====================
+        function startLuigiRiddleChallenge() {
+            easterStep = 3;
+            unlockMessage.innerHTML = '🧠 <strong>Luigi :</strong> "L\'énigme est gravée sur la porte... Lis-la bien Nolan !" 🔐';
+            showRiddleModal();
+        }
+
+        function stopQuiz() {
+            quizActive = false;
+            quizFinished = true;
+            answerInput.disabled = true;
+            validateBtn.disabled = true;
+            timerDisplay.classList.add('hidden');
+            if (marioTimer) {
+                clearInterval(marioTimer);
+                marioTimer = null;
+            }
+        }
+
+        function stopSnake() {
+            snakeRunning = false;
+            if (snakeInterval) {
+                clearInterval(snakeInterval);
+                snakeInterval = null;
+            }
+        }
+
+        function stopTetris() {
+            tetrisRunning = false;
+            if (tetrisInterval) {
+                clearInterval(tetrisInterval);
+                tetrisInterval = null;
+            }
+            stopTetrisMusic();
+        }
+
+        function resetNormalMode() {
+            stopQuiz();
+            stopSnake();
+            stopTetris();
+            easterActive = false;
+            easterStep = 0;
+            snakeEasterMode = false;
+            snakeEasterWon = false;
+            tetrisEasterMode = false;
+            step4QuizScore = 0;
+            step4CodeSum = 0;
+            appState = 'initial';
+            quizScore = 0;
+            quizFinished = false;
+            quizActive = true;
+            answerInput.disabled = false;
+            validateBtn.disabled = false;
+            answerInput.value = '';
+            answerInput.focus();
+            updateProgress();
+            generateQuestion();
+            feedbackMsg.innerHTML = '';
+            unlockMessage.classList.add('hidden');
+            timerDisplay.classList.add('hidden');
+            lockOverlay.classList.remove('hidden');
+            lockOverlay.style.display = 'flex';
+            lockText.innerHTML = 'Réponds aux 10 multiplications<br>pour débloquer le jeu Snake !';
+            gameScoreDisplay.textContent = '🐍 Score : 0';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0/10';
+            drawSnake();
+        }
+
+        // =====================
+        // QUIZ NORMAL
+        // =====================
+        function generateQuestion() {
+            const a = Math.floor(Math.random() * 8) + 2;
+            const b = Math.floor(Math.random() * 8) + 2;
+            correctAnswer = a * b;
+            questionDisplay.textContent = `${a} × ${b} = ?`;
+        }
+
+        function updateProgress() {
+            const percent = (quizScore / TOTAL_QUESTIONS) * 100;
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = quizScore + '/' + TOTAL_QUESTIONS;
+        }
+
+        function skipQuiz() {
+            if (!quizActive || quizFinished) return;
+            if (easterActive) return;
+            quizScore = TOTAL_QUESTIONS;
+            updateProgress();
+            feedbackMsg.innerHTML = '🔓 Accès secret activé ! Le jeu est débloqué ! 🎮';
+            finishQuiz();
+        }
+
+        function finishQuiz() {
+            quizFinished = true;
+            quizActive = false;
+            answerInput.disabled = true;
+            validateBtn.disabled = true;
+
+            if (appState === 'initial') {
+                appState = 'snake_unlocked';
+                unlockMessage.innerHTML = '🎉 Bravo Nolan ! Le Snake est débloqué ! Amuse-toi bien ! 🐍';
+                unlockMessage.classList.remove('hidden');
+                lockOverlay.classList.add('hidden');
+                lockOverlay.style.display = 'none';
+                startSnakeGame();
+            } else if (appState === 'gameover_quiz') {
+                appState = 'tetris_unlocked';
+                unlockMessage.innerHTML = '🎉 Bravo Nolan ! Le Tetris est débloqué ! À toi de jouer ! 🧱';
+                unlockMessage.classList.remove('hidden');
+                lockOverlay.classList.add('hidden');
+                lockOverlay.style.display = 'none';
+                startTetrisGame();
+            }
+        }
+
+        function checkAnswer() {
+            if (easterActive) {
+                checkMarioAnswer();
+                return;
+            }
+            if (!quizActive || quizFinished) return;
+
+            const userAnswer = answerInput.value.trim();
+            if (userAnswer === '') {
+                feedbackMsg.innerHTML = 'Nolan, écris un nombre ! Je suis sûr que tu connais la réponse 😊';
+                return;
+            }
+
+            const answerNum = parseInt(userAnswer, 10);
+            if (isNaN(answerNum)) {
+                feedbackMsg.innerHTML = 'Hé hé, mets un chiffre, pas une lettre Nolan ! 😉';
+                return;
+            }
+
+            if (answerNum === correctAnswer) {
+                quizScore++;
+                updateProgress();
+                const encouragements = [
+                    '✅ Bravo Nolan ! Tu progresses super bien ! 🌟',
+                    '✅ Excellent ! T\'es vraiment fort en maths ! 🚀',
+                    '✅ Parfait ! Continue comme ça champion ! ⭐',
+                    '✅ Yes ! Tu gères de mieux en mieux ! 💪'
+                ];
+                feedbackMsg.innerHTML = encouragements[Math.floor(Math.random() * encouragements.length)];
+
+                if (quizScore >= TOTAL_QUESTIONS) {
+                    finishQuiz();
+                    feedbackMsg.innerHTML = '🏆 Nolan, tu as réussi les 10 calculs ! Tu es un champion ! 🎉';
+                } else {
+                    setTimeout(() => {
+                        if (!quizFinished) {
+                            answerInput.value = '';
+                            answerInput.focus();
+                            generateQuestion();
+                            feedbackMsg.innerHTML = '';
+                        }
+                    }, 1000);
+                }
+            } else {
+                feedbackMsg.innerHTML = `❌ Pas tout à fait Nolan... La réponse était <strong>${correctAnswer}</strong>.<br>Ne t'inquiète pas, c'est en se trompant qu'on apprend ! 💪😊`;
+                setTimeout(() => {
+                    if (!quizFinished) {
+                        answerInput.value = '';
+                        answerInput.focus();
+                        generateQuestion();
+                        feedbackMsg.innerHTML = '';
+                    }
+                }, 1800);
+            }
+        }
+
+        function clearAnswer() {
+            if (!quizActive || quizFinished) return;
+            answerInput.value = '';
+            answerInput.focus();
+            feedbackMsg.innerHTML = '';
+        }
+
+        function resetQuizForTetris() {
+            quizScore = 0;
+            quizFinished = false;
+            quizActive = true;
+            answerInput.disabled = false;
+            validateBtn.disabled = false;
+            answerInput.value = '';
+            answerInput.focus();
+            updateProgress();
+            feedbackMsg.innerHTML = 'Game Over Nolan ! Réponds aux 10 multiplications pour débloquer Tetris ! 💪';
+            unlockMessage.classList.add('hidden');
+            generateQuestion();
+            lockOverlay.classList.remove('hidden');
+            lockOverlay.style.display = 'flex';
+            lockText.innerHTML = 'Réponds aux 10 multiplications<br>pour débloquer Tetris !';
+        }
+
+        // =====================
+        // SNAKE
+        // =====================
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{x: 10, y: 10}];
+        let direction = {x: 0, y: 0};
+        let food = {x: 15, y: 10};
+        let snakeScore = 0;
+        let snakeRunning = false;
+        let snakeInterval = null;
+
+        function randomFood() {
+            let newFood;
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (snake.some(seg => seg.x === newFood.x && seg.y === newFood.y));
+            food = newFood;
+        }
+
+        function drawSnake() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(
+                food.x * gridSize + gridSize/2,
+                food.y * gridSize + gridSize/2,
+                gridSize/2 - 2, 0, Math.PI*2
+            );
+            ctx.fill();
+
+            for (let i = 0; i < snake.length; i++) {
+                const seg = snake[i];
+                ctx.fillStyle = i === 0 ? '#4ecdc4' : '#2ecc71';
+                ctx.fillRect(seg.x * gridSize + 2, seg.y * gridSize + 2, gridSize - 4, gridSize - 4);
+            }
+
+            if (!snakeRunning && (appState === 'snake_unlocked' || easterStep === 2) && !snakeEasterWon) {
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.font = 'bold 18px "Comic Sans MS"';
+                ctx.textAlign = 'center';
+                ctx.fillText('Game Over', canvas.width/2, canvas.height/2 - 20);
+                ctx.font = '14px "Comic Sans MS"';
+                if (easterStep === 2) {
+                    ctx.fillText('Pas assez de points pour Luigi...', canvas.width/2, canvas.height/2 + 20);
+                } else {
+                    ctx.fillText('Pas grave, le quiz revient !', canvas.width/2, canvas.height/2 + 20);
+                }
+            }
+        }
+
+        function updateSnake() {
+            if (!snakeRunning) return;
+            if (direction.x === 0 && direction.y === 0) return;
+
+            const head = {
+                x: snake[0].x + direction.x,
+                y: snake[0].y + direction.y
+            };
+
+            if (head.x < 0) head.x = tileCount - 1;
+            if (head.x >= tileCount) head.x = 0;
+            if (head.y < 0) head.y = tileCount - 1;
+            if (head.y >= tileCount) head.y = 0;
+
+            if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
+                snakeGameOver();
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 100;
+                playAppleEatSound();
+
+                if (snakeEasterMode) {
+                    gameScoreDisplay.textContent = '🐍 Score : ' + snakeScore + ' / Objectif : ' + snakeTargetScore;
+                    checkLuigiSnakeVictory();
+                } else {
+                    gameScoreDisplay.textContent = '🐍 Score : ' + snakeScore;
+                }
+                randomFood();
+            } else {
+                snake.pop();
+            }
+
+            drawSnake();
+        }
+
+        function snakeGameOver() {
+            if (snakeEasterWon) return;
+            snakeRunning = false;
+            clearInterval(snakeInterval);
+            snakeInterval = null;
+            drawSnake();
+
+            if (snakeEasterMode && easterStep === 2) {
+                setTimeout(() => {
+                    showEasterModal(
+                        '😢 PAS ASSEZ DE POINTS NOLAN...',
+                        'Tu as fait de ton mieux, mais Luigi n\'a pas atteint les 1500 points...<br>La porte du château reste fermée pour l\'instant.<br><br>Je sais que tu peux y arriver, tu veux retenter ?',
+                        '🚪🔒',
+                        'Je réessaye ! 🔄',
+                        startLuigiSnakeChallenge
+                    );
+                }, 800);
+                return;
+            }
+
+            appState = 'gameover_quiz';
+            resetQuizForTetris();
+            gameScoreDisplay.textContent = '🐍 Score final : ' + snakeScore;
+        }
+
+        function startSnakeGame() {
+            snake = [{x: 10, y: 10}];
+            direction = {x: 0, y: 0};
+            snakeScore = 0;
+            if (snakeEasterMode) {
+                gameScoreDisplay.textContent = '🐍 Score : 0 / Objectif : ' + snakeTargetScore;
+            } else {
+                gameScoreDisplay.textContent = '🐍 Score : 0';
+            }
+            randomFood();
+            snakeRunning = true;
+            drawSnake();
+            if (snakeInterval) clearInterval(snakeInterval);
+            snakeInterval = setInterval(updateSnake, 100);
+        }
+
+        // =====================
+        // TETRIS
+        // =====================
+        const COLS = 10;
+        const ROWS = 20;
+        const BLOCK_SIZE = 20;
+        const TETRIS_OFFSET_X = (canvas.width - COLS * BLOCK_SIZE) / 2;
+
+        const TETROMINOS = {
+            I: { shape: [[1,1,1,1]], color: '#00f0f0' },
+            O: { shape: [[1,1],[1,1]], color: '#f0f000' },
+            T: { shape: [[0,1,0],[1,1,1]], color: '#a000f0' },
+            S: { shape: [[0,1,1],[1,1,0]], color: '#00f000' },
+            Z: { shape: [[1,1,0],[0,1,1]], color: '#f00000' },
+            J: { shape: [[1,0,0],[1,1,1]], color: '#0000f0' },
+            L: { shape: [[0,0,1],[1,1,1]], color: '#f0a000' }
+        };
+        const TETRO_KEYS = Object.keys(TETROMINOS);
+
+        let tetrisBoard = [];
+        let currentPiece = null;
+        let tetrisScore = 0;
+        let tetrisRunning = false;
+        let tetrisInterval = null;
+
+        function createBoard() {
+            return Array(ROWS).fill().map(() => Array(COLS).fill(0));
+        }
+
+        function randomPiece() {
+            const key = TETRO_KEYS[Math.floor(Math.random() * TETRO_KEYS.length)];
+            const t = TETROMINOS[key];
+            return {
+                shape: t.shape.map(row => [...row]),
+                color: t.color,
+                x: Math.floor((COLS - t.shape[0].length) / 2),
+                y: 0
+            };
+        }
+
+        function drawTetris() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 0.5;
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    ctx.strokeRect(TETRIS_OFFSET_X + c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                }
+            }
+
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (tetrisBoard[r][c]) {
+                        ctx.fillStyle = tetrisBoard[r][c];
+                        ctx.fillRect(TETRIS_OFFSET_X + c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                    }
+                }
+            }
+
+            if (currentPiece) {
+                ctx.fillStyle = currentPiece.color;
+                for (let r = 0; r < currentPiece.shape.length; r++) {
+                    for (let c = 0; c < currentPiece.shape[r].length; c++) {
+                        if (currentPiece.shape[r][c]) {
+                            const x = TETRIS_OFFSET_X + (currentPiece.x + c) * BLOCK_SIZE;
+                            const y = (currentPiece.y + r) * BLOCK_SIZE;
+                            ctx.fillRect(x, y, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                        }
+                    }
+                }
+            }
+
+            if (!tetrisRunning && appState === 'tetris_unlocked') {
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.font = 'bold 20px "Comic Sans MS"';
+                ctx.textAlign = 'center';
+                ctx.fillText('Game Over', canvas.width/2, canvas.height/2 - 20);
+                ctx.font = '16px "Comic Sans MS"';
+                ctx.fillText('Appuie sur Espace pour rejouer', canvas.width/2, canvas.height/2 + 20);
+            }
+        }
+
+        function collides(shape, x, y) {
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[r].length; c++) {
+                    if (shape[r][c]) {
+                        const boardX = x + c;
+                        const boardY = y + r;
+                        if (boardX < 0 || boardX >= COLS || boardY >= ROWS) return true;
+                        if (boardY >= 0 && tetrisBoard[boardY][boardX]) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function lockPiece() {
+            for (let r = 0; r < currentPiece.shape.length; r++) {
+                for (let c = 0; c < currentPiece.shape[r].length; c++) {
+                    if (currentPiece.shape[r][c]) {
+                        const boardY = currentPiece.y + r;
+                        const boardX = currentPiece.x + c;
+                        if (boardY < 0) {
+                            tetrisGameOver();
+                            return;
+                        }
+                        tetrisBoard[boardY][boardX] = currentPiece.color;
+                    }
+                }
+            }
+
+            playPieceLockSound();
+
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (tetrisBoard[row].every(cell => cell !== 0)) {
+                    tetrisBoard.splice(row, 1);
+                    tetrisBoard.unshift(new Array(COLS).fill(0));
+                    tetrisScore += 100;
+                    row++; // re-check same index after splice
+                    playLineClearSound();
+                    if (tetrisEasterMode) {
+                        gameScoreDisplay.textContent = '🧱 Score : ' + tetrisScore + ' / Objectif : 2 000';
+                        checkTetrisEasterVictory();
+                        if (!tetrisRunning) return;
+                    } else {
+                        gameScoreDisplay.textContent = '🧱 Score : ' + tetrisScore;
+                    }
+                }
+            }
+
+            currentPiece = randomPiece();
+            if (collides(currentPiece.shape, currentPiece.x, currentPiece.y)) {
+                tetrisGameOver();
+            }
+        }
+
+        function tetrisGameOver() {
+            tetrisRunning = false;
+            clearInterval(tetrisInterval);
+            tetrisInterval = null;
+            stopTetrisMusic();
+            drawTetris();
+
+            if (tetrisEasterMode && easterStep === 5) {
+                setTimeout(() => {
+                    showEasterModal(
+                        '😢 PAS ENCORE 2 000 POINTS...',
+                        `Tu as fait <strong>${tetrisScore} points</strong>, mais Peach est toujours enfermée !<br><br>` +
+                        'Bowser rigole… Mais toi tu ne lâches jamais, hein Nolan ? 💪<br><br>' +
+                        'Tu veux retenter ?',
+                        '🧱😤',
+                        'Je réessaye ! 🔄',
+                        startTetrisEasterGame
+                    );
+                }, 800);
+            }
+        }
+
+        function moveDown() {
+            if (!tetrisRunning) return;
+            if (!collides(currentPiece.shape, currentPiece.x, currentPiece.y + 1)) {
+                currentPiece.y++;
+            } else {
+                lockPiece();
+            }
+            drawTetris();
+        }
+
+        function moveLeft() {
+            if (!tetrisRunning) return;
+            if (!collides(currentPiece.shape, currentPiece.x - 1, currentPiece.y)) {
+                currentPiece.x--;
+            }
+            drawTetris();
+        }
+
+        function moveRight() {
+            if (!tetrisRunning) return;
+            if (!collides(currentPiece.shape, currentPiece.x + 1, currentPiece.y)) {
+                currentPiece.x++;
+            }
+            drawTetris();
+        }
+
+        function rotatePiece() {
+            if (!tetrisRunning) return;
+            const shape = currentPiece.shape;
+            const rotated = shape[0].map((_, idx) => shape.map(row => row[idx]).reverse());
+            if (!collides(rotated, currentPiece.x, currentPiece.y)) {
+                currentPiece.shape = rotated;
+            }
+            drawTetris();
+        }
+
+        function hardDrop() {
+            if (!tetrisRunning) return;
+            while (!collides(currentPiece.shape, currentPiece.x, currentPiece.y + 1)) {
+                currentPiece.y++;
+            }
+            playHardDropSound();
+            lockPiece();
+            drawTetris();
+        }
+
+        function startTetrisGame() {
+            stopTetrisMusic();
+            tetrisBoard = createBoard();
+            tetrisScore = 0;
+            gameScoreDisplay.textContent = '🧱 Score : 0';
+            currentPiece = randomPiece();
+            tetrisRunning = true;
+            drawTetris();
+            if (tetrisInterval) clearInterval(tetrisInterval);
+            tetrisInterval = setInterval(moveDown, 800);
+            startTetrisMusic();
+        }
+
+        // =====================
+        // GESTIONNAIRE DE TOUCHES
+        // =====================
+        function handleKeyDown(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                e.preventDefault();
+                initAudio();
+                if (!easterActive) {
+                    skipQuiz();
+                } else if (easterStep === 1) {
+                    // Skip mario quiz
+                    if (marioTimer) { clearInterval(marioTimer); marioTimer = null; }
+                    timerDisplay.classList.add('hidden');
+                    quizActive = false;
+                    quizFinished = true;
+                    answerInput.disabled = true;
+                    validateBtn.disabled = true;
+                    marioQuizScore = TOTAL_QUESTIONS;
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = TOTAL_QUESTIONS + '/' + TOTAL_QUESTIONS;
+                    marioChallengeComplete();
+                } else if (easterStep === 4) {
+                    // Skip code quiz
+                    quizActive = false;
+                    quizFinished = true;
+                    answerInput.disabled = true;
+                    validateBtn.disabled = true;
+                    const remaining = TOTAL_QUESTIONS - step4QuizScore;
+                    for (let i = 0; i < remaining; i++) step4CodeSum += 42;
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = TOTAL_QUESTIONS + '/' + TOTAL_QUESTIONS;
+                    step4QuizComplete();
+                }
+                return;
+            }
+
+            if (quizActive && !quizFinished) {
+                if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+                    e.preventDefault();
+                    if (easterActive && easterStep === 1) checkMarioAnswer();
+                    else if (easterActive && easterStep === 4) checkCodeAnswer();
+                    else checkAnswer();
+                    return;
+                }
+                if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+                    e.preventDefault();
+                    clearAnswer();
+                    return;
+                }
+            }
+
+            if (quizActive) return;
+
+            const key = e.key;
+            if (key.startsWith('Arrow')) e.preventDefault();
+
+            if ((appState === 'snake_unlocked' || snakeEasterMode) && snakeRunning) {
+                if (key === 'ArrowUp' && direction.y === 0) direction = {x: 0, y: -1};
+                else if (key === 'ArrowDown' && direction.y === 0) direction = {x: 0, y: 1};
+                else if (key === 'ArrowLeft' && direction.x === 0) direction = {x: -1, y: 0};
+                else if (key === 'ArrowRight' && direction.x === 0) direction = {x: 1, y: 0};
+            } else if ((appState === 'tetris_unlocked' || (tetrisEasterMode && easterStep === 5)) && tetrisRunning) {
+                if (key === 'ArrowLeft') moveLeft();
+                else if (key === 'ArrowRight') moveRight();
+                else if (key === 'ArrowDown') moveDown();
+                else if (key === 'ArrowUp') rotatePiece();
+                else if (key === ' ') { hardDrop(); e.preventDefault(); }
+            }
+
+            if (appState === 'tetris_unlocked' && !tetrisRunning && key === ' ') {
+                e.preventDefault();
+                startTetrisGame();
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        // =====================
+        // TOUCH CONTROLS
+        // =====================
+        const touchControls  = document.getElementById('touchControls');
+        const snakeDpad      = document.getElementById('snakeDpad');
+        const tetrisCtrl     = document.getElementById('tetrisCtrl');
+        const restartTetrisBtn = document.getElementById('restartTetrisBtn');
+
+        function showTouchControls(mode) {
+            // mode: 'none' | 'snake' | 'tetris'
+            touchControls.classList.toggle('hidden', mode === 'none');
+            snakeDpad.classList.toggle('hidden',  mode !== 'snake');
+            tetrisCtrl.classList.toggle('hidden', mode !== 'tetris');
+            restartTetrisBtn.classList.add('hidden');
+        }
+
+        // D-pad
+        function setDir(dx, dy) {
+            if ((appState === 'snake_unlocked' || snakeEasterMode) && snakeRunning) {
+                if (dx !== 0 && direction.x === 0) direction = {x: dx, y: 0};
+                else if (dy !== 0 && direction.y === 0) direction = {x: 0, y: dy};
+            }
+        }
+        document.getElementById('dpadUp')   .addEventListener('touchstart', e => { e.preventDefault(); setDir(0,-1); }, {passive:false});
+        document.getElementById('dpadDown') .addEventListener('touchstart', e => { e.preventDefault(); setDir(0, 1); }, {passive:false});
+        document.getElementById('dpadLeft') .addEventListener('touchstart', e => { e.preventDefault(); setDir(-1,0); }, {passive:false});
+        document.getElementById('dpadRight').addEventListener('touchstart', e => { e.preventDefault(); setDir( 1,0); }, {passive:false});
+
+        // Tetris buttons
+        document.getElementById('tLeft')  .addEventListener('touchstart', e => { e.preventDefault(); moveLeft();   }, {passive:false});
+        document.getElementById('tRight') .addEventListener('touchstart', e => { e.preventDefault(); moveRight();  }, {passive:false});
+        document.getElementById('tRotate').addEventListener('touchstart', e => { e.preventDefault(); rotatePiece();}, {passive:false});
+        document.getElementById('tSoft')  .addEventListener('touchstart', e => { e.preventDefault(); moveDown();   }, {passive:false});
+        document.getElementById('tHard')  .addEventListener('touchstart', e => { e.preventDefault(); hardDrop();   }, {passive:false});
+
+        // Mouse fallback (desktop)
+        document.getElementById('dpadUp')   .addEventListener('mousedown', () => setDir(0,-1));
+        document.getElementById('dpadDown') .addEventListener('mousedown', () => setDir(0, 1));
+        document.getElementById('dpadLeft') .addEventListener('mousedown', () => setDir(-1,0));
+        document.getElementById('dpadRight').addEventListener('mousedown', () => setDir( 1,0));
+        document.getElementById('tLeft')  .addEventListener('click', moveLeft);
+        document.getElementById('tRight') .addEventListener('click', moveRight);
+        document.getElementById('tRotate').addEventListener('click', rotatePiece);
+        document.getElementById('tSoft')  .addEventListener('click', moveDown);
+        document.getElementById('tHard')  .addEventListener('click', hardDrop);
+
+        // Restart tetris button (game over on touch device)
+        restartTetrisBtn.addEventListener('click', () => {
+            restartTetrisBtn.classList.add('hidden');
+            if (tetrisEasterMode) startTetrisEasterGame();
+            else startTetrisGame();
+        });
+
+        // ---- Swipe on canvas (Snake & Tetris) ----
+        let swipeTouchStartX = 0;
+        let swipeTouchStartY = 0;
+        let swipeTouchTime   = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            swipeTouchStartX = e.touches[0].clientX;
+            swipeTouchStartY = e.touches[0].clientY;
+            swipeTouchTime   = Date.now();
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+            const dy = e.changedTouches[0].clientY - swipeTouchStartY;
+            const absDx = Math.abs(dx);
+            const absDy = Math.abs(dy);
+            const dt    = Date.now() - swipeTouchTime;
+
+            // Snake swipe
+            if ((appState === 'snake_unlocked' || snakeEasterMode) && snakeRunning) {
+                if (absDx < 15 && absDy < 15) return; // too small
+                if (absDx > absDy) {
+                    if (dx > 0 && direction.x === 0) direction = {x: 1, y: 0};
+                    else if (dx < 0 && direction.x === 0) direction = {x: -1, y: 0};
+                } else {
+                    if (dy > 0 && direction.y === 0) direction = {x: 0, y: 1};
+                    else if (dy < 0 && direction.y === 0) direction = {x: 0, y: -1};
+                }
+                return;
+            }
+
+            // Tetris swipe / tap
+            if ((appState === 'tetris_unlocked' || (tetrisEasterMode && easterStep === 5)) && tetrisRunning) {
+                if (absDx < 15 && absDy < 15) {
+                    // Tap = rotate
+                    rotatePiece();
+                    return;
+                }
+                if (absDx > absDy) {
+                    if (dx > 0) moveRight(); else moveLeft();
+                } else {
+                    if (dy > 0) {
+                        if (absDy > 100 && dt < 400) hardDrop(); else moveDown();
+                    } else {
+                        rotatePiece();
+                    }
+                }
+            }
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); }, {passive: false});
+
+        // ---- Patch startSnakeGame / startTetrisGame / snakeGameOver / tetrisGameOver ----
+        // to show/hide touch controls automatically
+        const _origStartSnake = startSnakeGame;
+        startSnakeGame = function() {
+            _origStartSnake();
+            showTouchControls('snake');
+        };
+
+        const _origStopSnake = stopSnake;
+        stopSnake = function() {
+            _origStopSnake();
+        };
+
+        const _origSnakeGameOver = snakeGameOver;
+        snakeGameOver = function() {
+            _origSnakeGameOver();
+            showTouchControls('none');
+        };
+
+        const _origStartTetrisGame = startTetrisGame;
+        startTetrisGame = function() {
+            _origStartTetrisGame();
+            showTouchControls('tetris');
+        };
+
+        const _origStartTetrisEasterGame = startTetrisEasterGame;
+        startTetrisEasterGame = function() {
+            _origStartTetrisEasterGame();
+            showTouchControls('tetris');
+        };
+
+        const _origTetrisGameOver = tetrisGameOver;
+        tetrisGameOver = function() {
+            _origTetrisGameOver();
+            showTouchControls('none');
+            // Show restart button only if not easter (easter has its own modal retry)
+            if (!tetrisEasterMode) {
+                restartTetrisBtn.classList.remove('hidden');
+            }
+        };
+
+        const _origResetNormalMode = resetNormalMode;
+        resetNormalMode = function() {
+            _origResetNormalMode();
+            showTouchControls('none');
+        };
+
+        validateBtn.addEventListener('click', () => {
+            if (easterActive && easterStep === 1) checkMarioAnswer();
+            else if (easterActive && easterStep === 4) checkCodeAnswer();
+            else checkAnswer();
+        });
+
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (easterActive && easterStep === 1) checkMarioAnswer();
+                else if (easterActive && easterStep === 4) checkCodeAnswer();
+                else checkAnswer();
+            }
+        });
+
+        // =====================
+        // INTRO CINÉMATIQUE
+        // =====================
+        const INTRO_SCENES = [
+            {
+                emoji: '🌌✨',
+                title: 'Une histoire commence…',
+                subtitle: 'Ce message est spécialement pour toi, Nolan.',
+                bg: 'linear-gradient(135deg, #05050f, #12073a)'
+            },
+            {
+                emoji: '🏰🌸',
+                title: 'Le Royaume Champignon',
+                subtitle: 'Un monde magique et paisible,\nplein de couleurs et de bonheur.',
+                bg: 'linear-gradient(135deg, #0e2e10, #1a5c1a)'
+            },
+            {
+                emoji: '👸💜',
+                title: 'La Princesse Peach',
+                subtitle: 'Elle régnait avec douceur et gentillesse\nsur tout le royaume.',
+                bg: 'linear-gradient(135deg, #3e104e, #7a2090)'
+            },
+            {
+                emoji: '🐢👑💢',
+                title: 'SOUDAIN… BOWSER !',
+                subtitle: '"Wahaha ! Le Royaume Champignon est à MOI !"',
+                bg: 'linear-gradient(135deg, #5e0808, #8b0a0a)',
+                shake: true
+            },
+            {
+                emoji: '😱👸🔒',
+                title: "L'enlèvement !",
+                subtitle: "Bowser a kidnappé Peach et l'a enfermée\ndans son sombre château !",
+                bg: 'linear-gradient(135deg, #2a0505, #580000)',
+                shake: true
+            },
+            {
+                emoji: '🍄👨🟢',
+                title: 'Mario et Luigi sont bloqués…',
+                subtitle: "Ils ont besoin d'un héros capable de résoudre\nleurs défis mathématiques.",
+                bg: 'linear-gradient(135deg, #12214e, #1e3880)'
+            },
+            {
+                emoji: '⭐🦸',
+                title: 'NOLAN !',
+                subtitle: "Tu es le SEUL assez courageux et intelligent\npour les aider. Le Royaume compte sur toi !",
+                bg: 'linear-gradient(135deg, #4e3400, #7a5500)',
+                pulse: true
+            }
+        ];
+
+        let introSceneIdx = 0;
+        let introTimer = null;
+        let introRunning = false;
+        const SCENE_DURATION = 3200;
+
+        function initIntro() {
+            const starCanvas = document.getElementById('starCanvas');
+            starCanvas.width  = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+            const sc = starCanvas.getContext('2d');
+            for (let i = 0; i < 200; i++) {
+                const x = Math.random() * starCanvas.width;
+                const y = Math.random() * starCanvas.height;
+                const r = Math.random() * 1.6 + 0.3;
+                sc.beginPath();
+                sc.arc(x, y, r, 0, Math.PI * 2);
+                sc.fillStyle = `rgba(255,255,255,${Math.random() * 0.7 + 0.2})`;
+                sc.fill();
+            }
+
+            const dotsEl = document.getElementById('introDots');
+            INTRO_SCENES.forEach((_, i) => {
+                const d = document.createElement('span');
+                d.className = 'i-dot';
+                dotsEl.appendChild(d);
+            });
+
+            document.getElementById('introSkipBtn').addEventListener('click', skipToLastIntroScene);
+            document.getElementById('introStartBtn').addEventListener('click', launchGame);
+            document.addEventListener('keydown', introKeyHandler);
+
+            // Tap on overlay to advance scene (mobile — excludes buttons)
+            document.getElementById('introOverlay').addEventListener('click', (e) => {
+                if (!introRunning) return;
+                if (e.target.tagName === 'BUTTON') return;
+                clearTimeout(introTimer);
+                if (introSceneIdx >= INTRO_SCENES.length - 1) launchGame();
+                else showIntroScene(introSceneIdx + 1);
+            });
+
+            introRunning = true;
+            showIntroScene(0);
+        }
+
+        function introKeyHandler(e) {
+            if (!introRunning) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (introSceneIdx >= INTRO_SCENES.length - 1) {
+                    launchGame();
+                } else {
+                    clearTimeout(introTimer);
+                    showIntroScene(introSceneIdx + 1);
+                }
+            }
+            if (e.key === 'Escape') skipToLastIntroScene();
+        }
+
+        function showIntroScene(idx) {
+            introSceneIdx = idx;
+            const scene   = INTRO_SCENES[idx];
+            const content = document.getElementById('introContent');
+            const bg      = document.getElementById('introBg');
+            const dots    = document.querySelectorAll('.i-dot');
+            const skipBtn  = document.getElementById('introSkipBtn');
+            const startBtn = document.getElementById('introStartBtn');
+
+            content.classList.remove('intro-enter');
+            content.classList.add('intro-exit');
+
+            setTimeout(() => {
+                content.classList.remove('intro-exit');
+                bg.style.background = scene.bg;
+
+                document.getElementById('introEmoji').textContent    = scene.emoji;
+                document.getElementById('introTitle').textContent    = scene.title;
+                document.getElementById('introSubtitle').innerHTML   = scene.subtitle.replace(/\n/g, '<br>');
+
+                const emojiEl = document.getElementById('introEmoji');
+                emojiEl.style.animation = 'none';
+                void emojiEl.offsetWidth;
+                if (scene.shake) emojiEl.style.animation = 'introShake 0.65s ease 0.15s';
+                else if (scene.pulse) emojiEl.style.animation = 'introPulse 1.3s ease infinite';
+
+                dots.forEach((d, i) => {
+                    d.className = 'i-dot' + (i < idx ? ' i-done' : i === idx ? ' i-active' : '');
+                });
+
+                const isLast = idx === INTRO_SCENES.length - 1;
+                skipBtn.style.display  = isLast ? 'none'  : '';
+                startBtn.style.display = isLast ? 'block' : 'none';
+
+                content.classList.add('intro-enter');
+            }, 270);
+
+            clearTimeout(introTimer);
+            if (idx < INTRO_SCENES.length - 1) {
+                introTimer = setTimeout(() => showIntroScene(idx + 1), SCENE_DURATION);
+            }
+        }
+
+        function skipToLastIntroScene() {
+            clearTimeout(introTimer);
+            showIntroScene(INTRO_SCENES.length - 1);
+        }
+
+        function launchGame() {
+            if (!introRunning) return;
+            introRunning = false;
+            clearTimeout(introTimer);
+            document.removeEventListener('keydown', introKeyHandler);
+
+            const el = document.documentElement;
+            try {
+                if (el.requestFullscreen)            el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            } catch(e) {}
+
+            const overlay = document.getElementById('introOverlay');
+            overlay.classList.add('fade-out');
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                const gw = document.getElementById('gameWrapper');
+                gw.style.display = 'flex';
+
+                generateQuestion();
+                updateProgress();
+                lockOverlay.classList.remove('hidden');
+                lockOverlay.style.display = 'flex';
+                drawSnake();
+
+                initAudio();
+                activateEasterEgg();
+            }, 720);
+        }
+
+        // Cacher le bouton start au départ (affiché seulement à la dernière scène)
+        document.getElementById('introStartBtn').style.display = 'none';
+
+        window.addEventListener('load', initIntro);
+    </script>
 </body>
 </html>

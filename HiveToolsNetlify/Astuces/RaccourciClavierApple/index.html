@@ -1,66 +1,822 @@
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="sncf">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>RaccourciClavierApple — HiveOS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveOS · Raccourcis iPad</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&family=Press+Start+2P&family=Fredoka+One&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ========== RESET & BASE ========== */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0e0e0e;--tx:#f0f0f0;--tx2:#888;--brd:rgba(255,255,255,0.07);--body-bg:linear-gradient(to top left,#080810,#02000e);--card-bg:linear-gradient(to bottom right,rgba(12,12,20,0.75),rgba(6,6,14,0.75));--grad:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);--card-border:1px solid rgba(255,255,255,0.08);--card-glow:0 4px 15px rgba(194,23,88,0.15),0 1px 2px rgba(0,0,0,0.3)}
-    body.light{--bg:#fff;--tx:#111;--tx2:#555;--brd:rgba(0,0,0,0.08);--body-bg:linear-gradient(to top left,#fff,#f0f0f0);--card-bg:linear-gradient(to bottom right,rgba(255,255,255,0.75),rgba(245,245,245,0.75));--card-border:1px solid rgba(0,0,0,0.06);--card-glow:0 4px 15px rgba(194,23,88,0.08),0 1px 2px rgba(0,0,0,0.05)}
-    html{scroll-behavior:smooth}
-    body{font-family:'Space Mono',monospace;background:var(--body-bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-    .hive-bar{height:3px;background:var(--grad)}
-    header{background:rgba(8,8,16,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-    body.light header{background:rgba(255,255,255,0.92)}
-    .header-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
-    .back-link{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);text-decoration:none;transition:color .15s}
-    .back-link:hover{color:var(--tx)}
-    .header-theme-toggle{background:none;border:1px solid var(--brd);color:var(--tx);font-size:1.1rem;cursor:pointer;padding:.3rem .55rem;border-radius:8px;transition:background .2s;line-height:1}
-    .header-theme-toggle:hover{background:var(--brd)}
-    main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem}
-    .wip-card{background:var(--card-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:var(--card-border);border-radius:20px;padding:3rem 2.5rem;max-width:460px;width:100%;box-shadow:var(--card-glow);text-align:center;position:relative;overflow:hidden}
-    .wip-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--grad)}
-    .wip-icon{font-size:3rem;margin-bottom:1.5rem;display:block}
-    .wip-name{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx);margin-bottom:.75rem}
-    .wip-desc{font-size:.8rem;color:var(--tx2);line-height:1.7;margin-bottom:2rem}
-    .wip-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(218,29,51,0.12);border:1px solid rgba(218,29,51,0.25);border-radius:100px;padding:.4rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#da1d33;margin-bottom:2rem}
-    .wip-back{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:.45rem 1.2rem;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--tx);cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
-    .wip-back:hover{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-    footer{border-top:1px solid var(--brd);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(8,8,16,0.95)}
-    body.light footer{background:rgba(245,245,245,0.95)}
-    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .footer-copy{font-size:.68rem;color:var(--tx2)}
+    html{font-size:16px}
+    body{
+      font-family:'Space Mono',monospace;
+      background:var(--bg);color:var(--tx);
+      min-height:100vh;line-height:1.6;
+      transition:background 0.3s, color 0.3s;
+    }
+    #root{min-height:100vh}
+
+    /* ========== THEMES ========== */
+    :root,[data-theme="sncf"]{
+      --bg:#111;--bg2:#1c1c1c;--bg3:#262626;--bg4:#303030;
+      --brd:#7d206f44;--tx:#f5f5f5;--tx2:#888;--ac:#7d206f;
+      --ok:#1e8c3e;--warn:#c87800;--danger:#c0392b;
+      --header-gradient:linear-gradient(135deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="pro-blue"]{
+      --bg:#08080f;--bg2:#0e0e18;--bg3:#171728;--bg4:#2a2a42;
+      --brd:#1f1f35;--tx:#e4e4f4;--tx2:#6b6b90;--ac:#5865f2;
+      --ok:#57f287;--warn:#faa61a;--danger:#ed4245;
+      --header-gradient:linear-gradient(135deg,#5865f2,#7c6ff8,#a855f7);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="bleu"]{
+      --bg:#080810;--bg2:#0f0f1c;--bg3:#181828;--bg4:#22223a;
+      --brd:#2a2a48;--tx:#e2e2f4;--tx2:#6a6a9a;--ac:#5b8dee;
+      --header-gradient:linear-gradient(135deg,#3b6fd8,#5b8dee,#7daaf8);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="dracula"]{
+      --bg:#282a36;--bg2:#21222c;--bg3:#44475a;--bg4:#6272a4;
+      --brd:#44475a;--tx:#f8f8f2;--tx2:#6272a4;--ac:#ff79c6;
+      --header-gradient:linear-gradient(135deg,#bd93f9,#ff79c6,#ffb86c);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="windows95"]{
+      --bg:#c0c0c0;--bg2:#c0c0c0;--bg3:#d4d0c8;--bg4:#e8e4dc;
+      --brd:#808080;--tx:#000;--tx2:#444;--ac:#000080;
+      --header-gradient:linear-gradient(135deg,#000080,#0000a0,#0000c0);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="terminal"]{
+      --bg:#020200;--bg2:#070700;--bg3:#0f0f00;--bg4:#181800;
+      --brd:#2bd90040;--tx:#2bd900;--tx2:#1e9900;--ac:#2bd900;--ok:#00ff88;
+      --header-gradient:linear-gradient(135deg,#2bd900,#1e9900,#00ff88);
+      --font-titles:'Press Start 2P',cursive;--font-body:'Press Start 2P',cursive;
+    }
+    [data-theme="picsou"]{
+      --bg:#140d00;--bg2:#201300;--bg3:#301c00;--bg4:#402600;
+      --brd:#c89600;--tx:#ffd700;--tx2:#b07800;--ac:#ffd700;--ok:#4caf50;
+      --header-gradient:linear-gradient(135deg,#ffd700,#ffc200,#b89630);
+      --font-titles:'Fredoka One',cursive;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="cyberpunk"]{
+      --bg:#02000e;--bg2:#060018;--bg3:#0c0028;--bg4:#120036;
+      --brd:#ff006650;--tx:#eeeeff;--tx2:#6655bb;--ac:#ff0066;--ok:#00ffcc;
+      --header-gradient:linear-gradient(135deg,#ff0066,#ff4da6,#00ffcc);
+      --font-titles:'Orbitron',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="spectre"]{
+      --bg:#0a0a0f;--bg2:#0f0f16;--bg3:#16161f;--bg4:#1e1e2a;
+      --brd:#2a2a3a;--tx:#e8e8f0;--tx2:#6a6a80;--ac:#4df0a0;
+      --header-gradient:linear-gradient(135deg,#4df0a0,#2ee890,#0fd080);
+      --font-titles:'Syne',sans-serif;--font-body:'Space Mono',monospace;
+    }
+    [data-theme="matrix"]{
+      --bg:#0a0a0f;--bg2:#0f0f14;--bg3:#16161a;--bg4:#1e1e22;
+      --brd:#2bd90030;--tx:#2bd900;--tx2:#1e9900;--ac:#2bd900;--ok:#00ff88;
+      --header-gradient:linear-gradient(135deg,#2bd900,#1e9900,#00ff88);
+      --font-titles:'Press Start 2P',cursive;--font-body:'Press Start 2P',cursive;
+    }
+
+    /* Day mode */
+    body.day,[data-theme="sncf"].day{
+      --bg:#f5f4f0;--bg2:#ede9e3;--bg3:#e3ded6;--bg4:#d8d2c8;
+      --brd:#c8bfb0;--tx:#1a1714;--tx2:#6b6358;--ac:#7d206f;
+      --header-gradient:linear-gradient(135deg,#9b2d7a,#b83b85,#c94c6a,#db5d4f,#eb1925);
+    }
+    [data-theme="pro-blue"].day{
+      --bg:#eef0fa;--bg2:#e2e4f6;--bg3:#d0d3ee;--bg4:#bcc0e4;
+      --brd:#a0a4cc;--tx:#0a0c1a;--tx2:#3a3d5c;--ac:#3b49df;
+    }
+    [data-theme="bleu"].day{
+      --bg:#ecf0fa;--bg2:#dee3f7;--bg3:#cdd4f2;--bg4:#b8c1ec;
+      --brd:#9fa8d0;--tx:#080a18;--tx2:#3a4070;--ac:#3f6fd8;
+    }
+    [data-theme="dracula"].day{
+      --bg:#f2f2f8;--bg2:#e6e6f0;--bg3:#d0d0e0;--bg4:#b8b8cc;
+      --brd:#a0a0b8;--tx:#1a1a24;--tx2:#4a4a60;--ac:#cc3388;
+    }
+    [data-theme="windows95"].day{
+      --bg:#c0c0c0;--bg2:#c0c0c0;--bg3:#d4d0c8;--bg4:#e8e4dc;--tx:#000;--tx2:#444;--ac:#000080;
+    }
+    [data-theme="terminal"].day{
+      --bg:#f0f5e8;--bg2:#e4ebd4;--bg3:#d2dcc0;--bg4:#bfcba8;
+      --brd:#8ba060;--tx:#1a3a0a;--tx2:#3a5a2a;--ac:#197a00;
+    }
+    [data-theme="picsou"].day{
+      --bg:#fdf8e8;--bg2:#f5ecce;--bg3:#eddfa8;--bg4:#e0d080;
+      --brd:#b89630;--tx:#2a1a00;--tx2:#5a4420;--ac:#8a6000;
+    }
+    [data-theme="cyberpunk"].day{
+      --bg:#f5e8ff;--bg2:#ecd4ff;--bg3:#e0b8ff;--bg4:#d090ff;
+      --brd:#b060cc;--tx:#0a0018;--tx2:#3a2060;--ac:#99003d;
+    }
+    [data-theme="spectre"].day{
+      --bg:#f0f4f2;--bg2:#e0eae6;--bg3:#cfddd8;--bg4:#bdd0cb;
+      --brd:#8aa098;--tx:#0a1412;--tx2:#2e4a44;--ac:#1a6e50;
+    }
+    [data-theme="matrix"].day{
+      --bg:#141a14;--bg2:#1a221a;--bg3:#202820;--bg4:#272e27;
+      --brd:#3a5030;--tx:#4dff00;--tx2:#33aa00;--ac:#2bd900;
+    }
+
+    /* Fonts */
+    body{font-family:var(--font-body)}
+    h1,h2,h3,.app-title{font-family:var(--font-titles)}
+
+    /* Background effects */
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    }
+    /* Halos pour thèmes standards */
+    [data-theme="sncf"] body::before,
+    [data-theme="bleu"] body::before,
+    [data-theme="dracula"] body::before,
+    [data-theme="picsou"] body::before,
+    [data-theme="cyberpunk"] body::before{
+      background:radial-gradient(circle at 20% 20%, var(--ac), transparent 50%),
+                 radial-gradient(circle at 80% 80%, var(--bg4), transparent 50%);
+      opacity:0.05;
+    }
+    [data-theme="pro-blue"] body::before{
+      background:radial-gradient(circle at 20% 20%, #5865f2, transparent 50%),
+                 radial-gradient(circle at 80% 80%, #a855f7, transparent 50%);
+      opacity:0.05;
+    }
+    /* Grilles Spectre & Matrix */
+    [data-theme="spectre"] body::before,
+    [data-theme="matrix"] body::before{
+      background-image:linear-gradient(var(--brd) 1px,transparent 1px),
+                       linear-gradient(90deg,var(--brd) 1px,transparent 1px);
+      background-size:40px 40px;
+    }
+    /* Windows95 & Terminal = AUCUN fond */
+    [data-theme="windows95"] body::before,
+    [data-theme="terminal"] body::before{background:none}
+
+    /* ========== HEADER (invisible) ========== */
+    .hive-header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 20px;background:transparent;pointer-events:none;
+    }
+    .hive-header>*{pointer-events:auto}
+    .hive-logo{
+      display:flex;align-items:center;gap:6px;
+      font-family:var(--font-titles);font-weight:800;font-size:1.25rem;
+      text-decoration:none;user-select:none;
+      background:var(--header-gradient);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .hive-logo-sub{
+      font-family:'Space Mono',monospace;font-size:0.6rem;font-weight:400;
+      letter-spacing:0.15em;text-transform:uppercase;
+      color:var(--tx2);-webkit-text-fill-color:var(--tx2);background:none;margin-left:2px;
+    }
+    .hive-btns{display:flex;align-items:center;gap:6px}
+    .hive-btn{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:6px;
+      padding:7px 9px;cursor:pointer;font-size:1.1rem;line-height:1;
+      transition:0.2s;color:var(--tx);position:relative;user-select:none;
+    }
+    .hive-btn:hover{background:var(--bg3);border-color:var(--tx2)}
+    .hive-btn:active{transform:scale(0.95)}
+
+    /* Thème dropdown */
+    .theme-dropdown{
+      position:absolute;top:100%;right:0;margin-top:6px;
+      background:var(--bg2);border:1px solid var(--brd);border-radius:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:200;min-width:190px;
+      overflow:hidden;display:none;
+    }
+    .theme-dropdown.open{display:block}
+    .theme-option{
+      display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;
+      font-size:0.85rem;font-family:var(--font-body);color:var(--tx);
+      transition:0.15s;border:none;background:none;width:100%;text-align:left;
+    }
+    .theme-option:hover{background:var(--bg3)}
+    .theme-option.active{font-weight:700;background:var(--bg4)}
+
+    /* ========== MODAL ========== */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;
+      display:flex;align-items:center;justify-content:center;animation:fadeIn 0.15s;
+    }
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal-box{
+      background:var(--bg);border:1px solid var(--brd);border-radius:10px;
+      padding:24px;max-width:560px;width:92vw;max-height:85vh;overflow-y:auto;
+      box-shadow:0 12px 40px rgba(0,0,0,0.4);
+    }
+    .modal-box h3{font-family:var(--font-titles);font-size:1.1rem;margin-bottom:10px}
+    .modal-box textarea{
+      width:100%;min-height:100px;font-family:var(--font-body);font-size:0.8rem;
+      padding:10px;border-radius:6px;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx);resize:vertical;
+    }
+    .modal-box button{
+      margin:6px 4px 6px 0;padding:8px 14px;font-family:var(--font-body);font-size:0.8rem;
+      border-radius:6px;cursor:pointer;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx);transition:0.2s;
+    }
+    .modal-box button:hover{background:var(--bg3)}
+    .modal-box button.accent{background:var(--ac);border-color:var(--ac)}
+    .modal-box button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    .modal-section{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--brd)}
+    .modal-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .modal-box input[type="text"]{
+      width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx);font-family:var(--font-body);font-size:0.8rem;
+      margin:6px 0;
+    }
+
+    /* ========== NOTEPAD ========== */
+    .notepad-window{
+      position:fixed;z-index:250;background:var(--bg2);
+      border:2px solid var(--brd);border-radius:10px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      display:flex;flex-direction:column;min-width:260px;min-height:180px;
+      resize:both;overflow:auto;
+    }
+    .notepad-window textarea{
+      flex:1;border:none;background:var(--bg);color:var(--tx);
+      font-family:var(--font-body);font-size:0.85rem;padding:12px;
+      resize:none;outline:none;border-radius:0 0 10px 10px;
+    }
+    .notepad-bar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--brd);
+      border-radius:10px 10px 0 0;cursor:move;user-select:none;
+      font-size:0.75rem;color:var(--tx2);
+    }
+    .notepad-bar button{
+      background:var(--bg4);border:1px solid var(--brd);border-radius:4px;
+      padding:3px 8px;cursor:pointer;font-family:var(--font-body);font-size:0.7rem;color:var(--tx);
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .app-container{
+      position:relative;z-index:1;padding-top:60px;padding-bottom:40px;
+      max-width:1200px;margin:0 auto;padding-left:20px;padding-right:20px;
+    }
+    .app-title{font-size:2rem;font-weight:800;margin-bottom:4px}
+    .app-subtitle{font-size:0.8rem;color:var(--tx2);margin-bottom:20px}
+    .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .search-input{
+      flex:1;min-width:200px;padding:10px 14px;
+      font-family:var(--font-body);font-size:0.9rem;
+      border-radius:6px;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx);outline:none;
+    }
+    .search-input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(125,32,111,0.1)}
+    .view-toggle{display:flex;gap:4px}
+    .view-toggle button{
+      padding:8px 12px;font-family:var(--font-body);font-size:0.85rem;
+      border-radius:6px;cursor:pointer;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx);transition:0.2s;
+    }
+    /* Bouton actif : contraste auto */
+    .view-toggle button.active{
+      background:var(--ac);border-color:var(--ac);
+      color:#fff;
+    }
+    /* Override contraste pour accents clairs */
+    [data-theme="terminal"] .view-toggle button.active,
+    [data-theme="matrix"] .view-toggle button.active,
+    [data-theme="spectre"] .view-toggle button.active,
+    [data-theme="picsou"] .view-toggle button.active,
+    [data-theme="terminal"].day .view-toggle button.active,
+    [data-theme="matrix"].day .view-toggle button.active{
+      color:#000;
+    }
+    .cat-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+    .cat-pill{
+      padding:6px 14px;font-family:var(--font-body);font-size:0.75rem;
+      border-radius:20px;cursor:pointer;border:1px solid var(--brd);
+      background:var(--bg2);color:var(--tx2);transition:0.2s;white-space:nowrap;
+    }
+    .cat-pill:hover{border-color:var(--tx2);color:var(--tx)}
+    .cat-pill.active{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+    .stats-row{font-size:0.75rem;color:var(--tx2);margin-bottom:12px}
+    .cards-grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;
+    }
+    .cards-grid.compact{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+    .shortcut-card{
+      background:var(--bg2);border:1px solid var(--brd);
+      border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;
+      transition:0.2s;position:relative;
+    }
+    .shortcut-card:hover{border-color:var(--tx2);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+    .shortcut-card .kbd-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .shortcut-card kbd{
+      display:inline-block;background:var(--bg4);border:1px solid var(--brd);
+      border-radius:4px;padding:3px 7px;font-family:var(--font-body);
+      font-size:0.78rem;font-weight:700;color:var(--tx);white-space:nowrap;
+    }
+    .shortcut-card .action-text{font-size:0.9rem;line-height:1.4}
+    .shortcut-card .meta-row{display:flex;align-items:center;gap:8px;font-size:0.7rem;color:var(--tx2);flex-wrap:wrap}
+    .shortcut-card .meta-tag{background:var(--bg3);padding:2px 8px;border-radius:10px;font-size:0.68rem}
+    .fav-star{
+      position:absolute;top:8px;right:10px;cursor:pointer;
+      font-size:1.1rem;opacity:0.35;transition:0.2s;
+      background:none;border:none;color:var(--tx);user-select:none;
+    }
+    .fav-star:hover,.fav-star.faved{opacity:1;color:#f0a500}
+    .no-results{text-align:center;padding:40px;color:var(--tx2);font-size:0.9rem}
+
+    /* ========== TOUR GUIDE (blur effect) ========== */
+    .tour-overlay-blur {
+      position: fixed; inset: 0; z-index: 400;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.3);
+      transition: backdrop-filter 0.3s;
+      pointer-events: all;
+    }
+    /* Masque qui crée un trou net autour de l'élément ciblé */
+    .tour-spotlight-cutout {
+      position: absolute;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.65);
+      border-radius: 10px;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+    /* Bulle centrée */
+    .tour-bubble-center {
+      position: fixed; z-index: 410; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg2); border: 2px solid var(--ac);
+      border-radius: 12px; padding: 18px 20px; max-width: 380px; width: 90vw;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      font-family: var(--font-body); font-size: 0.85rem; color: var(--tx); line-height: 1.5;
+    }
+    .tour-bubble-center h4 { font-family: var(--font-titles); font-size: 1rem; margin-bottom: 6px; }
+    .tour-bubble-center .tour-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .tour-bubble-center button {
+      padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); font-size: 0.8rem;
+      border: 1px solid var(--brd); background: var(--bg3); color: var(--tx); transition: 0.2s;
+    }
+    .tour-bubble-center button:hover { background: var(--bg4); }
+    .tour-bubble-center button.primary { background: var(--ac); border-color: var(--ac); color: #000; }
+
+    /* Responsive */
+    @media(max-width:600px){
+      .cards-grid{grid-template-columns:1fr}
+      .app-title{font-size:1.4rem}
+      .hive-header{padding:8px 12px}
+      .tour-bubble-center{max-width:90vw}
+    }
   </style>
 </head>
-<body class="dark">
-<div class="hive-bar"></div>
-<header>
-  <a href="../../" class="header-logo">HiveOS</a>
-  <a href="../../" class="back-link">← Retour</a>
-  <button id="themeToggle" class="header-theme-toggle" aria-label="Changer le thème">🌙</button>
-</header>
-<main>
-  <div class="wip-card">
-    <span class="wip-icon">⌨️</span>
-    <div class="wip-name">RaccourciClavierApple</div>
-    <p class="wip-desc">Liste complète des raccourcis clavier Mac. Bientôt disponible.</p>
-    <div class="wip-badge">⚙️ En développement</div><br>
-    <a href="../../" class="wip-back">← Retour à l'accueil</a>
-  </div>
-</main>
-<footer>
-  <span class="footer-logo">HiveOS</span>
-  <span class="footer-copy">Outils faits maison — pas de tracking, pas de compte.</span>
-</footer>
-<script>
-  (function(){
-    const t=document.getElementById('themeToggle'),b=document.body;
-    function s(l){if(l){b.classList.add('light');b.classList.remove('dark');t.textContent='☀️';localStorage.setItem('hiveTheme','light')}else{b.classList.remove('light');b.classList.add('dark');t.textContent='🌙';localStorage.setItem('hiveTheme','dark')}}
-    s(localStorage.getItem('hiveTheme')==='light');
-    t.addEventListener('click',()=>s(!b.classList.contains('light')));
-  })();
-</script>
+<body class="day">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+    /* ========== STORAGE HELPERS ========== */
+    const storage = {
+      get: (k) => { try{ return localStorage.getItem(k); }catch(e){return null;} },
+      set: (k,v) => { try{ localStorage.setItem(k,v); }catch(e){} },
+      remove: (k) => { try{ localStorage.removeItem(k); }catch(e){} }
+    };
+
+    /* ========== SEED DATA ========== */
+    /*__SEED_START__*/
+    const SEED_ITEMS = [{"id":"s1","cat":"Système","shortcut":"⌘ Tab","action":"Basculer entre les applications ouvertes","compat":"Tous claviers"},{"id":"s2","cat":"Système","shortcut":"⌘ Espace","action":"Ouvrir la recherche Spotlight","compat":"Tous claviers"},{"id":"s3","cat":"Système","shortcut":"⌘ H","action":"Masquer l’application active","compat":"Tous claviers"},{"id":"s4","cat":"Système","shortcut":"⌘ Q","action":"Quitter l’application active","compat":"Tous claviers"},{"id":"s5","cat":"Système","shortcut":"⌘ ⌥ D","action":"Masquer/afficher le Dock","compat":"Magic Keyboard"},{"id":"s6","cat":"Système","shortcut":"⌘ ↑","action":"Mission Control (Stage Manager)","compat":"Magic Keyboard"},{"id":"s7","cat":"Système","shortcut":"⌘ ↓","action":"Fermer la fenêtre active","compat":"Tous claviers"},{"id":"s8","cat":"Système","shortcut":"⌘ F4","action":"Fermer la fenêtre active","compat":"Magic Keyboard"},{"id":"s9","cat":"Système","shortcut":"⌘ N","action":"Nouvelle fenêtre (apps compatibles)","compat":"Tous claviers"},{"id":"s10","cat":"Système","shortcut":"⌘ T","action":"Nouvel onglet (Safari, Notes…)","compat":"Tous claviers"},{"id":"s11","cat":"Système","shortcut":"⌘ W","action":"Fermer l’onglet ou la fenêtre","compat":"Tous claviers"},{"id":"s12","cat":"Système","shortcut":"⌘ ,","action":"Préférences de l’application","compat":"Tous claviers"},{"id":"s13","cat":"Système","shortcut":"⌘ ⌥ ←/→","action":"Passer à l’espace suivant/précédent","compat":"Magic Keyboard"},{"id":"s14","cat":"Système","shortcut":"⌘ Tab ↑","action":"Fenêtres de l’app active","compat":"Magic Keyboard"},{"id":"s15","cat":"Système","shortcut":"⌘ ⌥ H","action":"Masquer les autres apps","compat":"Tous claviers"},{"id":"s16","cat":"Système","shortcut":"⌘ ⌥ M","action":"Réduire toutes les fenêtres","compat":"Magic Keyboard"},{"id":"c1","cat":"Captures","shortcut":"⌘ ⇧ 3","action":"Capture d’écran complète","compat":"Tous claviers"},{"id":"c2","cat":"Captures","shortcut":"⌘ ⇧ 4","action":"Capture d’une zone","compat":"Magic Keyboard"},{"id":"c3","cat":"Captures","shortcut":"⌘ ⇧ 5","action":"Menu de capture (iPadOS 17+)","compat":"Magic Keyboard"},{"id":"c4","cat":"Captures","shortcut":"⌘ ⇧ R","action":"Enregistrement d’écran","compat":"Magic Keyboard"},{"id":"e1","cat":"Édition","shortcut":"⌘ Z","action":"Annuler","compat":"Tous claviers"},{"id":"e2","cat":"Édition","shortcut":"⌘ ⇧ Z","action":"Rétablir","compat":"Tous claviers"},{"id":"e3","cat":"Édition","shortcut":"⌘ C","action":"Copier","compat":"Tous claviers"},{"id":"e4","cat":"Édition","shortcut":"⌘ V","action":"Coller","compat":"Tous claviers"},{"id":"e5","cat":"Édition","shortcut":"⌘ X","action":"Couper","compat":"Tous claviers"},{"id":"e6","cat":"Édition","shortcut":"⌘ A","action":"Tout sélectionner","compat":"Tous claviers"},{"id":"e7","cat":"Édition","shortcut":"⌘ F","action":"Rechercher","compat":"Tous claviers"},{"id":"e8","cat":"Édition","shortcut":"⌘ G","action":"Résultat suivant","compat":"Tous claviers"},{"id":"e9","cat":"Édition","shortcut":"⌘ ⇧ G","action":"Résultat précédent","compat":"Tous claviers"},{"id":"fn1","cat":"Touches Fn","shortcut":"F1","action":"Réduire luminosité","compat":"✅"},{"id":"fn2","cat":"Touches Fn","shortcut":"F2","action":"Augmenter luminosité","compat":"✅"},{"id":"fn3","cat":"Touches Fn","shortcut":"F3","action":"Mission Control","compat":"✅"},{"id":"fn4","cat":"Touches Fn","shortcut":"F4","action":"Siri","compat":"✅"},{"id":"fn5","cat":"Touches Fn","shortcut":"F5","action":"Dictée vocale","compat":"✅"},{"id":"fn6","cat":"Touches Fn","shortcut":"F6","action":"Ne pas déranger","compat":"✅"},{"id":"fn7","cat":"Touches Fn","shortcut":"F7","action":"Reculer (media)","compat":"✅"},{"id":"fn8","cat":"Touches Fn","shortcut":"F8","action":"Lecture/Pause","compat":"✅"},{"id":"fn9","cat":"Touches Fn","shortcut":"F9","action":"Avancer (media)","compat":"✅"},{"id":"fn10","cat":"Touches Fn","shortcut":"F10","action":"Muet","compat":"✅"},{"id":"fn11","cat":"Touches Fn","shortcut":"F11","action":"Baisser volume","compat":"✅"},{"id":"fn12","cat":"Touches Fn","shortcut":"F12","action":"Augmenter volume","compat":"✅"},{"id":"fn13","cat":"Touches Fn","shortcut":"F13","action":"Verrouiller orientation","compat":"✅"},{"id":"fn14","cat":"Touches Fn","shortcut":"F14","action":"Verrouiller iPad","compat":"✅"},{"id":"g1","cat":"Globe","shortcut":"Globe","action":"Basculer entre claviers"},{"id":"g2","cat":"Globe","shortcut":"Globe Espace","action":"Prédiction de texte"},{"id":"g3","cat":"Globe","shortcut":"Globe ⌘","action":"Menu raccourcis clavier"},{"id":"g4","cat":"Globe","shortcut":"Globe ⇧","action":"Clavier emoji"},{"id":"sa1","cat":"Safari","shortcut":"⌘ 1-9","action":"Onglet n°","compat":"Safari, Notes"},{"id":"sa2","cat":"Safari","shortcut":"⌘ T","action":"Nouvel onglet","compat":"Safari, Notes"},{"id":"sa3","cat":"Safari","shortcut":"⌘ W","action":"Fermer onglet","compat":"Safari, Notes"},{"id":"sa4","cat":"Safari","shortcut":"⌘ ⇧ T","action":"Rouvrir onglet fermé","compat":"Safari"},{"id":"sa5","cat":"Safari","shortcut":"⌘ L","action":"Barre d’adresse","compat":"Safari"},{"id":"sa6","cat":"Safari","shortcut":"⌘ K","action":"Effacer barre d’adresse","compat":"Safari"},{"id":"sa7","cat":"Safari","shortcut":"⌘ R","action":"Rafraîchir","compat":"Safari"},{"id":"sa8","cat":"Safari","shortcut":"⌘ ⇧ R","action":"Rafraîchir sans cache","compat":"Safari"},{"id":"sa9","cat":"Safari","shortcut":"⌘ +/-","action":"Zoomer/Dézoomer","compat":"Safari, Notes, Mail"},{"id":"sa10","cat":"Safari","shortcut":"⌘ 0","action":"Zoom normal","compat":"Safari"},{"id":"sa11","cat":"Safari","shortcut":"⌘ ⌥ ←/→","action":"Onglet précédent/suivant","compat":"Safari"},{"id":"sa12","cat":"Safari","shortcut":"⌘ ⇧ [/]","action":"Onglet précédent/suivant","compat":"Safari"},{"id":"sa13","cat":"Safari","shortcut":"⌘ D","action":"Ajouter aux signets","compat":"Safari"},{"id":"sa14","cat":"Safari","shortcut":"⌘ ⇧ D","action":"Liste de lecture","compat":"Safari"},{"id":"sa15","cat":"Safari","shortcut":"⌘ F","action":"Rechercher dans la page","compat":"Safari"},{"id":"sa16","cat":"Safari","shortcut":"⌘ G","action":"Résultat suivant","compat":"Safari"},{"id":"sa17","cat":"Safari","shortcut":"⌘ ⇧ G","action":"Résultat précédent","compat":"Safari"},{"id":"sa18","cat":"Safari","shortcut":"⌘ Y","action":"Historique","compat":"Safari"},{"id":"n1","cat":"Notes","shortcut":"⌘ N","action":"Nouvelle note","compat":"Notes"},{"id":"n2","cat":"Notes","shortcut":"⌘ T","action":"Nouvel onglet","compat":"Notes"},{"id":"n3","cat":"Notes","shortcut":"⌘ W","action":"Fermer note/onglet","compat":"Notes"},{"id":"n4","cat":"Notes","shortcut":"⌘ ⇧ N","action":"Note rapide","compat":"Notes"},{"id":"n5","cat":"Notes","shortcut":"⌘ F","action":"Rechercher","compat":"Notes"},{"id":"n6","cat":"Notes","shortcut":"⌘ E","action":"Archiver","compat":"Notes"},{"id":"n7","cat":"Notes","shortcut":"⌘ ⇧ E","action":"Désarchiver","compat":"Notes"},{"id":"n8","cat":"Notes","shortcut":"⌘ D","action":"Dupliquer","compat":"Notes"},{"id":"n9","cat":"Notes","shortcut":"⌘ Delete","action":"Supprimer","compat":"Notes"},{"id":"n10","cat":"Notes","shortcut":"⌘ ↑/↓","action":"Naviguer entre notes","compat":"Notes"},{"id":"n11","cat":"Notes","shortcut":"⌘ ⇧ ↑/↓","action":"Sélectionner notes","compat":"Notes"},{"id":"m1","cat":"Mail","shortcut":"⌘ N","action":"Nouveau message","compat":"Mail"},{"id":"m2","cat":"Mail","shortcut":"⌘ R","action":"Répondre","compat":"Mail"},{"id":"m3","cat":"Mail","shortcut":"⌘ ⇧ R","action":"Répondre à tous","compat":"Mail"},{"id":"m4","cat":"Mail","shortcut":"⌘ F","action":"Transférer","compat":"Mail"},{"id":"m5","cat":"Mail","shortcut":"⌘ D","action":"Supprimer","compat":"Mail"},{"id":"m6","cat":"Mail","shortcut":"⌘ ⇧ D","action":"Lu/Non lu","compat":"Mail"},{"id":"m7","cat":"Mail","shortcut":"⌘ J","action":"Spam","compat":"Mail"},{"id":"m8","cat":"Mail","shortcut":"⌘ E","action":"Archiver","compat":"Mail"},{"id":"m9","cat":"Mail","shortcut":"⌘ ⇧ E","action":"Désarchiver","compat":"Mail"},{"id":"m10","cat":"Mail","shortcut":"⌘ 1-9","action":"Boîte n°","compat":"Mail"},{"id":"fi1","cat":"Fichiers","shortcut":"⌘ N","action":"Nouveau dossier","compat":"Fichiers"},{"id":"fi2","cat":"Fichiers","shortcut":"⌘ O","action":"Ouvrir","compat":"Fichiers"},{"id":"fi3","cat":"Fichiers","shortcut":"⌘ D","action":"Dupliquer","compat":"Fichiers"},{"id":"fi4","cat":"Fichiers","shortcut":"⌘ C/V/X","action":"Copier/Coller/Couper","compat":"Fichiers"},{"id":"fi5","cat":"Fichiers","shortcut":"⌘ Delete","action":"Supprimer","compat":"Fichiers"},{"id":"fi6","cat":"Fichiers","shortcut":"⌘ Z/⇧ Z","action":"Annuler/Rétablir","compat":"Fichiers"},{"id":"fi7","cat":"Fichiers","shortcut":"⌘ A","action":"Tout sélectionner","compat":"Fichiers"},{"id":"fi8","cat":"Fichiers","shortcut":"⌘ F","action":"Rechercher","compat":"Fichiers"},{"id":"fi9","cat":"Fichiers","shortcut":"⌘ R","action":"Renommer","compat":"Fichiers"},{"id":"fi10","cat":"Fichiers","shortcut":"⌘ I","action":"Infos","compat":"Fichiers"},{"id":"fi11","cat":"Fichiers","shortcut":"⌘ P","action":"Partager","compat":"Fichiers"},{"id":"fi12","cat":"Fichiers","shortcut":"⌘ ↑","action":"Remonter","compat":"Fichiers"},{"id":"ph1","cat":"Photos","shortcut":"⌘ N","action":"Nouveau dossier","compat":"Photos"},{"id":"ph2","cat":"Photos","shortcut":"⌘ D","action":"Dupliquer","compat":"Photos"},{"id":"ph3","cat":"Photos","shortcut":"⌘ Delete","action":"Supprimer","compat":"Photos"},{"id":"ph4","cat":"Photos","shortcut":"⌘ E","action":"Modifier","compat":"Photos"},{"id":"ph5","cat":"Photos","shortcut":"⌘ S","action":"Partager","compat":"Photos"},{"id":"ph6","cat":"Photos","shortcut":"⌘ F","action":"Rechercher","compat":"Photos"},{"id":"ph7","cat":"Photos","shortcut":"⌘ +/-","action":"Zoom","compat":"Photos"},{"id":"ph8","cat":"Photos","shortcut":"⌘ ↑/↓","action":"Naviguer","compat":"Photos"},{"id":"iw1","cat":"iWork","shortcut":"⌘ N","action":"Nouveau document","compat":"Pages, Keynote"},{"id":"iw2","cat":"iWork","shortcut":"⌘ O","action":"Ouvrir","compat":"Pages, Keynote"},{"id":"iw3","cat":"iWork","shortcut":"⌘ S","action":"Enregistrer","compat":"Pages, Keynote"},{"id":"iw4","cat":"iWork","shortcut":"⌘ P","action":"Imprimer","compat":"Pages, Keynote"},{"id":"iw5","cat":"iWork","shortcut":"⌘ Z/⇧ Z","action":"Annuler/Rétablir","compat":"Pages, Keynote"},{"id":"iw6","cat":"iWork","shortcut":"⌘ C/V/X","action":"Copier/Coller/Couper","compat":"Pages, Keynote"},{"id":"iw7","cat":"iWork","shortcut":"⌘ A","action":"Tout sélectionner","compat":"Pages, Keynote"},{"id":"iw8","cat":"iWork","shortcut":"⌘ B/I/U","action":"Gras/Italique/Souligné","compat":"Pages, Keynote"},{"id":"iw9","cat":"iWork","shortcut":"⌘ T","action":"Nouveau texte/objet","compat":"Pages, Keynote"},{"id":"iw10","cat":"iWork","shortcut":"⌘ D","action":"Dupliquer","compat":"Pages, Keynote"},{"id":"st1","cat":"Stage Manager","shortcut":"⌘ ↑","action":"Mission Control (groupes)","compat":""},{"id":"st2","cat":"Stage Manager","shortcut":"⌘ ⌥ ←/→","action":"Basculer entre groupes","compat":""},{"id":"st3","cat":"Stage Manager","shortcut":"⌘ ⌥ F","action":"Plein écran","compat":""},{"id":"st4","cat":"Stage Manager","shortcut":"⌘ ⌥ M","action":"Réduire le groupe","compat":""},{"id":"st5","cat":"Stage Manager","shortcut":"⌘ Tab ↑","action":"Fenêtres app active","compat":""},{"id":"ge1","cat":"Gestes 1 doigt","shortcut":"Tap simple","action":"Sélectionner"},{"id":"ge2","cat":"Gestes 1 doigt","shortcut":"Double tap","action":"Ouvrir / double-clic"},{"id":"ge3","cat":"Gestes 1 doigt","shortcut":"Glisser (1 doigt)","action":"Déplacer le curseur"},{"id":"ge4","cat":"Gestes 1 doigt","shortcut":"Glisser vers le haut (bas)","action":"Afficher le Dock"},{"id":"ge5","cat":"Gestes 1 doigt","shortcut":"Glisser vers le bas (haut)","action":"Centre de contrôle"},{"id":"ge6","cat":"Gestes 1 doigt","shortcut":"Glisser vers le bas (milieu)","action":"Notifications"},{"id":"ge7","cat":"Gestes 2 doigts","shortcut":"Tap 2 doigts","action":"Clic droit (menu contextuel)"},{"id":"ge8","cat":"Gestes 2 doigts","shortcut":"Glisser haut/bas","action":"Défilement vertical"},{"id":"ge9","cat":"Gestes 2 doigts","shortcut":"Glisser gauche/droite","action":"Défilement horizontal"},{"id":"ge10","cat":"Gestes 2 doigts","shortcut":"Pincer (écarter)","action":"Zoom avant"},{"id":"ge11","cat":"Gestes 2 doigts","shortcut":"Pincer (rapprocher)","action":"Zoom arrière"},{"id":"ge12","cat":"Gestes 2 doigts","shortcut":"Double tap 2 doigts","action":"Zoom intelligent (Safari, Photos)"},{"id":"ge13","cat":"Gestes 2 doigts","shortcut":"Glisser 2 doigts horizontal","action":"Pages/onglets"},{"id":"ge14","cat":"Gestes 3 doigts","shortcut":"Glisser vers le haut","action":"Retour à l’accueil"},{"id":"ge15","cat":"Gestes 3 doigts","shortcut":"Glisser gauche/droite","action":"Basculer entre apps"},{"id":"ge16","cat":"Gestes 3 doigts","shortcut":"Glisser vers le bas","action":"App Switcher"},{"id":"ge17","cat":"Gestes 3 doigts","shortcut":"Tap 3 doigts","action":"Actions rapides"},{"id":"ge18","cat":"Gestes 4 doigts","shortcut":"Glisser gauche/droite","action":"Basculer espaces (Stage Manager)"},{"id":"ge19","cat":"Gestes 4 doigts","shortcut":"Pincer (4 doigts)","action":"Retour à l’accueil"},{"id":"ga1","cat":"Gestes avancés","shortcut":"Tap 2 doigts + maintenir","action":"Déplacer un élément"},{"id":"ga2","cat":"Gestes avancés","shortcut":"Glisser 2 doigts diagonale","action":"Sélectionner du texte"},{"id":"ga3","cat":"Gestes avancés","shortcut":"Double tap 2 doigts + glisser","action":"Sélectionner mot/paragraphe"},{"id":"sv1","cat":"Multitâche","shortcut":"Glisser app Dock → bord","action":"Ouvrir en Split View"},{"id":"sv2","cat":"Multitâche","shortcut":"Glisser app Dock → centre","action":"Ouvrir en Slide Over"},{"id":"sv3","cat":"Multitâche","shortcut":"Glisser barre séparation","action":"Redimensionner Split View"},{"id":"sv4","cat":"Multitâche","shortcut":"Glisser Slide Over → haut","action":"Transformer en Split View"},{"id":"sv5","cat":"Multitâche","shortcut":"Glisser Split View → bas","action":"Transformer en Slide Over"},{"id":"pt1","cat":"Saisie","shortcut":"Appuyer mot suggéré","action":"Accepter suggestion"},{"id":"pt2","cat":"Saisie","shortcut":"Espace / ponctuation","action":"Accepter suggestion en évidence"},{"id":"pt3","cat":"Saisie","shortcut":"Appuyer mot original","action":"Rejeter suggestion"},{"id":"pt4","cat":"Saisie","shortcut":"Icône Globe 🌐","action":"Basculer entre claviers"},{"id":"pt5","cat":"Saisie","shortcut":"Icône Micro 🎤","action":"Dicter"},{"id":"pt6","cat":"Saisie","shortcut":"Globe → Minimiser","action":"Minimiser la barre"},{"id":"tr1","cat":"Trackpad","shortcut":"Vitesse de suivi","action":"Ajuster sensibilité du pointeur"},{"id":"tr2","cat":"Trackpad","shortcut":"Direction défilement","action":"Naturel ou inversé"},{"id":"tr3","cat":"Trackpad","shortcut":"Appuyer pour cliquer","action":"Activer/Désactiver"},{"id":"tr4","cat":"Trackpad","shortcut":"Clic secondaire","action":"Activer clic droit 2 doigts"},{"id":"tr5","cat":"Trackpad","shortcut":"Retour haptique (17+)","action":"Vibrations pour actions"},{"id":"ap1","cat":"Apps","shortcut":"Textastic","action":"Éditeur de code","meta":"Gratuit + achats","link":"https://apps.apple.com/app/textastic/id1042880160"},{"id":"ap2","cat":"Apps","shortcut":"a-Shell","action":"Terminal","meta":"Gratuit","link":"https://apps.apple.com/app/a-shell/id1472087274"},{"id":"ap3","cat":"Apps","shortcut":"Working Copy","action":"Git Client","meta":"Payant","link":"https://apps.apple.com/app/working-copy/id896694807"},{"id":"ap4","cat":"Apps","shortcut":"Termius","action":"SSH/SFTP","meta":"Gratuit + Pro","link":"https://apps.apple.com/app/termius/id549039908"},{"id":"ap5","cat":"Apps","shortcut":"Buffer","action":"Éditeur de texte","meta":"Gratuit + Pro","link":"https://apps.apple.com/app/buffer-editor/id1492446636"},{"id":"ap6","cat":"Apps","shortcut":"GoodNotes","action":"Prise de notes","meta":"Payant","link":"https://apps.apple.com/app/goodnotes/id1444383602"},{"id":"ap7","cat":"Apps","shortcut":"Notion","action":"Organisation","meta":"Gratuit + Pro","link":"https://apps.apple.com/app/notion/id1232780281"},{"id":"ap8","cat":"Apps","shortcut":"Spark","action":"Email","meta":"Gratuit","link":"https://apps.apple.com/app/spark-mail/id997102246"},{"id":"ap9","cat":"Apps","shortcut":"1Password","action":"Gestionnaire MDP","meta":"Abonnement","link":"https://apps.apple.com/app/1password/id568903335"},{"id":"ap10","cat":"Apps","shortcut":"Alfred","action":"Lancement d’apps","meta":"Gratuit","link":"https://apps.apple.com/app/alfred/id1508614994"},{"id":"top1","cat":"Top Raccourcis","shortcut":"⌘ Tab","action":"Basculer entre apps","freq":"⭐⭐⭐⭐⭐"},{"id":"top2","cat":"Top Raccourcis","shortcut":"⌘ Espace","action":"Recherche Spotlight","freq":"⭐⭐⭐⭐⭐"},{"id":"top3","cat":"Top Raccourcis","shortcut":"⌘ C/V","action":"Copier/Coller","freq":"⭐⭐⭐⭐⭐"},{"id":"top4","cat":"Top Raccourcis","shortcut":"⌘ T","action":"Nouvel onglet","freq":"⭐⭐⭐⭐"},{"id":"top5","cat":"Top Raccourcis","shortcut":"⌘ W","action":"Fermer onglet/fenêtre","freq":"⭐⭐⭐⭐"},{"id":"top6","cat":"Top Raccourcis","shortcut":"⌘ Z","action":"Annuler","freq":"⭐⭐⭐⭐"},{"id":"top7","cat":"Top Raccourcis","shortcut":"⌘ F","action":"Rechercher","freq":"⭐⭐⭐⭐"},{"id":"top8","cat":"Top Raccourcis","shortcut":"⌘ ⇧ T","action":"Rouvrir onglet fermé","freq":"⭐⭐⭐"},{"id":"top9","cat":"Top Raccourcis","shortcut":"⌘ ↑","action":"Mission Control","freq":"⭐⭐⭐"},{"id":"top10","cat":"Top Raccourcis","shortcut":"⌘ ⌥ ←/→","action":"Basculer espaces","freq":"⭐⭐⭐"},{"id":"tg1","cat":"Top Gestes","shortcut":"Glisser 2 doigts","action":"Défilement","freq":"⭐⭐⭐⭐⭐"},{"id":"tg2","cat":"Top Gestes","shortcut":"Tap 2 doigts","action":"Clic droit","freq":"⭐⭐⭐⭐"},{"id":"tg3","cat":"Top Gestes","shortcut":"Pincer 2 doigts","action":"Zoom","freq":"⭐⭐⭐⭐"},{"id":"tg4","cat":"Top Gestes","shortcut":"Glisser 3 doigts haut","action":"Accueil","freq":"⭐⭐⭐⭐"},{"id":"tg5","cat":"Top Gestes","shortcut":"Glisser 4 doigts G/D","action":"Espaces","freq":"⭐⭐⭐"}];
+    /*__SEED_END__*/
+    /*__SEED_FAVS_START__*/
+    const SEED_FAVS = [];
+    /*__SEED_FAVS_END__*/
+
+    // ========== CONSTANTS ==========
+    const STORAGE_KEY = "app_data_state";
+    const NOTEPAD_KEY = "hiveos_notepad";
+    const THEME_KEY = "app-theme";
+    const DAY_KEY = "app-day-mode";
+
+    // ========== HELPERS ==========
+    const loadState = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash.startsWith("d=")) {
+        try {
+          const decoded = JSON.parse(atob(hash.slice(2)));
+          if (decoded && decoded.items) return { items: decoded.items, favs: decoded.favs || [] };
+        } catch(e){}
+      }
+      const stored = storage.get(STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.items) return { items: parsed.items, favs: parsed.favs || [] };
+        } catch(e){}
+      }
+      return { items: SEED_ITEMS, favs: SEED_FAVS };
+    };
+
+    // ========== TOUR STEPS ==========
+    const TOUR_STEPS = [
+      {
+        title: "Bienvenue sur HiveOS Raccourcis iPad",
+        text: "Cette app référence tous les raccourcis clavier, gestes et apps utiles pour iPad. Filtre, recherche, mets en favoris. Prêt ?",
+        target: null
+      },
+      {
+        title: "Logo HiveOS",
+        text: "Toujours en haut à gauche. Le sous-titre rappelle le contexte de l'app.",
+        target: ".hive-logo"
+      },
+      {
+        title: "Bloc-notes 📝",
+        text: "Ouvre une fenêtre flottante pour prendre des notes rapides. Re-clic pour fermer. Jamais sauvegardé avec les données.",
+        target: ".hive-btn[title=\"Bloc-notes\"]"
+      },
+      {
+        title: "Thème 🎨",
+        text: "10 thèmes disponibles. HiveOS par défaut. Le choix est persisté.",
+        target: ".hive-btn:nth-child(2)"
+      },
+      {
+        title: "Mode Jour/Nuit ☀️/🌙",
+        text: "Bascule entre mode clair et sombre. Chaque thème a ses propres couleurs jour/nuit.",
+        target: ".hive-btn:nth-child(3)"
+      },
+      {
+        title: "Sauvegarde 💾",
+        text: "Exporte/importe tes données (JSON, URL, fichier HTML autonome). Remise à zéro possible.",
+        target: ".hive-btn:nth-child(4)"
+      },
+      {
+        title: "Aide ❓",
+        text: "Cette visite guidée ! Reviens quand tu veux en cliquant ici.",
+        target: ".hive-btn:nth-child(5)"
+      },
+      {
+        title: "Recherche et filtres",
+        text: "Tape un mot-clé ou sélectionne une catégorie pour trouver le raccourci qu'il te faut.",
+        target: ".search-bar"
+      },
+      {
+        title: "Favoris ★",
+        text: "Clique l'étoile sur une carte pour la retrouver facilement plus tard.",
+        target: ".fav-star"
+      },
+      {
+        title: "Et voilà !",
+        text: "Tu peux maintenant explorer tous les raccourcis. Bonne productivité sur iPad !",
+        target: null
+      }
+    ];
+
+    // ========== APP COMPONENT ==========
+    function App() {
+      // --- All useState grouped ---
+      const initialState = useMemo(() => loadState(), []);
+      const [items, setItems] = useState(initialState.items);
+      const [favorites, setFavorites] = useState(initialState.favs);
+      const [search, setSearch] = useState("");
+      const [activeCat, setActiveCat] = useState("Toutes");
+      const [viewCompact, setViewCompact] = useState(false);
+      const [theme, setTheme] = useState(() => storage.get(THEME_KEY) || "sncf");
+      const [dayMode, setDayMode] = useState(() => {
+        const d = storage.get(DAY_KEY);
+        return d === null ? true : d === "true";
+      });
+      const [showNotepad, setShowNotepad] = useState(false);
+      const [notepadText, setNotepadText] = useState(() => storage.get(NOTEPAD_KEY) || "");
+      const [showThemeMenu, setShowThemeMenu] = useState(false);
+      const [showSaveModal, setShowSaveModal] = useState(false);
+      const [notepadPos, setNotepadPos] = useState({ x: 100, y: 100 });
+      const [dragging, setDragging] = useState(false);
+      const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+      const [downloadFileName, setDownloadFileName] = useState("RaccourcisIpad.html");
+      const [tourStep, setTourStep] = useState(-1);
+
+      // --- Refs ---
+      const themeBtnRef = useRef(null);
+      const themeMenuRef = useRef(null);
+      const notepadRef = useRef(null);
+
+      // --- Effects ---
+      useEffect(() => { storage.set(NOTEPAD_KEY, notepadText); }, [notepadText]);
+      useEffect(() => {
+        storage.set(STORAGE_KEY, JSON.stringify({ items, favs: favorites }));
+      }, [items, favorites]);
+      useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+        storage.set(THEME_KEY, theme);
+      }, [theme]);
+      useEffect(() => {
+        document.body.classList.toggle("day", dayMode);
+        storage.set(DAY_KEY, String(dayMode));
+      }, [dayMode]);
+      useEffect(() => {
+        const handler = (e) => {
+          if (themeMenuRef.current && !themeMenuRef.current.contains(e.target) &&
+              themeBtnRef.current && !themeBtnRef.current.contains(e.target)) {
+            setShowThemeMenu(false);
+          }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+      }, []);
+      useEffect(() => {
+        if (!dragging) return;
+        const move = (e) => { setNotepadPos({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }); };
+        const up = () => setDragging(false);
+        window.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", up);
+        return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+      }, [dragging, dragStart]);
+
+      // Tour : avancer au clic (sur overlay) ou touche clavier (sauf Échap)
+      const closeTour = () => setTourStep(-1);
+      const nextTour = useCallback(() => {
+        setTourStep(s => s < TOUR_STEPS.length - 1 ? s + 1 : -1);
+      }, []);
+      useEffect(() => {
+        if (tourStep < 0) return;
+        const handleKey = (e) => {
+          if (e.key === "Escape") { closeTour(); return; }
+          nextTour();
+        };
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+      }, [tourStep, nextTour]);
+
+      const handleOverlayClick = useCallback((e) => {
+        // Avancer si on clique sur le fond flouté (pas sur la bulle)
+        if (e.target === e.currentTarget) {
+          nextTour();
+        }
+      }, [nextTour]);
+
+      // --- Derived ---
+      const categories = useMemo(() => {
+        const cats = new Set(items.map(i => i.cat));
+        return ["Toutes", ...Array.from(cats).sort()];
+      }, [items]);
+      const filteredItems = useMemo(() => {
+        let result = items;
+        if (activeCat !== "Toutes") result = result.filter(i => i.cat === activeCat);
+        const q = search.toLowerCase().trim();
+        if (q) {
+          result = result.filter(i =>
+            (i.shortcut && i.shortcut.toLowerCase().includes(q)) ||
+            (i.action && i.action.toLowerCase().includes(q)) ||
+            (i.cat && i.cat.toLowerCase().includes(q)) ||
+            (i.compat && i.compat && i.compat.toLowerCase().includes(q))
+          );
+        }
+        return result;
+      }, [items, activeCat, search]);
+
+      // --- Handlers ---
+      const toggleFav = (id) => setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+
+      const resetToSeed = () => {
+        if (window.confirm("Réinitialiser toutes les données métier ?")) {
+          if (window.confirm("Confirmation finale : cela effacera vos favoris et modifications.")) {
+            setItems(SEED_ITEMS);
+            setFavorites(SEED_FAVS);
+            setTheme("sncf");
+            setDayMode(true);
+            storage.remove(STORAGE_KEY);
+          }
+        }
+      };
+
+      const exportJSON = () => JSON.stringify({ items, favs: favorites }, null, 2);
+
+      const importJSON = (jsonStr, replace = false) => {
+        try {
+          const data = JSON.parse(jsonStr);
+          if (data.items) {
+            if (replace) {
+              setItems(data.items);
+              setFavorites(data.favs || []);
+            } else {
+              setItems(prev => [...prev, ...data.items]);
+              if (data.favs) setFavorites(prev => [...new Set([...prev, ...data.favs])]);
+            }
+          }
+        } catch(e) { alert("JSON invalide."); }
+      };
+
+      const downloadHTML = () => {
+        const itemsJSON = JSON.stringify(items);
+        const favsJSON = JSON.stringify(favorites);
+        const source = document.documentElement.outerHTML;
+        let newSource = source.replace(
+          /\/\*__SEED_START__\*\/[\s\S]*?\/\*__SEED_END__\*\//,
+          `/*__SEED_START__*/\n    const SEED_ITEMS = ${itemsJSON};\n    /*__SEED_END__*/`
+        );
+        newSource = newSource.replace(
+          /\/\*__SEED_FAVS_START__\*\/[\s\S]*?\/\*__SEED_FAVS_END__\*\//,
+          `/*__SEED_FAVS_START__*/\n    const SEED_FAVS = ${favsJSON};\n    /*__SEED_FAVS_END__*/`
+        );
+        const blob = new Blob([newSource], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = downloadFileName || "RaccourcisIpad.html";
+        a.click();
+      };
+
+      const copyToClipboard = (text) => navigator.clipboard.writeText(text);
+
+      const startDragNotepad = (e) => {
+        setDragging(true);
+        setDragStart({ x: e.clientX - notepadPos.x, y: e.clientY - notepadPos.y });
+      };
+
+      // --- Theme config ---
+      const themes = [
+        { id: "sncf", emoji: "🐝", name: "HiveOS" },
+        { id: "pro-blue", emoji: "🔷", name: "Pro Bleu" },
+        { id: "bleu", emoji: "🔵", name: "Bleu" },
+        { id: "dracula", emoji: "🧛", name: "Dracula" },
+        { id: "windows95", emoji: "🪟", name: "Windows95" },
+        { id: "terminal", emoji: "💻", name: "Terminal" },
+        { id: "picsou", emoji: "🪙", name: "Picsou" },
+        { id: "cyberpunk", emoji: "⚡", name: "Cyberpunk" },
+        { id: "spectre", emoji: "👾", name: "Spectre" },
+        { id: "matrix", emoji: "🟢", name: "Matrix" }
+      ];
+
+      // --- Tour spotlight ---
+      const tourActive = tourStep >= 0;
+      const currentTour = tourActive ? TOUR_STEPS[tourStep] : null;
+      const [spotRect, setSpotRect] = useState(null);
+      useEffect(() => {
+        if (!tourActive || !currentTour?.target) { setSpotRect(null); return; }
+        const el = document.querySelector(currentTour.target);
+        if (el) {
+          const r = el.getBoundingClientRect();
+          setSpotRect({ top: r.top - 4, left: r.left - 4, width: r.width + 8, height: r.height + 8 });
+        } else {
+          setSpotRect(null);
+        }
+      }, [tourActive, currentTour]);
+
+      return (
+        <>
+          {/* HEADER invisible */}
+          <header className="hive-header">
+            <div className="hive-logo">
+              HiveOS
+              <span className="hive-logo-sub">Raccourcis</span>
+            </div>
+            <div className="hive-btns">
+              <button className="hive-btn" onClick={() => setShowNotepad(!showNotepad)} title="Bloc-notes">📝</button>
+              <div style={{position:'relative'}}>
+                <button className="hive-btn" ref={themeBtnRef} onClick={() => setShowThemeMenu(!showThemeMenu)}>🎨</button>
+                {showThemeMenu && (
+                  <div className="theme-dropdown open" ref={themeMenuRef}>
+                    {themes.map(t => (
+                      <button key={t.id} className={`theme-option ${theme===t.id?'active':''}`}
+                        onClick={() => { setTheme(t.id); setShowThemeMenu(false); }}>
+                        {t.emoji} {t.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button className="hive-btn" onClick={() => setDayMode(!dayMode)}>{dayMode ? '☀️' : '🌙'}</button>
+              <button className="hive-btn" onClick={() => setShowSaveModal(true)}>💾</button>
+              <button className="hive-btn" onClick={() => setTourStep(0)}>❓</button>
+            </div>
+          </header>
+
+          {/* MAIN CONTENT */}
+          <div className="app-container">
+            <h1 className="app-title">Raccourcis & Gestes iPad</h1>
+            <p className="app-subtitle">Tous les raccourcis clavier, gestes et apps utiles — filtrables et favoris</p>
+
+            <div className="search-bar">
+              <input className="search-input" type="text" placeholder="Rechercher un raccourci, une action…"
+                value={search} onChange={e => setSearch(e.target.value)} />
+              <div className="view-toggle">
+                <button className={!viewCompact ? 'active' : ''} onClick={() => setViewCompact(false)}>📋 Cartes</button>
+                <button className={viewCompact ? 'active' : ''} onClick={() => setViewCompact(true)}>📄 Compact</button>
+              </div>
+            </div>
+
+            <div className="cat-pills">
+              {categories.map(cat => (
+                <button key={cat} className={`cat-pill ${activeCat===cat?'active':''}`}
+                  onClick={() => setActiveCat(cat)}>{cat}</button>
+              ))}
+            </div>
+            <div className="stats-row">{filteredItems.length} résultat(s) {activeCat!=='Toutes' && `dans ${activeCat}`}</div>
+
+            <div className={`cards-grid ${viewCompact?'compact':''}`}>
+              {filteredItems.length === 0 && <div className="no-results">Aucun résultat</div>}
+              {filteredItems.map(item => (
+                <div key={item.id} className="shortcut-card">
+                  <button className={`fav-star ${favorites.includes(item.id)?'faved':''}`}
+                    onClick={() => toggleFav(item.id)}>★</button>
+                  <div className="kbd-row">
+                    <kbd>{item.shortcut}</kbd>
+                    {item.freq && <span className="meta-tag">{item.freq}</span>}
+                  </div>
+                  <div className="action-text">{item.action}</div>
+                  <div className="meta-row">
+                    {item.compat && <span className="meta-tag">{item.compat}</span>}
+                    {item.meta && <span className="meta-tag">{item.meta}</span>}
+                    {item.link && <a href={item.link} target="_blank" rel="noopener" style={{color:'var(--ac)',fontSize:'0.7rem'}}>App Store ↗</a>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* NOTEPAD */}
+          {showNotepad && (
+            <div className="notepad-window" ref={notepadRef} style={{ left: notepadPos.x, top: notepadPos.y }}>
+              <div className="notepad-bar" onMouseDown={startDragNotepad}>
+                <span>📝 Bloc-notes</span>
+                <button onClick={() => copyToClipboard(notepadText)}>Copier</button>
+              </div>
+              <textarea value={notepadText} onChange={e => setNotepadText(e.target.value)} />
+            </div>
+          )}
+
+          {/* SAVE MODAL */}
+          {showSaveModal && (
+            <div className="modal-overlay" onClick={() => setShowSaveModal(false)}>
+              <div className="modal-box" onClick={e => e.stopPropagation()}>
+                <h3>💾 Sauvegarde & Restauration</h3>
+                <div className="modal-section">
+                  <p style={{fontSize:'0.8rem', marginBottom:6}}>📤 Exporter les données</p>
+                  <textarea readOnly value={exportJSON()}></textarea>
+                  <button onClick={() => copyToClipboard(exportJSON())}>Copier le JSON</button>
+                  <button onClick={() => { const b = new Blob([exportJSON()],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='raccourcis.json'; a.click(); }}>Télécharger .json</button>
+                </div>
+                <div className="modal-section">
+                  <p style={{fontSize:'0.8rem', marginBottom:6}}>📥 Restaurer</p>
+                  <textarea id="importArea" placeholder="Collez le JSON ici"></textarea>
+                  <button onClick={() => { const v = document.getElementById('importArea').value; if(v) importJSON(v, false); }}>Valider · Fusionner</button>
+                  <button onClick={() => { const v = document.getElementById('importArea').value; if(v && window.confirm("Remplacer toutes les données ?")) importJSON(v, true); }}>Valider · Remplacer tout</button>
+                </div>
+                <div className="modal-section">
+                  <p style={{fontSize:'0.8rem', marginBottom:6}}>🔗 URL partageable</p>
+                  <button onClick={() => { const encoded = btoa(JSON.stringify({items,favs:favorites})); const url = `${window.location.origin}${window.location.pathname}#d=${encoded}`; copyToClipboard(url); alert('URL copiée !'); }}>Copier l'URL</button>
+                </div>
+                <div className="modal-section">
+                  <p style={{fontSize:'0.8rem', marginBottom:6}}>📦 Télécharger l'application</p>
+                  <input type="text" value={downloadFileName} onChange={e => setDownloadFileName(e.target.value)} placeholder="Nom du fichier" />
+                  <button onClick={downloadHTML}>Télécharger .html</button>
+                </div>
+                <div className="modal-section">
+                  <p style={{fontSize:'0.8rem', marginBottom:6}}>♻️ Remise à zéro</p>
+                  <button className="danger" onClick={resetToSeed}>Réinitialiser les données</button>
+                </div>
+                <button style={{marginTop:12}} onClick={() => setShowSaveModal(false)}>Fermer</button>
+              </div>
+            </div>
+          )}
+
+          {/* TOUR GUIDE avec flou et fenêtre centrée */}
+          {tourActive && (
+            <div className="tour-overlay-blur" onClick={handleOverlayClick}>
+              {/* Cutout : zone nette autour de l'élément ciblé (sauf si pas de cible) */}
+              {spotRect && (
+                <div className="tour-spotlight-cutout" style={{
+                  top: spotRect.top, left: spotRect.left,
+                  width: spotRect.width, height: spotRect.height
+                }} />
+              )}
+              {/* Bulle centrée */}
+              <div className="tour-bubble-center" onClick={e => e.stopPropagation()}>
+                <h4>{currentTour.title}</h4>
+                <p>{currentTour.text}</p>
+                <div className="tour-btns">
+                  <button onClick={closeTour}>Fermer</button>
+                  {tourStep < TOUR_STEPS.length - 1 ? (
+                    <button className="primary" onClick={nextTour}>Suivant</button>
+                  ) : (
+                    <button className="primary" onClick={closeTour}>C'est parti !</button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
+```
