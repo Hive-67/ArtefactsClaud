@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulation Serveur Gaming</title>
+
+<!-- CDN réparés – versions stables -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.0/babel.min.js" crossorigin></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   VARIABLES — THÈME SOMBRE (défaut) / CLAIR (.light sur body)
+   Toute couleur dans le CSS passe par une variable.
+   Basculer le thème = ajouter/retirer .light sur <body>.
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-app    : #1a1b1e;   /* fond de page */
+  --bg-side   : #25262b;   /* sidebar */
+  --bg-shead  : #1f2023;   /* header sidebar */
+  --bg-main   : #313338;   /* zone centrale */
+  --bg-bar    : #2f3136;   /* topbar */
+  --bg-card   : #2b2d31;   /* cartes / sections */
+  --bg-input  : #1e1f22;   /* inputs / textareas */
+  --bg-hover  : #35373c;   /* survol */
+  --bg-active : #404249;   /* sélectionné */
+  --bg-tabs   : #232428;   /* fond onglets */
+  --bg-modal  : #2b2d31;   /* fond modal */
+  --bd        : #3f4147;   /* bordure standard */
+  --bd-s      : #2e3035;   /* bordure subtile */
+  --tx-h      : #f2f3f5;   /* texte principal */
+  --tx        : #dcddde;   /* texte courant */
+  --tx-s      : #96989d;   /* texte secondaire */
+  --tx-m      : #4e5058;   /* texte muted */
+  --ac        : #5865F2;   /* accent violet Discord */
+  --green     : #57F287;   /* rempli */
+  --green-d   : #3ba55c;
+  --orange    : #FAA81A;   /* instructions */
+  --red       : #ED4245;   /* danger / staff */
+  --purple    : #A855F7;   /* validé */
+  --sb-bg     : #1e1f22;
+  --sb-thumb  : #3f4147;
+}
+body.light {
+  --bg-app    : #e3e5e8;
+  --bg-side   : #f2f3f5;
+  --bg-shead  : #e3e5e8;
+  --bg-main   : #ffffff;
+  --bg-bar    : #f2f3f5;
+  --bg-card   : #ffffff;
+  --bg-input  : #ebedef;
+  --bg-hover  : #dde0e4;
+  --bg-active : #d4d7dc;
+  --bg-tabs   : #e3e5e8;
+  --bg-modal  : #ffffff;
+  --bd        : #c8ccd2;
+  --bd-s      : #d4d7dc;
+  --tx-h      : #060607;
+  --tx        : #2e3338;
+  --tx-s      : #4f5660;
+  --tx-m      : #96989d;
+  --sb-bg     : #e3e5e8;
+  --sb-thumb  : #c8ccd2;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-app);
+  color: var(--tx);
+  height: 100vh;
+  overflow: hidden;
+  transition: background .2s, color .2s;
+}
+textarea, input, select, button { font-family: 'Outfit', sans-serif; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--sb-bg); }
+::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ac); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT — sidebar | main
+═══════════════════════════════════════════════════════════════ */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 242px; flex-shrink: 0;
+  background: var(--bg-side);
+  border-right: 1px solid var(--bd);
+  display: flex; flex-direction: column;
+  overflow: hidden; transition: background .2s;
+}
+.s-head {
+  background: var(--bg-shead);
+  border-bottom: 1px solid var(--bd);
+  padding: 12px 14px 10px; flex-shrink: 0;
+  transition: background .2s;
+}
+.s-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--tx-h); text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 8px;
+}
+.prog-wrap { margin-top: 5px; }
+.prog-bar {
+  height: 4px; border-radius: 2px;
+  background: var(--bd); overflow: hidden; margin-bottom: 3px;
+}
+.prog-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+.pf-green  { background: linear-gradient(90deg, var(--green), var(--green-d)); }
+.pf-purple { background: linear-gradient(90deg, var(--purple), #7c3aed); }
+.prog-lbl  {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--tx-m); font-weight: 600;
+}
+.prog-lbl .c-green  { color: var(--green); }
+.prog-lbl .c-purple { color: var(--purple); }
+.s-scroll { flex: 1; overflow-y: auto; padding: 6px 0 40px; }
+
+/* Catégories */
+.cat-h {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 10px 4px; cursor: pointer; user-select: none;
+}
+.cat-h:hover .cat-n { color: var(--tx-s); }
+.cat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.cat-n {
+  font-size: 9px; font-weight: 700; color: var(--tx-m);
+  text-transform: uppercase; letter-spacing: .3px; flex: 1; transition: color .1s;
+}
+.cat-count {
+  font-size: 9px; font-weight: 700; color: var(--green);
+  background: rgba(87,242,135,.1); padding: 1px 5px; border-radius: 8px;
+}
+.cat-chev { font-size: 7px; color: var(--tx-m); transition: transform .15s; }
+.nocat-lbl {
+  padding: 8px 10px 2px; font-size: 9px;
+  color: var(--tx-m); font-style: italic; letter-spacing: .4px; user-select: none;
+}
+
+/* Salons */
+.ch-list { padding: 0 6px; }
+.ch {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 8px; border-radius: 4px;
+  cursor: pointer; transition: background .1s; min-height: 28px; user-select: none;
+}
+.ch:hover:not(.voice) { background: var(--bg-hover); }
+.ch.active  { background: var(--bg-active); }
+.ch.voice   { opacity: .5; cursor: default; }
+.ch.val .ch-n { color: var(--purple) !important; }
+.ch-ico { font-size: 11px; color: var(--tx-m); flex-shrink: 0; }
+.ch-n {
+  font-size: 12px; color: var(--tx-s); flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .1s;
+}
+.ch:not(.voice):hover .ch-n, .ch.active .ch-n { color: var(--tx-h); }
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot.g { background: var(--green);  }
+.dot.p { background: var(--purple); }
+.dot.b { background: var(--ac);     }
+
+/* ── MAIN ── */
+.main {
+  flex: 1; display: flex; flex-direction: column;
+  background: var(--bg-main); overflow: hidden; transition: background .2s;
+}
+
+/* Topbar */
+.bar {
+  background: var(--bg-bar); border-bottom: 1px solid var(--bd);
+  padding: 0 14px; height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; transition: background .2s;
+}
+.bar-l { display: flex; align-items: center; gap: 8px; }
+.bar-title { font-size: 15px; font-weight: 600; color: var(--tx-h); }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+.bar-r { display: flex; align-items: center; gap: 6px; }
+.auto-save { font-size: 10px; color: var(--green); opacity: 0; transition: opacity .3s; pointer-events: none; }
+.auto-save.on { opacity: 1; }
+
+/* Boutons icon (emoji seuls) */
+.ico-btn {
+  width: 34px; height: 34px;
+  background: var(--bg-card); border: 1px solid var(--bd);
+  border-radius: 7px; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.ico-btn:hover { background: var(--bg-hover); border-color: var(--tx-m); }
+.ico-btn.active-save { background: var(--green) !important; border-color: var(--green) !important; }
+
+/* Menu déroulant langue */
+.lang-menu {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 100;
+  background: var(--bg-modal); border: 1px solid var(--bd);
+  border-radius: 9px; padding: 5px; min-width: 150px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.4);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.lang-opt {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  background: transparent; border: none; border-radius: 6px;
+  color: var(--tx); font-family: inherit; font-size: 13px; font-weight: 500;
+  padding: 8px 10px; cursor: pointer; text-align: left;
+  transition: background .12s;
+}
+.lang-opt:hover { background: var(--bg-hover); }
+.lang-opt.on { background: var(--ac); color: #fff; }
+
+/* Tabs */
+.tabs {
+  display: flex; background: var(--bg-tabs);
+  border-bottom: 1px solid var(--bd); flex-shrink: 0; transition: background .2s;
+}
+.tab {
+  padding: 10px 16px; font-size: 12px; font-weight: 600;
+  color: var(--tx-s); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s; user-select: none;
+}
+.tab:hover { color: var(--tx-h); }
+.tab.on    { color: var(--tx-h); border-bottom-color: var(--ac); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PANNEAU ÉDITEUR
+═══════════════════════════════════════════════════════════════ */
+.panel { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+.sec {
+  background: var(--bg-card); border: 1px solid var(--bd-s);
+  border-radius: 8px; overflow: hidden; transition: background .2s, border-color .2s;
+}
+.sec-h {
+  padding: 9px 14px 8px; border-bottom: 1px solid var(--bd-s);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sec-lbl { font-size: 11px; font-weight: 700; color: var(--tx-s); text-transform: uppercase; letter-spacing: .5px; }
+.sec-sub { font-size: 10px; color: var(--tx-m); }
+.sec-body { padding: 10px 14px 12px; position: relative; }
+
+.sec.sujet { border-left: 3px solid var(--ac); }
+.sec.inst  { border-left: 3px solid var(--orange); }
+.sec.inst  .sec-lbl { color: var(--orange); }
+.sec.post  { border-left: 3px solid var(--green); }
+.sec.post  .sec-lbl { color: var(--green); }
+.sec.modif { border-left: 3px solid var(--purple); }
+.sec.modif .sec-lbl { color: var(--purple); }
+
+textarea, input[type=text] {
+  width: 100%; background: var(--bg-input); border: 1px solid var(--bd);
+  border-radius: 6px; color: var(--tx); font-size: 13px;
+  line-height: 1.5; padding: 9px 11px; resize: vertical; outline: none;
+  transition: border-color .15s, background .2s;
+}
+textarea:focus, input[type=text]:focus { border-color: var(--ac); }
+textarea.t-inst { background: rgba(250,168,26,.05); border-color: rgba(250,168,26,.2); color: #e8c87a; }
+textarea.t-inst:focus { border-color: var(--orange); }
+textarea.t-modif { background: rgba(168,85,247,.05); border-color: rgba(168,85,247,.2); color: #c9b8e8; }
+textarea.t-modif:focus { border-color: var(--purple); }
+body.light textarea.t-inst { background: #fff8ec; border-color: rgba(250,168,26,.3); color: #7a4f00; }
+body.light textarea.t-modif { background: #f8f0ff; border-color: rgba(168,85,247,.3); color: #6b21a8; }
+.char-c { position: absolute; bottom: 16px; right: 18px; font-size: 9px; font-family: monospace; color: var(--tx-m); pointer-events: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   PANNEAU PERMISSIONS
+═══════════════════════════════════════════════════════════════ */
+.perm-panel { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.perm-sec { background: var(--bg-card); border: 1px solid var(--bd-s); border-radius: 8px; overflow: hidden; transition: background .2s; }
+.perm-th { padding: 9px 14px; font-size: 11px; font-weight: 700; color: var(--tx-s); text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--bd-s); background: var(--bg-shead); transition: background .2s; }
+.perm-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.perm-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.perm-lbl { font-size: 12px; color: var(--tx-s); font-weight: 600; }
+.vt { display: flex; gap: 3px; }
+.vt-b { padding: 4px 9px; border-radius: 4px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; opacity: .3; transition: opacity .15s, background .15s; font-family: 'Outfit', sans-serif; }
+.vt-b:hover { opacity: .65; }
+.vt-b.on { opacity: 1; }
+.vt-b.s { background: rgba(87,242,135,.15); color: var(--green); }
+.vt-b.s.on { background: var(--green); color: #111; }
+.vt-b.r { background: rgba(250,168,26,.15); color: var(--orange); }
+.vt-b.r.on { background: var(--orange); color: #111; }
+.vt-b.h { background: rgba(237,66,69,.15); color: var(--red); }
+.vt-b.h.on { background: var(--red); color: #fff; }
+.roles-lbl { font-size: 10px; color: var(--tx-m); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; margin: 6px 0 4px; }
+.roles-box { background: var(--bg-input); border: 1px solid var(--bd); border-radius: 6px; padding: 6px 8px; min-height: 36px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.chip { background: rgba(88,101,242,.2); color: #a5b0ff; border: 1px solid rgba(88,101,242,.3); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background .1s; }
+.chip:hover { background: rgba(237,66,69,.2); color: #ff9999; border-color: rgba(237,66,69,.4); }
+select { background: var(--bg-input); border: 1px solid var(--bd); border-radius: 6px; color: var(--tx); font-size: 12px; padding: 5px 8px; outline: none; transition: border-color .15s; font-family: 'Outfit', sans-serif; }
+select:focus { border-color: var(--ac); }
+.inh-row { background: rgba(88,101,242,.06); border: 1px solid rgba(88,101,242,.15); border-radius: 6px; padding: 7px 12px; font-size: 11px; color: var(--tx-m); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BOUTONS GÉNÉRAUX
+═══════════════════════════════════════════════════════════════ */
+.btn { padding: 7px 13px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: filter .15s; font-family: 'Outfit', sans-serif; white-space: nowrap; }
+.btn:hover { filter: brightness(1.1); }
+.btn.prim  { background: var(--ac); color: #fff; }
+.btn.ghost { background: transparent; border: 1px solid var(--bd); color: var(--tx-s); }
+.btn.ghost:hover { border-color: var(--tx-s); color: var(--tx-h); }
+.btn.ok    { background: var(--green); color: #111; }
+.btn.warn  { background: var(--red); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL — overlay + boîte
+═══════════════════════════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.65);
+  z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal {
+  background: var(--bg-modal); border: 1px solid var(--bd);
+  border-radius: 10px; width: 100%; max-width: 580px; max-height: 88vh;
+  overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.5); transition: background .2s;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: var(--tx-h); }
+.modal-sep   { height: 1px; background: var(--bd); }
+.modal-sub   { font-size: 11px; color: var(--tx-m); line-height: 1.5; }
+.modal-row   { display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-code  { background: var(--bg-input); border: 1px solid var(--bd); border-radius: 6px; padding: 10px 12px; font-family: monospace; font-size: 11px; color: var(--green); word-break: break-all; line-height: 1.4; }
+.mta { background: var(--bg-input); border: 1px solid var(--bd); border-radius: 6px; color: var(--tx-s); font-family: monospace; font-size: 11px; padding: 10px 12px; width: 100%; height: 140px; resize: none; outline: none; transition: border-color .15s; }
+.mta:focus { border-color: var(--ac); }
+.mta.imp { color: var(--purple); }
+.msg { padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.msg.ok  { background: rgba(87,242,135,.1);  color: var(--green); border: 1px solid rgba(87,242,135,.2); }
+.msg.err { background: rgba(237,66,69,.1);   color: var(--red);   border: 1px solid rgba(237,66,69,.2); }
+
+/* État vide */
+.empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--tx-m); }
+.empty-ico { font-size: 40px; }
+.empty-txt { font-size: 13px; text-align: center; max-width: 260px; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback } = React;
+
+/* ═══════════════════════════════════════════════════════════════
+   SEED — données initiales
+   Complètement vide : fichier "valeur d'usine".
+   Tout est rempli par l'utilisateur ou restauré depuis le storage / URL.
+═══════════════════════════════════════════════════════════════ */
+/*__SEED_START__*/
+const SEED = {
+  topics:       {},
+  instructions: {},
+  posts:        {},
+  modifs:       {},
+  catPerms:     {},
+  chPerms:      {},
+  validated:    {},
+};
+/*__SEED_END__*/
+
+/* ═══════════════════════════════════════════════════════════════
+   I18N — Dictionnaire FR / EN / DE / ES
+   L = langue active. t("clé") renvoie le texte courant.
+   Les id techniques (espace-transfert, j00-annonces, fondateur…)
+   NE sont jamais traduits : seuls les LABELS affichés le sont.
+═══════════════════════════════════════════════════════════════ */
+const LANGS = [
+  { v:"fr", em:"🇫🇷", n:"Français" },
+  { v:"en", em:"🇬🇧", n:"English"  },
+  { v:"de", em:"🇩🇪", n:"Deutsch"  },
+  { v:"es", em:"🇪🇸", n:"Español"  },
+];
+const S_LANG = "discord-gaming-lang";
+
+const I18N = {
+  // ── Sidebar ──
+  serverTitle:   { fr:"🎮 Serveur Gaming", en:"🎮 Gaming Server", de:"🎮 Gaming-Server", es:"🎮 Servidor Gaming" },
+  filled:        { fr:"remplis",  en:"filled",   de:"ausgefüllt", es:"rellenados" },
+  channels:      { fr:"salons",   en:"channels", de:"Kanäle",     es:"canales" },
+  validated:     { fr:"validés",  en:"validated",de:"validiert",  es:"validados" },
+  remaining:     { fr:"restants", en:"remaining",de:"verbleibend",es:"restantes" },
+  noCategory:    { fr:"⌁ Hors catégorie", en:"⌁ Uncategorized", de:"⌁ Ohne Kategorie", es:"⌁ Sin categoría" },
+  // ── Topbar ──
+  editorTitle:   { fr:"Éditeur — Serveur Gaming", en:"Editor — Gaming Server", de:"Editor — Gaming-Server", es:"Editor — Servidor Gaming" },
+  darkMode:      { fr:"Mode sombre", en:"Dark mode", de:"Dunkelmodus", es:"Modo oscuro" },
+  lightMode:     { fr:"Mode clair", en:"Light mode", de:"Heller Modus", es:"Modo claro" },
+  language:      { fr:"Langue", en:"Language", de:"Sprache", es:"Idioma" },
+  saveData:      { fr:"Sauvegarder / Données", en:"Save / Data", de:"Speichern / Daten", es:"Guardar / Datos" },
+  // ── Onglets ──
+  tabContent:    { fr:"💬 Contenu", en:"💬 Content", de:"💬 Inhalt", es:"💬 Contenido" },
+  tabPerms:      { fr:"🔐 Permissions", en:"🔐 Permissions", de:"🔐 Berechtigungen", es:"🔐 Permisos" },
+  // ── Section Sujet ──
+  topicLbl:      { fr:"📝 Sujet du salon", en:"📝 Channel topic", de:"📝 Kanalthema", es:"📝 Tema del canal" },
+  topicSub:      { fr:"Appliqué par le script Python dans les paramètres Discord", en:"Applied by the Python script in the Discord settings", de:"Vom Python-Skript in den Discord-Einstellungen angewendet", es:"Aplicado por el script Python en los ajustes de Discord" },
+  topicPh:       { fr:"Décris l'utilité de ce salon…", en:"Describe what this channel is for…", de:"Beschreibe den Zweck dieses Kanals…", es:"Describe para qué sirve este canal…" },
+  // ── Section Instructions ──
+  instLbl:       { fr:"📋 Instructions client", en:"📋 Client instructions", de:"📋 Kundenanweisungen", es:"📋 Instrucciones para el cliente" },
+  instSub:       { fr:"Affiché dans le guide client — pas dans le script Python", en:"Shown in the client guide — not in the Python script", de:"Im Kundenhandbuch angezeigt — nicht im Python-Skript", es:"Mostrado en la guía del cliente — no en el script Python" },
+  instPh:        { fr:"Étapes pour le client : convertir en forum, épingler, configurer un bot…", en:"Steps for the client: convert to forum, pin, set up a bot…", de:"Schritte für den Kunden: in Forum umwandeln, anpinnen, Bot einrichten…", es:"Pasos para el cliente: convertir en foro, fijar, configurar un bot…" },
+  // ── Section Post ──
+  postLbl:       { fr:"📌 Poste", en:"📌 Post", de:"📌 Beitrag", es:"📌 Publicación" },
+  postSub:       { fr:"Texte prêt à coller dans Discord", en:"Text ready to paste into Discord", de:"Text bereit zum Einfügen in Discord", es:"Texto listo para pegar en Discord" },
+  postPh:        { fr:"Règles, bienvenue, annonces… textes à coller dans Discord", en:"Rules, welcome, announcements… texts to paste into Discord", de:"Regeln, Willkommen, Ankündigungen… Texte zum Einfügen in Discord", es:"Reglas, bienvenida, anuncios… textos para pegar en Discord" },
+  copy:          { fr:"📋 Copier", en:"📋 Copy", de:"📋 Kopieren", es:"📋 Copiar" },
+  copied:        { fr:"✓ Copié", en:"✓ Copied", de:"✓ Kopiert", es:"✓ Copiado" },
+  // ── Section Notes internes ──
+  modifLbl:      { fr:"🛠️ Notes internes", en:"🛠️ Internal notes", de:"🛠️ Interne Notizen", es:"🛠️ Notas internas" },
+  modifSub:      { fr:"Jamais livré — reminders et questions en suspens", en:"Never delivered — reminders and open questions", de:"Wird nie geliefert — Erinnerungen und offene Fragen", es:"Nunca se entrega — recordatorios y preguntas pendientes" },
+  modifPh:       { fr:"Notes, corrections à faire, questions…", en:"Notes, fixes to do, questions…", de:"Notizen, anstehende Korrekturen, Fragen…", es:"Notas, correcciones pendientes, preguntas…" },
+  // ── Empty state ──
+  emptyTxt:      { fr:"Clique sur un salon pour l'éditer", en:"Click a channel to edit it", de:"Klicke auf einen Kanal, um ihn zu bearbeiten", es:"Haz clic en un canal para editarlo" },
+  emptyHint:     { fr:"Double-clic = marquer comme validé ✓", en:"Double-click = mark as validated ✓", de:"Doppelklick = als validiert markieren ✓", es:"Doble clic = marcar como validado ✓" },
+  // ── Permissions panel ──
+  permCatTitle:  { fr:"Permissions catégorie (héritage)", en:"Category permissions (inheritance)", de:"Kategorie-Berechtigungen (Vererbung)", es:"Permisos de categoría (herencia)" },
+  permChTitle:   { fr:"Permissions salon (override)", en:"Channel permissions (override)", de:"Kanal-Berechtigungen (Override)", es:"Permisos de canal (override)" },
+  rolesAllowed:  { fr:"Rôles autorisés (voir + interagir)", en:"Allowed roles (see + interact)", de:"Erlaubte Rollen (sehen + interagieren)", es:"Roles permitidos (ver + interactuar)" },
+  noRole:        { fr:"Aucun rôle", en:"No role", de:"Keine Rolle", es:"Ningún rol" },
+  addRolePh:     { fr:"+ Ajouter un rôle…", en:"+ Add a role…", de:"+ Rolle hinzufügen…", es:"+ Añadir un rol…" },
+  add:           { fr:"Ajouter", en:"Add", de:"Hinzufügen", es:"Añadir" },
+  removeChip:    { fr:"Clic pour retirer", en:"Click to remove", de:"Zum Entfernen klicken", es:"Clic para quitar" },
+  inherit:       { fr:"Hérite de la catégorie (par défaut)", en:"Inherits from category (default)", de:"Erbt von der Kategorie (Standard)", es:"Hereda de la categoría (por defecto)" },
+  everyoneOv:    { fr:"@everyone (override)", en:"@everyone (override)", de:"@everyone (Override)", es:"@everyone (override)" },
+  vtSee:         { fr:"Voit + interagit", en:"Sees + interacts", de:"Sieht + interagiert", es:"Ve + interactúa" },
+  vtRead:        { fr:"Lecture seule", en:"Read-only", de:"Nur Lesen", es:"Solo lectura" },
+  vtHide:        { fr:"Ne voit pas", en:"Cannot see", de:"Sieht nicht", es:"No ve" },
+  // ── Modal sauvegarde ──
+  modalTitle:    { fr:"💾 Sauvegarde & Données", en:"💾 Save & Data", de:"💾 Sicherung & Daten", es:"💾 Guardado y Datos" },
+  urlSecT:       { fr:"🔗 Sauvegarder dans l'URL", en:"🔗 Save to URL", de:"🔗 In URL speichern", es:"🔗 Guardar en la URL" },
+  urlSecD:       { fr:"Encode toutes tes données dans le # de l'URL et la copie dans le presse-papier. Colle cette URL dans n'importe quel navigateur pour retrouver exactement où tu en étais.", en:"Encodes all your data into the URL # and copies it to the clipboard. Paste this URL into any browser to get back exactly where you were.", de:"Codiert alle deine Daten in das URL-# und kopiert sie in die Zwischenablage. Füge diese URL in einen beliebigen Browser ein, um genau dort weiterzumachen, wo du warst.", es:"Codifica todos tus datos en el # de la URL y la copia al portapapeles. Pega esta URL en cualquier navegador para volver exactamente donde estabas." },
+  urlBtn:        { fr:"💾 Sauvegarder + copier l'URL", en:"💾 Save + copy URL", de:"💾 Speichern + URL kopieren", es:"💾 Guardar + copiar URL" },
+  urlBtnOk:      { fr:"✓ URL copiée !", en:"✓ URL copied!", de:"✓ URL kopiert!", es:"✓ ¡URL copiada!" },
+  jsonExpT:      { fr:"📤 Exporter en JSON", en:"📤 Export as JSON", de:"📤 Als JSON exportieren", es:"📤 Exportar como JSON" },
+  jsonExpD:      { fr:"Sauvegarde complète de toutes tes données. Utilisable pour importer sur un autre fichier ou garder un backup local.", en:"Full backup of all your data. Use it to import into another file or keep a local backup.", de:"Vollständige Sicherung all deiner Daten. Nutzbar zum Import in eine andere Datei oder als lokales Backup.", es:"Copia de seguridad completa de todos tus datos. Úsala para importar en otro archivo o guardar un backup local." },
+  dlJson:        { fr:"⬇ Télécharger .json", en:"⬇ Download .json", de:"⬇ .json herunterladen", es:"⬇ Descargar .json" },
+  jsonImpT:      { fr:"📥 Importer un JSON", en:"📥 Import a JSON", de:"📥 JSON importieren", es:"📥 Importar un JSON" },
+  jsonImpD:      { fr:"Colle un JSON exporté précédemment. Fusionner garde tes données actuelles et ajoute les nouvelles. Remplacer écrase tout.", en:"Paste a previously exported JSON. Merge keeps your current data and adds the new. Replace overwrites everything.", de:"Füge ein zuvor exportiertes JSON ein. Zusammenführen behält deine aktuellen Daten und fügt die neuen hinzu. Ersetzen überschreibt alles.", es:"Pega un JSON exportado anteriormente. Fusionar mantiene tus datos actuales y añade los nuevos. Reemplazar lo sobrescribe todo." },
+  jsonImpPh:     { fr:"Colle ton JSON ici…", en:"Paste your JSON here…", de:"Füge dein JSON hier ein…", es:"Pega tu JSON aquí…" },
+  merge:         { fr:"🔀 Fusionner", en:"🔀 Merge", de:"🔀 Zusammenführen", es:"🔀 Fusionar" },
+  replaceAll:    { fr:"♻ Remplacer tout", en:"♻ Replace all", de:"♻ Alles ersetzen", es:"♻ Reemplazar todo" },
+  resetT:        { fr:"♻️ Remise à zéro", en:"♻️ Factory reset", de:"♻️ Zurücksetzen", es:"♻️ Restablecer" },
+  resetD:        { fr:"Efface toutes les données saisies et remet le fichier dans son état d'origine — comme s'il venait d'être téléchargé. Cette action est irréversible.", en:"Erases all entered data and restores the file to its original state — as if just downloaded. This action is irreversible.", de:"Löscht alle eingegebenen Daten und setzt die Datei auf den Originalzustand zurück — als wäre sie gerade heruntergeladen worden. Diese Aktion ist unumkehrbar.", es:"Borra todos los datos introducidos y devuelve el archivo a su estado original — como recién descargado. Esta acción es irreversible." },
+  resetBtn:      { fr:"♻️ Remettre à zéro (valeur d'usine)", en:"♻️ Reset (factory value)", de:"♻️ Zurücksetzen (Werkszustand)", es:"♻️ Restablecer (valor de fábrica)" },
+  // ── Messages ──
+  msgReset:      { fr:"✓ Remise à zéro effectuée — fichier vierge", en:"✓ Factory reset done — blank file", de:"✓ Zurücksetzen abgeschlossen — leere Datei", es:"✓ Restablecimiento hecho — archivo en blanco" },
+  msgMerged:     { fr:"✓ Données fusionnées", en:"✓ Data merged", de:"✓ Daten zusammengeführt", es:"✓ Datos fusionados" },
+  msgReplaced:   { fr:"✓ Données remplacées", en:"✓ Data replaced", de:"✓ Daten ersetzt", es:"✓ Datos reemplazados" },
+  msgBadJson:    { fr:"✗ JSON invalide : ", en:"✗ Invalid JSON: ", de:"✗ Ungültiges JSON: ", es:"✗ JSON no válido: " },
+  cfReplace:     { fr:"⚠️ Remplacer toutes les données ? Irréversible.", en:"⚠️ Replace all data? Irreversible.", de:"⚠️ Alle Daten ersetzen? Unumkehrbar.", es:"⚠️ ¿Reemplazar todos los datos? Irreversible." },
+};
+
+/* Zones (labels traduits, couleurs inchangées) */
+const ZONE_LABELS = {
+  staff:    { fr:"Staff",    en:"Staff",    de:"Staff",    es:"Staff"    },
+  logs:     { fr:"Logs",     en:"Logs",     de:"Logs",     es:"Logs"     },
+  public:   { fr:"Public",   en:"Public",   de:"Öffentl.", es:"Público"  },
+  membre:   { fr:"Membre",   en:"Member",   de:"Mitglied", es:"Miembro"  },
+  jeu:      { fr:"Jeu",      en:"Game",     de:"Spiel",    es:"Juego"    },
+  archives: { fr:"Archives", en:"Archives", de:"Archiv",   es:"Archivo"  },
+  stock:    { fr:"Stock",    en:"Stock",    de:"Lager",    es:"Stock"    },
+};
+
+/* Rôles : clé technique (jamais traduite) → label affiché par langue */
+const ROLE_LABELS = {
+  "fondateur":    { fr:"Fondateur",     en:"Founder",        de:"Gründer",          es:"Fundador"        },
+  "superadmin":   { fr:"SuperAdmin",    en:"SuperAdmin",     de:"SuperAdmin",       es:"SuperAdmin"      },
+  "admin":        { fr:"Admin",         en:"Admin",          de:"Admin",            es:"Admin"           },
+  "modo":         { fr:"Modo",          en:"Mod",            de:"Mod",              es:"Mod"             },
+  "staff-ping":   { fr:"Staff-ping",    en:"Staff-ping",     de:"Staff-Ping",       es:"Staff-ping"      },
+  "bot":          { fr:"Bot",           en:"Bot",            de:"Bot",              es:"Bot"             },
+  "nouveau":      { fr:"Nouveau",       en:"Newcomer",       de:"Neuling",          es:"Nuevo"           },
+  "membre":       { fr:"Membre",        en:"Member",         de:"Mitglied",         es:"Miembro"         },
+  "membre-actif": { fr:"Membre actif",  en:"Active member",  de:"Aktives Mitglied", es:"Miembro activo"  },
+  "vip":          { fr:"VIP",           en:"VIP",            de:"VIP",              es:"VIP"             },
+  "booster":      { fr:"Booster",       en:"Booster",        de:"Booster",          es:"Booster"         },
+  "jeu-00":       { fr:"Jeu-00", en:"Game-00", de:"Spiel-00", es:"Juego-00" },
+  "jeu-01":       { fr:"Jeu-01", en:"Game-01", de:"Spiel-01", es:"Juego-01" },
+  "jeu-02":       { fr:"Jeu-02", en:"Game-02", de:"Spiel-02", es:"Juego-02" },
+  "jeu-03":       { fr:"Jeu-03", en:"Game-03", de:"Spiel-03", es:"Juego-03" },
+  "jeu-04":       { fr:"Jeu-04", en:"Game-04", de:"Spiel-04", es:"Juego-04" },
+  "jeu-05":       { fr:"Jeu-05", en:"Game-05", de:"Spiel-05", es:"Juego-05" },
+  "jeu-06":       { fr:"Jeu-06", en:"Game-06", de:"Spiel-06", es:"Juego-06" },
+  "jeu-07":       { fr:"Jeu-07", en:"Game-07", de:"Spiel-07", es:"Juego-07" },
+};
+
+/* Catégories : id → nom affiché par langue (emoji + style conservés) */
+const CAT_LABELS = {
+  "hors-cat":   { fr:"Hors catégorie",     en:"Uncategorized",      de:"Ohne Kategorie",     es:"Sin categoría"      },
+  "logs":       { fr:"【 📋 LOGS 】",        en:"【 📋 LOGS 】",        de:"【 📋 LOGS 】",        es:"【 📋 LOGS 】"        },
+  "staff-cat":  { fr:"【 👮 STAFF 】",       en:"【 👮 STAFF 】",       de:"【 👮 STAFF 】",       es:"【 👮 STAFF 】"       },
+  "accueil":    { fr:"【 🏠 ACCUEIL 】",     en:"【 🏠 WELCOME 】",     de:"【 🏠 WILLKOMMEN 】",  es:"【 🏠 BIENVENIDA 】"  },
+  "annonces":   { fr:"【 📣 ANNONCES 】",    en:"【 📣 ANNOUNCEMENTS 】",de:"【 📣 ANKÜNDIGUNGEN 】",es:"【 📣 ANUNCIOS 】"   },
+  "discussion": { fr:"【 💬 DISCUSSION 】",  en:"【 💬 CHAT 】",        de:"【 💬 CHAT 】",        es:"【 💬 CHARLA 】"      },
+  "jeu-00-cat": { fr:"【 🎮 JEU-00 】",      en:"【 🎮 GAME-00 】",     de:"【 🎮 SPIEL-00 】",    es:"【 🎮 JUEGO-00 】"    },
+  "utilitaires":{ fr:"【 🛠️ UTILITAIRES 】", en:"【 🛠️ UTILITIES 】",   de:"【 🛠️ WERKZEUGE 】",   es:"【 🛠️ UTILIDADES 】"  },
+  "archives":   { fr:"【 📦 ARCHIVES 】",    en:"【 📦 ARCHIVES 】",    de:"【 📦 ARCHIV 】",      es:"【 📦 ARCHIVO 】"     },
+};
+
+/* Salons : id → nom affiché par langue (arborescence ╭├╰ + emoji conservés) */
+const CH_LABELS = {
+  "espace-transfert":{ fr:"💾・Espace-transfert", en:"💾・Transfer-space", de:"💾・Transfer-Bereich", es:"💾・Espacio-transferencia" },
+  "logs-messages":     { fr:"╭・📨・Logs-messages",      en:"╭・📨・Logs-messages",      de:"╭・📨・Logs-Nachrichten",   es:"╭・📨・Logs-mensajes" },
+  "logs-modifications":{ fr:"├・✏️・Logs-modifications", en:"├・✏️・Logs-edits",         de:"├・✏️・Logs-Änderungen",   es:"├・✏️・Logs-ediciones" },
+  "logs-pseudos":      { fr:"├・📝・Logs-pseudos",       en:"├・📝・Logs-nicknames",     de:"├・📝・Logs-Nicknamen",    es:"├・📝・Logs-apodos" },
+  "logs-sanctions":    { fr:"├・⚖️・Logs-sanctions",     en:"├・⚖️・Logs-sanctions",     de:"├・⚖️・Logs-Sanktionen",   es:"├・⚖️・Logs-sanciones" },
+  "logs-depart":       { fr:"╰・🚪・Logs-départ",        en:"╰・🚪・Logs-leaves",        de:"╰・🚪・Logs-Abgänge",      es:"╰・🚪・Logs-salidas" },
+  "staff-regles":      { fr:"╭・📜・Staff-règles-internes", en:"╭・📜・Staff-internal-rules", de:"╭・📜・Staff-interne-Regeln", es:"╭・📜・Staff-reglas-internas" },
+  "staff-discussion":  { fr:"├・💬・Staff-discussion",   en:"├・💬・Staff-chat",         de:"├・💬・Staff-Chat",        es:"├・💬・Staff-charla" },
+  "staff-gestion":     { fr:"├・🗂️・Staff-gestion (forum)", en:"├・🗂️・Staff-management (forum)", de:"├・🗂️・Staff-Verwaltung (Forum)", es:"├・🗂️・Staff-gestión (foro)" },
+  "staff-signalements":{ fr:"├・🚨・Staff-signalements", en:"├・🚨・Staff-reports",      de:"├・🚨・Staff-Meldungen",   es:"├・🚨・Staff-reportes" },
+  "staff-blacklist":   { fr:"├・⛔・Staff-blacklist",    en:"├・⛔・Staff-blacklist",    de:"├・⛔・Staff-Blacklist",   es:"├・⛔・Staff-blacklist" },
+  "staff-vocal":       { fr:"╰・🔊・Vocal Staff",        en:"╰・🔊・Staff Voice",        de:"╰・🔊・Staff-Sprachkanal", es:"╰・🔊・Voz Staff" },
+  "bienvenue":   { fr:"╭・👋・Bienvenue",      en:"╭・👋・Welcome",        de:"╭・👋・Willkommen",     es:"╭・👋・Bienvenida" },
+  "regles":      { fr:"├・📜・Règles",          en:"├・📜・Rules",          de:"├・📜・Regeln",         es:"├・📜・Reglas" },
+  "presentation":{ fr:"├・🪪・Présentation",   en:"├・🪪・Introductions",   de:"├・🪪・Vorstellung",    es:"├・🪪・Presentación" },
+  "choix-roles": { fr:"├・🎭・Choix-des-rôles",en:"├・🎭・Role-selection",  de:"├・🎭・Rollen-Auswahl",  es:"├・🎭・Selección-roles" },
+  "nos-reseaux": { fr:"├・🌐・Nos-réseaux",    en:"├・🌐・Our-socials",     de:"├・🌐・Unsere-Netzwerke",es:"├・🌐・Nuestras-redes" },
+  "boosters":    { fr:"╰・💎・Boosters",       en:"╰・💎・Boosters",        de:"╰・💎・Booster",        es:"╰・💎・Boosters" },
+  "annonces-generales":{ fr:"╭・📢・Annonces-générales", en:"╭・📢・General-announcements", de:"╭・📢・Allgemeine-Ankündigungen", es:"╭・📢・Anuncios-generales" },
+  "annonces-events":   { fr:"├・🎉・Annonces-events",    en:"├・🎉・Event-announcements",   de:"├・🎉・Event-Ankündigungen",     es:"├・🎉・Anuncios-eventos" },
+  "partenariats":      { fr:"╰・🤝・Partenariats",       en:"╰・🤝・Partnerships",          de:"╰・🤝・Partnerschaften",         es:"╰・🤝・Asociaciones" },
+  "general":     { fr:"╭・💬・Général",        en:"╭・💬・General",        de:"╭・💬・Allgemein",      es:"╭・💬・General" },
+  "gaming-gen":  { fr:"├・🎮・Gaming-général", en:"├・🎮・Gaming-general", de:"├・🎮・Gaming-allgemein",es:"├・🎮・Gaming-general" },
+  "medias-clips":{ fr:"├・🎬・Médias-clips",   en:"├・🎬・Media-clips",     de:"├・🎬・Medien-Clips",    es:"├・🎬・Medios-clips" },
+  "memes":       { fr:"├・😂・Memes-humour",   en:"├・😂・Memes-humor",     de:"├・😂・Memes-Humor",     es:"├・😂・Memes-humor" },
+  "off-topic":   { fr:"├・🌙・Off-topic",      en:"├・🌙・Off-topic",       de:"├・🌙・Off-Topic",       es:"├・🌙・Off-topic" },
+  "exhibition":  { fr:"╰・🍆・Exhibition",     en:"╰・🍆・Exhibition",      de:"╰・🍆・Exhibition",      es:"╰・🍆・Exhibición" },
+  "j00-annonces":  { fr:"╭・📢・Jeu-00-annonces",   en:"╭・📢・Game-00-announcements", de:"╭・📢・Spiel-00-Ankündigungen", es:"╭・📢・Juego-00-anuncios" },
+  "j00-discussion":{ fr:"├・💬・Jeu-00-discussion", en:"├・💬・Game-00-chat",          de:"├・💬・Spiel-00-Chat",          es:"├・💬・Juego-00-charla" },
+  "j00-lfg":       { fr:"├・👥・Jeu-00-lfg",        en:"├・👥・Game-00-lfg",           de:"├・👥・Spiel-00-LFG",           es:"├・👥・Juego-00-lfg" },
+  "j00-forum":     { fr:"├・🗂️・Jeu-00-forum (forum)", en:"├・🗂️・Game-00-forum (forum)", de:"├・🗂️・Spiel-00-Forum (Forum)", es:"├・🗂️・Juego-00-foro (foro)" },
+  "j00-vocal":     { fr:"╰・🔊・Vocal Jeu-00",      en:"╰・🔊・Game-00 Voice",         de:"╰・🔊・Spiel-00 Sprachkanal",   es:"╰・🔊・Voz Juego-00" },
+  "commandes-bots":{ fr:"╭・🤖・Commandes-bots", en:"╭・🤖・Bot-commands", de:"╭・🤖・Bot-Befehle",   es:"╭・🤖・Comandos-bots" },
+  "suggestions":   { fr:"├・💡・Suggestions",    en:"├・💡・Suggestions",  de:"├・💡・Vorschläge",    es:"├・💡・Sugerencias" },
+  "support":       { fr:"├・🆘・Support",        en:"├・🆘・Support",      de:"├・🆘・Support",       es:"├・🆘・Soporte" },
+  "ticket":        { fr:"╰・🎟️・Ticket",         en:"╰・🎟️・Ticket",       de:"╰・🎟️・Ticket",        es:"╰・🎟️・Ticket" },
+};
+
+/* Modèles pour les catégories/salons générés JEU-01..07 (suffixe nn injecté) */
+const CAT_TPL = { fr:"【 🎮 JEU-NN 】", en:"【 🎮 GAME-NN 】", de:"【 🎮 SPIEL-NN 】", es:"【 🎮 JUEGO-NN 】" };
+const CH_TPL = {
+  annonces:   { fr:"╭・📢・Jeu-NN-annonces",       en:"╭・📢・Game-NN-announcements", de:"╭・📢・Spiel-NN-Ankündigungen", es:"╭・📢・Juego-NN-anuncios" },
+  discussion: { fr:"├・💬・Jeu-NN-discussion",     en:"├・💬・Game-NN-chat",          de:"├・💬・Spiel-NN-Chat",          es:"├・💬・Juego-NN-charla" },
+  lfg:        { fr:"├・👥・Jeu-NN-lfg",            en:"├・👥・Game-NN-lfg",           de:"├・👥・Spiel-NN-LFG",           es:"├・👥・Juego-NN-lfg" },
+  forum:      { fr:"├・🗂️・Jeu-NN-forum (forum)",  en:"├・🗂️・Game-NN-forum (forum)", de:"├・🗂️・Spiel-NN-Forum (Forum)", es:"├・🗂️・Juego-NN-foro (foro)" },
+  vocal:      { fr:"╰・🔊・Vocal Jeu-NN",          en:"╰・🔊・Game-NN Voice",         de:"╰・🔊・Spiel-NN Sprachkanal",   es:"╰・🔊・Voz Juego-NN" },
+};
+
+/* ── Helpers de traduction ──
+   LANG_REF.v = langue active (mise à jour par React au changement).
+   t(key)        → libellé d'interface
+   tDict(obj)    → libellé depuis un objet {fr,en,de,es}
+   catName / chName / roleName / zoneName → labels structure
+   Pour JEU-01..07 (générés), on reconstruit depuis les templates via le nn. */
+const LANG_REF = { v: "fr" };
+function curLang(){ return LANG_REF.v; }
+function tDict(o){ return (o && (o[LANG_REF.v] ?? o.fr)) || ""; }
+function t(key){ return tDict(I18N[key]); }
+function zoneName(z){ return tDict(ZONE_LABELS[z]) || z; }
+function roleName(id){ return tDict(ROLE_LABELS[id]) || id; }
+function catName(cat){
+  if (CAT_LABELS[cat.id]) return tDict(CAT_LABELS[cat.id]);
+  const m = cat.id.match(/^jeu-(\d{2})-cat$/);
+  if (m) return tDict(CAT_TPL).replace("NN", m[1]);
+  return cat.name;
+}
+function chName(ch){
+  if (CH_LABELS[ch.id]) return tDict(CH_LABELS[ch.id]);
+  const m = ch.id.match(/^j(\d{2})-(annonces|discussion|lfg|forum|vocal)$/);
+  if (m && CH_TPL[m[2]]) return tDict(CH_TPL[m[2]]).replace("NN", m[1]);
+  return ch.name;
+}
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STRUCTURE DU SERVEUR — ordre des catégories et salons
+═══════════════════════════════════════════════════════════════ */
+const STRUCTURE = [
+  { id:"hors-cat", name:"Hors catégorie", zone:"staff", nocat:true, channels:[
+    { id:"espace-transfert", name:"💾・Espace-transfert", type:"text" },
+  ]},
+  { id:"logs", name:"【 📋 LOGS 】", zone:"logs", channels:[
+    { id:"logs-messages",      name:"╭・📨・Logs-messages",      type:"text" },
+    { id:"logs-modifications", name:"├・✏️・Logs-modifications", type:"text" },
+    { id:"logs-pseudos",       name:"├・📝・Logs-pseudos",       type:"text" },
+    { id:"logs-sanctions",     name:"├・⚖️・Logs-sanctions",     type:"text" },
+    { id:"logs-depart",        name:"╰・🚪・Logs-départ",        type:"text" },
+  ]},
+  { id:"staff-cat", name:"【 👮 STAFF 】", zone:"staff", channels:[
+    { id:"staff-regles",       name:"╭・📜・Staff-règles-internes", type:"text" },
+    { id:"staff-discussion",   name:"├・💬・Staff-discussion",      type:"text" },
+    { id:"staff-gestion",      name:"├・🗂️・Staff-gestion (forum)", type:"text" },
+    { id:"staff-signalements", name:"├・🚨・Staff-signalements",    type:"text" },
+    { id:"staff-blacklist",    name:"├・⛔・Staff-blacklist",       type:"text" },
+    { id:"staff-vocal",        name:"╰・🔊・Vocal Staff",           type:"voice" },
+  ]},
+  { id:"accueil", name:"【 🏠 ACCUEIL 】", zone:"membre", channels:[
+    { id:"bienvenue",    name:"╭・👋・Bienvenue",       type:"text" },
+    { id:"regles",       name:"├・📜・Règles",           type:"text" },
+    { id:"presentation", name:"├・🪪・Présentation",    type:"text" },
+    { id:"choix-roles",  name:"├・🎭・Choix-des-rôles", type:"text" },
+    { id:"nos-reseaux",  name:"├・🌐・Nos-réseaux",     type:"text" },
+    { id:"boosters",     name:"╰・💎・Boosters",        type:"text" },
+  ]},
+  { id:"annonces", name:"【 📣 ANNONCES 】", zone:"public", channels:[
+    { id:"annonces-generales", name:"╭・📢・Annonces-générales", type:"text" },
+    { id:"annonces-events",    name:"├・🎉・Annonces-events",    type:"text" },
+    { id:"partenariats",       name:"╰・🤝・Partenariats",       type:"text" },
+  ]},
+  { id:"discussion", name:"【 💬 DISCUSSION 】", zone:"membre", channels:[
+    { id:"general",      name:"╭・💬・Général",        type:"text" },
+    { id:"gaming-gen",   name:"├・🎮・Gaming-général", type:"text" },
+    { id:"medias-clips", name:"├・🎬・Médias-clips",   type:"text" },
+    { id:"memes",        name:"├・😂・Memes-humour",   type:"text" },
+    { id:"off-topic",    name:"├・🌙・Off-topic",      type:"text" },
+    { id:"exhibition",   name:"╰・🍆・Exhibition",     type:"text" },
+  ]},
+  { id:"jeu-00-cat", name:"【 🎮 JEU-00 】", zone:"jeu", channels:[
+    { id:"j00-annonces",   name:"╭・📢・Jeu-00-annonces",       type:"text" },
+    { id:"j00-discussion", name:"├・💬・Jeu-00-discussion",     type:"text" },
+    { id:"j00-lfg",        name:"├・👥・Jeu-00-lfg",            type:"text" },
+    { id:"j00-forum",      name:"├・🗂️・Jeu-00-forum (forum)", type:"text" },
+    { id:"j00-vocal",      name:"╰・🔊・Vocal Jeu-00",          type:"voice" },
+  ]},
+  { id:"utilitaires", name:"【 🛠️ UTILITAIRES 】", zone:"membre", channels:[
+    { id:"commandes-bots", name:"╭・🤖・Commandes-bots", type:"text" },
+    { id:"suggestions",    name:"├・💡・Suggestions",    type:"text" },
+    { id:"support",        name:"├・🆘・Support",        type:"text" },
+    { id:"ticket",         name:"╰・🎟️・Ticket",        type:"text" },
+  ]},
+  { id:"archives", name:"【 📦 ARCHIVES 】", zone:"archives", channels:[] },
+  ...[1,2,3,4,5,6,7].map(n => {
+    const nn = String(n).padStart(2,"0");
+    return { id:`jeu-${nn}-cat`, name:`【 🎮 JEU-${nn} 】`, zone:"stock", channels:[
+      { id:`j${nn}-annonces`,   name:`╭・📢・Jeu-${nn}-annonces`,        type:"text" },
+      { id:`j${nn}-discussion`, name:`├・💬・Jeu-${nn}-discussion`,      type:"text" },
+      { id:`j${nn}-lfg`,        name:`├・👥・Jeu-${nn}-lfg`,             type:"text" },
+      { id:`j${nn}-forum`,      name:`├・🗂️・Jeu-${nn}-forum (forum)`,  type:"text" },
+      { id:`j${nn}-vocal`,      name:`╰・🔊・Vocal Jeu-${nn}`,           type:"voice" },
+    ]};
+  }),
+];
+
+/* Couleurs et labels par zone */
+const ZONES = {
+  staff:    { color:"#ED4245", label:"Staff"    },
+  logs:     { color:"#FAA81A", label:"Logs"     },
+  public:   { color:"#57F287", label:"Public"   },
+  membre:   { color:"#5865F2", label:"Membre"   },
+  jeu:      { color:"#A855F7", label:"Jeu"      },
+  archives: { color:"#72767D", label:"Archives" },
+  stock:    { color:"#4e5058", label:"Stock"    },
+};
+
+/* Rôles disponibles dans le sélecteur de permissions */
+const ROLES = [
+  "fondateur","superadmin","admin","modo","staff-ping","bot",
+  "nouveau","membre","membre-actif","vip","booster",
+  "jeu-00","jeu-01","jeu-02","jeu-03","jeu-04","jeu-05","jeu-06","jeu-07",
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   STORAGE — window.storage (Claude) → localStorage → SEED
+═══════════════════════════════════════════════════════════════ */
+const S_KEY     = "discord-gaming-v5";
+const S_THEME   = "discord-gaming-theme";
+
+async function sGet() {
+  if (window.storage?.get) {
+    try { const r = await window.storage.get(S_KEY); if (r?.value) return JSON.parse(r.value); } catch(_) {}
+  }
+  try { const r = localStorage.getItem(S_KEY); if (r) return JSON.parse(r); } catch(_) {}
+  return null;
+}
+async function sSet(data) {
+  const j = JSON.stringify(data);
+  if (window.storage?.set) {
+    try { await window.storage.set(S_KEY, j); return; } catch(_) {}
+  }
+  try { localStorage.setItem(S_KEY, j); } catch(_) {}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   URL HASH — encode/décode les données dans le # de l'URL
+   Fonctionnement : JSON → UTF-8 bytes → base64 → window.location.hash
+   Priorité maximale au chargement : écrase localStorage et SEED.
+═══════════════════════════════════════════════════════════════ */
+function hashEncode(data) {
+  try {
+    const bytes = new TextEncoder().encode(JSON.stringify(data));
+    let bin = "";
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
+  } catch(_) { return null; }
+}
+
+function hashDecode(b64) {
+  try {
+    const bin   = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch(_) { return null; }
+}
+
+function hashRead()  {
+  const h = window.location.hash.slice(1);
+  return h ? hashDecode(h) : null;
+}
+
+function hashWrite(data) {
+  const enc = hashEncode(data);
+  if (!enc) return false;
+  window.location.hash = enc;
+  try { navigator.clipboard.writeText(window.location.href); } catch(_) {}
+  return true;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SOUS-COMPOSANT PermsPanel
+   Gestion des permissions catégorie (héritage) + override salon.
+═══════════════════════════════════════════════════════════════ */
+function PermsPanel({ catId, chId, catPerms, setCatPerms, chPerms, setChPerms }) {
+  const [newRole, setNewRole] = useState("");
+  const cp = catPerms[catId] || {};
+  const sp = chPerms[chId]   || {};
+  const updCat = p => setCatPerms(prev => ({ ...prev, [catId]: { ...(prev[catId]||{}), ...p } }));
+  const updCh  = p => setChPerms( prev => ({ ...prev, [chId]:  { ...(prev[chId] ||{}), ...p } }));
+
+  const VT = ({ val, onChange }) => (
+    <div className="vt">
+      {[["s","✅","see","vtSee"],["r","👁","read","vtRead"],["h","❌","hide","vtHide"]].map(([k,l,v,tk])=>(
+        <button key={k} className={`vt-b ${k}${val===v?" on":""}`} title={t(tk)} onClick={()=>onChange(v)}>{l}</button>
+      ))}
+    </div>
+  );
+
+  const addRole = () => {
+    if (!newRole||(cp.roles||[]).includes(newRole)) return;
+    setCatPerms(p=>({...p,[catId]:{...p[catId],roles:[...(p[catId]?.roles||[]),newRole]}}));
+    setNewRole("");
+  };
+  const rmRole = r => setCatPerms(p=>({...p,[catId]:{...p[catId],roles:(p[catId]?.roles||[]).filter(x=>x!==r)}}));
+
+  return (
+    <div className="perm-panel">
+      <div className="perm-sec">
+        <div className="perm-th">{t("permCatTitle")}</div>
+        <div className="perm-body">
+          <div className="perm-row">
+            <span className="perm-lbl">@everyone</span>
+            <VT val={cp.everyone||"hide"} onChange={v=>updCat({everyone:v})} />
+          </div>
+          <div className="perm-row">
+            <span className="perm-lbl">{roleName("membre")}</span>
+            <VT val={cp.membre||"hide"} onChange={v=>updCat({membre:v})} />
+          </div>
+          <div>
+            <div className="roles-lbl">{t("rolesAllowed")}</div>
+            <div className="roles-box">
+              {(cp.roles||[]).length
+                ? (cp.roles||[]).map(r=><span key={r} className="chip" title={t("removeChip")} onClick={()=>rmRole(r)}>{roleName(r)} ✕</span>)
+                : <span style={{fontSize:11,color:"var(--tx-m)"}}>{t("noRole")}</span>}
+            </div>
+            <div style={{display:"flex",gap:6,marginTop:6}}>
+              <select value={newRole} onChange={e=>setNewRole(e.target.value)}>
+                <option value="">{t("addRolePh")}</option>
+                {ROLES.filter(r=>!(cp.roles||[]).includes(r)).map(r=><option key={r} value={r}>{roleName(r)}</option>)}
+              </select>
+              <button className="btn ghost" style={{padding:"5px 12px"}} onClick={addRole}>{t("add")}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="perm-sec">
+        <div className="perm-th">{t("permChTitle")}</div>
+        <div className="perm-body">
+          <label className="inh-row">
+            <input type="checkbox" checked={!!sp.inherit} onChange={e=>updCh({inherit:e.target.checked})} />
+            {t("inherit")}
+          </label>
+          {!sp.inherit && (
+            <div className="perm-row" style={{marginTop:6}}>
+              <span className="perm-lbl">{t("everyoneOv")}</span>
+              <VT val={sp.everyone||"hide"} onChange={v=>updCh({everyone:v})} />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPOSANT PRINCIPAL App
+═══════════════════════════════════════════════════════════════ */
+function App() {
+
+  /* ── État : données des salons ── */
+  const [topics,       setTopics]       = useState({});
+  const [instructions, setInstructions] = useState({});
+  const [posts,        setPosts]        = useState({});
+  const [modifs,       setModifs]       = useState({});
+
+  /* ── État : permissions ── */
+  const [catPerms, setCatPerms] = useState({});
+  const [chPerms,  setChPerms]  = useState({});
+
+  /* ── État : validation (double-clic → point violet) ── */
+  const [validated, setValidated] = useState({});
+
+  /* ── État : interface ── */
+  const [selected,   setSelected]  = useState(null);
+  const [tab,        setTab]       = useState("content");
+  const [collapsed,  setCollapsed] = useState({});
+  const [light,      setLight]     = useState(false);
+  const [lang,       setLang]      = useState("fr");
+  const [showLang,   setShowLang]  = useState(false);
+  const [autoFlash,  setAutoFlash] = useState(false);
+  const [copied,     setCopied]    = useState(false);
+  const [showSave,   setShowSave]  = useState(false);
+
+  /* ── État : modal de sauvegarde ── */
+  const [saveMsg,    setSaveMsg]   = useState(null);
+  const [urlFlash,   setUrlFlash]  = useState(false);
+  const [importTxt,  setImportTxt] = useState("");
+  const [importMsg,  setImportMsg] = useState(null);
+
+  /* ── Ref : évite la sauvegarde auto avant le 1er chargement ── */
+  const loaded = useRef(false);
+
+  /* ─────────────────────────────────────────────────────────
+     EFFET 1 — Thème
+  ───────────────────────────────────────────────────────── */
+  useEffect(() => {
+    document.body.classList.toggle("light", light);
+    try { localStorage.setItem(S_THEME, light?"light":"dark"); } catch(_) {}
+  }, [light]);
+
+  /* Langue — sync immédiate (avant rendu) pour les helpers t()/catName()… */
+  LANG_REF.v = lang;
+  useEffect(() => {
+    try { localStorage.setItem(S_LANG, lang); } catch(_) {}
+    document.documentElement.lang = lang;
+    document.title = t("serverTitle").replace(/^🎮\s*/, "") + " — Simulation";
+  }, [lang]);
+
+  /* Fermer le menu langue au clic extérieur */
+  useEffect(() => {
+    if (!showLang) return;
+    const h = () => setShowLang(false);
+    document.addEventListener("click", h);
+    return () => document.removeEventListener("click", h);
+  }, [showLang]);
+
+  /* ─────────────────────────────────────────────────────────
+     EFFET 2 — Chargement initial
+     Priorité : hash URL → localStorage → SEED (vide)
+  ───────────────────────────────────────────────────────── */
+  useEffect(() => {
+    try { if (localStorage.getItem(S_THEME)==="light") setLight(true); } catch(_) {}
+    try { const lg = localStorage.getItem(S_LANG); if (lg && LANGS.some(l=>l.v===lg)) setLang(lg); } catch(_) {}
+    let live = true;
+    (async () => {
+      const fromHash    = hashRead();
+      const fromStorage = !fromHash ? await sGet() : null;
+      if (!live) return;
+      const d = fromHash || fromStorage || SEED;
+      setTopics(d.topics||{});
+      setInstructions(d.instructions||{});
+      setPosts(d.posts||{});
+      setModifs(d.modifs||{});
+      setCatPerms(d.catPerms||{});
+      setChPerms(d.chPerms||{});
+      setValidated(d.validated||{});
+      loaded.current = true;
+    })();
+    return () => { live = false; };
+  }, []); // eslint-disable-line
+
+  /* ─────────────────────────────────────────────────────────
+     EFFET 3 — Sauvegarde automatique (localStorage)
+  ───────────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!loaded.current) return;
+    sSet({ topics, instructions, posts, modifs, catPerms, chPerms, validated });
+    setAutoFlash(true);
+    const t = setTimeout(()=>setAutoFlash(false), 800);
+    return () => clearTimeout(t);
+  }, [topics, instructions, posts, modifs, catPerms, chPerms, validated]);
+
+  /* ─────────────────────────────────────────────────────────
+     VALEURS DÉRIVÉES
+  ───────────────────────────────────────────────────────── */
+  const allTxt   = STRUCTURE.flatMap(c => c.channels.filter(x => x.type==="text"));
+  const total    = allTxt.length;
+  const nFilled  = allTxt.filter(c => (topics[c.id]||"").trim()||(posts[c.id]||"").trim()).length;
+  const nVal     = allTxt.filter(c => validated[c.id]).length;
+  const isFilled = id => !!(( topics[id]||"").trim()||(posts[id]||"").trim());
+  const hasCustomP = id => !!(chPerms[id]&&!chPerms[id].inherit);
+  const allData  = () => ({ topics, instructions, posts, modifs, catPerms, chPerms, validated });
+
+  /* ─────────────────────────────────────────────────────────
+     HANDLERS
+  ───────────────────────────────────────────────────────── */
+  const toggleVal      = useCallback(id => setValidated(p=>({...p,[id]:!p[id]})), []);
+  const toggleCollapse = useCallback(id => setCollapsed(p=>({...p,[id]:!p[id]})), []);
+
+  const copyPost = useCallback(id => {
+    navigator.clipboard?.writeText(posts[id]||"").then(()=>{
+      setCopied(true); setTimeout(()=>setCopied(false), 1500);
+    });
+  }, [posts]);
+
+  /* Sauvegarde dans l'URL hash + copie presse-papier */
+  const saveToUrl = () => {
+    const ok = hashWrite(allData());
+    if (ok) {
+      setUrlFlash(true);
+      setSaveMsg({ok:true, txt:"🔗 URL copiée dans le presse-papier"});
+      setTimeout(()=>setUrlFlash(false), 2500);
+    } else {
+      setSaveMsg({ok:false, txt:"Erreur lors de l'encodage"});
+    }
+  };
+
+  /* Export JSON */
+  const getJson = () => JSON.stringify(allData(), null, 2);
+  const dlJson  = () => {
+    const a = document.createElement("a");
+    a.href = "data:application/json;charset=utf-8,"+encodeURIComponent(getJson());
+    a.download = "discord-gaming-backup.json"; a.click();
+  };
+
+  /* Remise à zéro — efface tout et recharge le SEED vide */
+  const factoryReset = () => {
+    if (!confirm("⚠️ Remettre à zéro TOUTES les données ?\n\nTout ce que tu as écrit sera effacé définitivement.\nCette action est irréversible.")) return;
+    setTopics({});
+    setInstructions({});
+    setPosts({});
+    setModifs({});
+    setCatPerms({});
+    setChPerms({});
+    setValidated({});
+    window.location.hash = "";
+    try { localStorage.removeItem(S_KEY); } catch(_) {}
+    if (window.storage?.delete) { try { window.storage.delete(S_KEY); } catch(_) {} }
+    setSaveMsg({ ok:true, txt:t("msgReset") });
+  };
+  const applyImport = (mode) => {
+    try {
+      const d = JSON.parse(importTxt);
+      if (mode==="merge") {
+        const m = (a,b) => ({...a,...b});
+        if (d.topics)       setTopics(p=>m(p,d.topics));
+        if (d.instructions) setInstructions(p=>m(p,d.instructions));
+        if (d.posts)        setPosts(p=>m(p,d.posts));
+        if (d.modifs)       setModifs(p=>m(p,d.modifs));
+        if (d.catPerms)     setCatPerms(p=>m(p,d.catPerms));
+        if (d.chPerms)      setChPerms(p=>m(p,d.chPerms));
+        if (d.validated)    setValidated(p=>m(p,d.validated));
+        setImportMsg({ok:true, txt:t("msgMerged")});
+      } else {
+        if (!confirm(t("cfReplace"))) return;
+        if (d.topics!==undefined)       setTopics(d.topics);
+        if (d.instructions!==undefined) setInstructions(d.instructions);
+        if (d.posts!==undefined)        setPosts(d.posts);
+        if (d.modifs!==undefined)       setModifs(d.modifs);
+        if (d.catPerms!==undefined)     setCatPerms(d.catPerms);
+        if (d.chPerms!==undefined)      setChPerms(d.chPerms);
+        if (d.validated!==undefined)    setValidated(d.validated);
+        setImportMsg({ok:true, txt:t("msgReplaced")});
+      }
+    } catch(e) { setImportMsg({ok:false, txt:t("msgBadJson")+e.message}); }
+  };
+
+  /* ─────────────────────────────────────────────────────────
+     RENDU — sidebar
+  ───────────────────────────────────────────────────────── */
+  const selCat  = selected ? STRUCTURE.find(c=>c.id===selected.catId) : null;
+  const selCh   = selected?.ch || null;
+  const selZone = selCat ? ZONES[selCat.zone] : null;
+
+  const renderCh = (cat, c) => {
+    const voice  = c.type==="voice";
+    const active = selCh?.id===c.id;
+    const isVal  = !!validated[c.id];
+    const filled = isFilled(c.id);
+    const custP  = hasCustomP(c.id);
+    const cls    = ["ch",voice&&"voice",active&&"active",isVal&&"val"].filter(Boolean).join(" ");
+    return (
+      <div key={c.id} className={cls}
+        onClick={()=>!voice&&setSelected({catId:cat.id,ch:c})}
+        onDoubleClick={e=>{if(!voice){e.stopPropagation();toggleVal(c.id);}}}
+      >
+        <span className="ch-ico">{voice?"🔊":"#"}</span>
+        <span className="ch-n">{chName(c)}</span>
+        {isVal&&<div className="dot p"/>}
+        {!isVal&&filled&&<div className="dot g"/>}
+        {custP&&<div className="dot b"/>}
+      </div>
+    );
+  };
+
+  /* ─────────────────────────────────────────────────────────
+     RENDU — modal sauvegarde
+  ───────────────────────────────────────────────────────── */
+  const renderSaveModal = () => (
+    <div className="overlay" onClick={()=>{setShowSave(false);setSaveMsg(null);setImportMsg(null);}}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">{t("modalTitle")}</div>
+
+        {/* ── Section URL hash ── */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:"var(--tx-s)",textTransform:"uppercase",letterSpacing:".4px"}}>{t("urlSecT")}</div>
+          <div className="modal-sub">{t("urlSecD")}</div>
+          <button className={`btn ${urlFlash?"ok":"prim"}`} style={{alignSelf:"flex-start"}} onClick={saveToUrl}>
+            {urlFlash?t("urlBtnOk"):t("urlBtn")}
+          </button>
+          {window.location.hash.length>1&&(
+            <div className="modal-code">{window.location.href.slice(0,80)}…</div>
+          )}
+          {saveMsg&&<div className={`msg ${saveMsg.ok?"ok":"err"}`}>{saveMsg.txt}</div>}
+        </div>
+
+        <div className="modal-sep"/>
+
+        {/* ── Section export JSON ── */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:"var(--tx-s)",textTransform:"uppercase",letterSpacing:".4px"}}>{t("jsonExpT")}</div>
+          <div className="modal-sub">{t("jsonExpD")}</div>
+          <textarea className="mta" readOnly value={getJson()} onClick={e=>e.target.select()} />
+          <div className="modal-row">
+            <button className="btn ghost" onClick={()=>navigator.clipboard?.writeText(getJson())}>{t("copy")}</button>
+            <button className="btn ghost" onClick={dlJson}>{t("dlJson")}</button>
+          </div>
+        </div>
+
+        <div className="modal-sep"/>
+
+        {/* ── Section import JSON ── */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:"var(--tx-s)",textTransform:"uppercase",letterSpacing:".4px"}}>{t("jsonImpT")}</div>
+          <div className="modal-sub">{t("jsonImpD")}</div>
+          <textarea className="mta imp" placeholder={t("jsonImpPh")} value={importTxt} onChange={e=>{setImportTxt(e.target.value);setImportMsg(null);}} />
+          {importMsg&&<div className={`msg ${importMsg.ok?"ok":"err"}`}>{importMsg.txt}</div>}
+          <div className="modal-row">
+            <button className="btn ghost" onClick={()=>applyImport("merge")}>{t("merge")}</button>
+            <button className="btn warn"  onClick={()=>applyImport("replace")}>{t("replaceAll")}</button>
+          </div>
+        </div>
+
+        <div className="modal-sep"/>
+
+        {/* ── Section remise à zéro ── */}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:"var(--red)",textTransform:"uppercase",letterSpacing:".4px"}}>{t("resetT")}</div>
+          <div className="modal-sub">{t("resetD")}</div>
+          <button className="btn warn" style={{alignSelf:"flex-start"}} onClick={factoryReset}>
+            {t("resetBtn")}
+          </button>
+        </div>
+
+        <div className="modal-sep"/>
+      </div>
+    </div>
+  );
+
+  /* ─────────────────────────────────────────────────────────
+     RENDU PRINCIPAL
+  ───────────────────────────────────────────────────────── */
+  const id = selCh?.id;
+
+  return (
+    <div className="app">
+
+      {/* SIDEBAR */}
+      <div className="sidebar">
+        <div className="s-head">
+          <div className="s-title">{t("serverTitle")}</div>
+          <div className="prog-wrap">
+            <div className="prog-bar"><div className="prog-fill pf-green"  style={{width:total?Math.round(nFilled/total*100)+"%":"0%"}}/></div>
+            <div className="prog-lbl"><span className="c-green">📝 {nFilled} {t("filled")}</span><span>{total} {t("channels")}</span></div>
+          </div>
+          <div className="prog-wrap">
+            <div className="prog-bar"><div className="prog-fill pf-purple" style={{width:total?Math.round(nVal/total*100)+"%":"0%"}}/></div>
+            <div className="prog-lbl"><span className="c-purple">✓ {nVal} {t("validated")}</span><span>{total-nVal} {t("remaining")}</span></div>
+          </div>
+        </div>
+        <div className="s-scroll">
+          {STRUCTURE.map(cat=>{
+            const zone = ZONES[cat.zone]||{};
+            const open = !collapsed[cat.id];
+            const nf   = cat.channels.filter(c=>isFilled(c.id)).length;
+            if (cat.nocat) return (
+              <div key={cat.id}>
+                <div className="nocat-lbl">{t("noCategory")}</div>
+                <div className="ch-list">{cat.channels.map(c=>renderCh(cat,c))}</div>
+              </div>
+            );
+            return (
+              <div key={cat.id}>
+                <div className="cat-h" onClick={()=>toggleCollapse(cat.id)}>
+                  <div className="cat-dot" style={{background:zone.color}}/>
+                  <span className="cat-n">{catName(cat)}</span>
+                  {nf>0&&<span className="cat-count">{nf}</span>}
+                  <span className="cat-chev" style={{transform:open?"rotate(0)":"rotate(-90deg)"}}>▼</span>
+                </div>
+                {open&&cat.channels.length>0&&(
+                  <div className="ch-list">{cat.channels.map(c=>renderCh(cat,c))}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MAIN */}
+      <div className="main">
+
+        {/* Topbar */}
+        <div className="bar">
+          <div className="bar-l">
+            {selCh
+              ? <><span className="bar-title">{chName(selCh)}</span>
+                  {selZone&&<span className="badge" style={{background:selZone.color+"22",color:selZone.color}}>{zoneName(selCat.zone)}</span>}
+                </>
+              : <span className="bar-title" style={{color:"var(--tx-m)"}}>{t("editorTitle")}</span>
+            }
+          </div>
+          <div className="bar-r">
+            <span className={`auto-save${autoFlash?" on":""}`}>●</span>
+            {/* ☀️/🌙 — bascule thème — emoji seul */}
+            <button className="ico-btn" title={light?t("darkMode"):t("lightMode")} onClick={()=>setLight(v=>!v)}>
+              {light?"🌙":"☀️"}
+            </button>
+            {/* 🌐 — langue — menu déroulant */}
+            <div style={{position:"relative"}}>
+              <button className="ico-btn" title={t("language")} onClick={(e)=>{e.stopPropagation();setShowLang(v=>!v);}}>
+                🌐
+              </button>
+              {showLang&&(
+                <div className="lang-menu" onClick={e=>e.stopPropagation()}>
+                  {LANGS.map(l=>(
+                    <button key={l.v} className={`lang-opt${l.v===lang?" on":""}`} onClick={()=>{setLang(l.v);setShowLang(false);}}>
+                      <span style={{fontSize:15}}>{l.em}</span><span>{l.n}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* 💾 — ouvre le panneau de sauvegarde */}
+            <button className={`ico-btn${urlFlash?" active-save":""}`} title={t("saveData")} onClick={()=>{setShowSave(true);setSaveMsg(null);setImportMsg(null);}}>
+              💾
+            </button>
+          </div>
+        </div>
+
+        {selCh ? (
+          <>
+            <div className="tabs">
+              <div className={`tab${tab==="content"?" on":""}`} onClick={()=>setTab("content")}>{t("tabContent")}</div>
+              <div className={`tab${tab==="perms"?" on":""}`}   onClick={()=>setTab("perms")}>{t("tabPerms")}</div>
+            </div>
+
+            {tab==="content" ? (
+              <div className="panel">
+                {/* Sujet */}
+                <div className="sec sujet">
+                  <div className="sec-h">
+                    <div><div className="sec-lbl">{t("topicLbl")}</div><div className="sec-sub">{t("topicSub")}</div></div>
+                  </div>
+                  <div className="sec-body">
+                    <textarea rows={3} maxLength={1024} placeholder={t("topicPh")}
+                      value={topics[id]||""} onChange={e=>setTopics(p=>({...p,[id]:e.target.value}))} style={{paddingBottom:22}}/>
+                    <span className="char-c">{(topics[id]||"").length}/1024</span>
+                  </div>
+                </div>
+                {/* Instructions */}
+                <div className="sec inst">
+                  <div className="sec-h">
+                    <div><div className="sec-lbl">{t("instLbl")}</div><div className="sec-sub">{t("instSub")}</div></div>
+                  </div>
+                  <div className="sec-body">
+                    <textarea className="t-inst" rows={4} placeholder={t("instPh")}
+                      value={instructions[id]||""} onChange={e=>setInstructions(p=>({...p,[id]:e.target.value}))}/>
+                  </div>
+                </div>
+                {/* Post */}
+                <div className="sec post">
+                  <div className="sec-h">
+                    <div><div className="sec-lbl">{t("postLbl")}</div><div className="sec-sub">{t("postSub")}</div></div>
+                    <button className={`btn ${copied?"ok":"ghost"}`} style={{padding:"4px 10px",fontSize:11}} onClick={()=>copyPost(id)}>
+                      {copied?t("copied"):t("copy")}
+                    </button>
+                  </div>
+                  <div className="sec-body">
+                    <textarea rows={6} placeholder={t("postPh")}
+                      value={posts[id]||""} onChange={e=>setPosts(p=>({...p,[id]:e.target.value}))}/>
+                  </div>
+                </div>
+                {/* Modifs */}
+                <div className="sec modif">
+                  <div className="sec-h">
+                    <div><div className="sec-lbl">{t("modifLbl")}</div><div className="sec-sub">{t("modifSub")}</div></div>
+                  </div>
+                  <div className="sec-body">
+                    <textarea className="t-modif" rows={3} placeholder={t("modifPh")}
+                      value={modifs[id]||""} onChange={e=>setModifs(p=>({...p,[id]:e.target.value}))}/>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <PermsPanel catId={selCat.id} chId={id}
+                catPerms={catPerms} setCatPerms={setCatPerms}
+                chPerms={chPerms}   setChPerms={setChPerms}/>
+            )}
+          </>
+        ) : (
+          <div className="empty">
+            <div className="empty-ico">🎮</div>
+            <div className="empty-txt">{t("emptyTxt")}<br/><span style={{fontSize:11,opacity:.6}}>{t("emptyHint")}</span></div>
+          </div>
+        )}
+      </div>
+
+      {/* MODAL SAUVEGARDE */}
+      {showSave&&renderSaveModal()}
+
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MONTAGE — avec fallback si createRoot n'existe pas
+═══════════════════════════════════════════════════════════════ */
+const rootEl = document.getElementById("root");
+if (ReactDOM.createRoot) {
+  ReactDOM.createRoot(rootEl).render(<App/>);
+} else {
+  ReactDOM.render(<App/>, rootEl);
+}
+</script>
+</body>
+</html>
