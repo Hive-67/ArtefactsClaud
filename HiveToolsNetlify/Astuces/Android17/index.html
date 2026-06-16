@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Android17 — HiveOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0e0e0e;--tx:#f0f0f0;--tx2:#888;--brd:rgba(255,255,255,0.07);--body-bg:linear-gradient(to top left,#080810,#02000e);--card-bg:linear-gradient(to bottom right,rgba(12,12,20,0.75),rgba(6,6,14,0.75));--grad:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);--card-border:1px solid rgba(255,255,255,0.08);--card-glow:0 4px 15px rgba(194,23,88,0.15),0 1px 2px rgba(0,0,0,0.3)}
+    body.light{--bg:#fff;--tx:#111;--tx2:#555;--brd:rgba(0,0,0,0.08);--body-bg:linear-gradient(to top left,#fff,#f0f0f0);--card-bg:linear-gradient(to bottom right,rgba(255,255,255,0.75),rgba(245,245,245,0.75));--card-border:1px solid rgba(0,0,0,0.06);--card-glow:0 4px 15px rgba(194,23,88,0.08),0 1px 2px rgba(0,0,0,0.05)}
+    html{scroll-behavior:smooth}
+    body{font-family:'Space Mono',monospace;background:var(--body-bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+    .hive-bar{height:3px;background:var(--grad)}
+    header{background:rgba(8,8,16,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    body.light header{background:rgba(255,255,255,0.92)}
+    .header-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
+    .back-link{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);text-decoration:none;transition:color .15s}
+    .back-link:hover{color:var(--tx)}
+    .header-theme-toggle{background:none;border:1px solid var(--brd);color:var(--tx);font-size:1.1rem;cursor:pointer;padding:.3rem .55rem;border-radius:8px;transition:background .2s;line-height:1}
+    .header-theme-toggle:hover{background:var(--brd)}
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem}
+    .wip-card{background:var(--card-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:var(--card-border);border-radius:20px;padding:3rem 2.5rem;max-width:460px;width:100%;box-shadow:var(--card-glow);text-align:center;position:relative;overflow:hidden}
+    .wip-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--grad)}
+    .wip-icon{font-size:3rem;margin-bottom:1.5rem;display:block}
+    .wip-name{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx);margin-bottom:.75rem}
+    .wip-desc{font-size:.8rem;color:var(--tx2);line-height:1.7;margin-bottom:2rem}
+    .wip-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(218,29,51,0.12);border:1px solid rgba(218,29,51,0.25);border-radius:100px;padding:.4rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#da1d33;margin-bottom:2rem}
+    .wip-back{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:.45rem 1.2rem;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--tx);cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
+    .wip-back:hover{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+    footer{border-top:1px solid var(--brd);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(8,8,16,0.95)}
+    body.light footer{background:rgba(245,245,245,0.95)}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .footer-copy{font-size:.68rem;color:var(--tx2)}
+  </style>
+</head>
+<body class="dark">
+<div class="hive-bar"></div>
+<header>
+  <a href="../../" class="header-logo">HiveOS</a>
+  <a href="../../" class="back-link">← Retour</a>
+  <button id="themeToggle" class="header-theme-toggle" aria-label="Changer le thème">🌙</button>
+</header>
+<main>
+  <div class="wip-card">
+    <span class="wip-icon">📱</span>
+    <div class="wip-name">Android17</div>
+    <p class="wip-desc">Astuces et guides pratiques pour Android 17. Bientôt disponible.</p>
+    <div class="wip-badge">⚙️ En développement</div><br>
+    <a href="../../" class="wip-back">← Retour à l'accueil</a>
+  </div>
+</main>
+<footer>
+  <span class="footer-logo">HiveOS</span>
+  <span class="footer-copy">Outils faits maison — pas de tracking, pas de compte.</span>
+</footer>
+<script>
+  (function(){
+    const t=document.getElementById('themeToggle'),b=document.body;
+    function s(l){if(l){b.classList.add('light');b.classList.remove('dark');t.textContent='☀️';localStorage.setItem('hiveTheme','light')}else{b.classList.remove('light');b.classList.add('dark');t.textContent='🌙';localStorage.setItem('hiveTheme','dark')}}
+    s(localStorage.getItem('hiveTheme')==='light');
+    t.addEventListener('click',()=>s(!b.classList.contains('light')));
+  })();
+</script>
+</body>
+</html>

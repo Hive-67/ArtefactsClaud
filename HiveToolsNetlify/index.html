@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>The Hive Beta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #0e0e0e;
+      --bg2:  #1a1a1a;
+      --bg3:  #242424;
+      --tx:   #f0f0f0;
+      --tx2:  #888;
+      --brd:  rgba(255,255,255,0.07);
+      --body-bg: linear-gradient(to top left, #080810, #02000e);
+      --card-bg: linear-gradient(to bottom right, rgba(12,12,20,0.75), rgba(6,6,14,0.75));
+      --card-hover-bg: linear-gradient(to bottom right, rgba(20,20,30,0.8), rgba(10,10,18,0.8));
+      --grad: linear-gradient(90deg, #7d206f, #b01678, #c21758, #da1d33, #eb1925);
+      --card-border: 1px solid rgba(255,255,255,0.08);
+      --card-glow: 0 4px 15px rgba(194,23,88,0.15), 0 1px 2px rgba(0,0,0,0.3);
+      --card-hover-glow: 0 8px 25px rgba(194,23,88,0.25);
+      --attention-color: #ffaa33;
+    }
+
+    body.light {
+      --bg:   #ffffff;
+      --bg2:  #f5f5f5;
+      --bg3:  #e8e8e8;
+      --tx:   #111111;
+      --tx2:  #555555;
+      --brd:  rgba(0,0,0,0.08);
+      --body-bg: linear-gradient(to top left, #ffffff, #f0f0f0);
+      --card-bg: linear-gradient(to bottom right, rgba(255,255,255,0.75), rgba(245,245,245,0.75));
+      --card-hover-bg: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(250,250,250,0.9));
+      --card-border: 1px solid rgba(0,0,0,0.06);
+      --card-glow: 0 4px 15px rgba(194,23,88,0.08), 0 1px 2px rgba(0,0,0,0.05);
+      --card-hover-glow: 0 8px 25px rgba(194,23,88,0.15);
+      --attention-color: #cc7700;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--body-bg);
+      color: var(--tx);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hive-bar {
+      height: 3px;
+      background: var(--grad);
+    }
+
+    .floating-logo {
+      position: fixed;
+      top: 1.2rem;
+      left: 2rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      z-index: 20;
+    }
+
+    .floating-theme-toggle {
+      position: fixed;
+      top: 1.2rem;
+      right: 2rem;
+      background: none;
+      border: 1px solid var(--brd);
+      color: var(--tx);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+      line-height: 1;
+      z-index: 20;
+      backdrop-filter: blur(4px);
+    }
+
+    /* --- HEADER STICKY + NAV --- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(8,8,16,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--brd);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    body.light header {
+      background: rgba(255,255,255,0.92);
+    }
+
+    .header-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      flex-shrink: 0;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .nav-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--tx2);
+      text-decoration: none;
+      padding-bottom: 3px;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+
+    .nav-link:hover { color: var(--tx); }
+    .nav-link.active { color: var(--tx); border-bottom-color: #da1d33; }
+
+    .header-theme-toggle {
+      background: none;
+      border: 1px solid var(--brd);
+      color: var(--tx);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.3rem 0.55rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .header-theme-toggle:hover { background: var(--brd); }
+
+    .floating-logo { display: none; }
+    .floating-theme-toggle { display: none; }
+
+    /* --- HERO --- */
+    .hero {
+      padding: 3.5rem 2rem 3rem;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--tx2);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 2px;
+      background: var(--grad);
+      flex-shrink: 0;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--tx);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .bee-i {
+      position: relative;
+      display: inline-block;
+    }
+    .bee-i::after {
+      content: "🐝";
+      position: absolute;
+      top: -0.25em;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55em;
+      line-height: 1;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .hero-sub {
+      font-size: 0.88rem;
+      color: var(--tx2);
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    /* --- SECTIONS COMMUNES --- */
+    .section-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tx2);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-icon { font-size: 1.1rem; }
+
+    @keyframes attentionBlink {
+      0%, 100% { opacity: 1; color: var(--attention-color); }
+      50% { opacity: 0.3; color: var(--attention-color); }
+    }
+
+    .attention-blink {
+      animation: attentionBlink 1.4s ease-in-out infinite;
+      color: var(--attention-color);
+      border-bottom-color: var(--attention-color);
+    }
+
+    .tools-grid,
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      overflow: visible;
+      margin-bottom: 3rem;
+    }
+
+    .tool-card,
+    .info-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--card-glow);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s;
+    }
+
+    .tool-card::after,
+    .info-card::after {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .tool-card:hover,
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-glow), 0 1px 2px rgba(0,0,0,0.1);
+      background: var(--card-hover-bg);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--grad);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      border-radius: 0 0 2px 2px;
+      z-index: 2;
+    }
+
+    .tool-card:hover::before { transform: scaleX(1); }
+
+    .card-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--tx);
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-desc {
+      font-size: 0.75rem;
+      color: var(--tx2);
+      line-height: 1.6;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--brd);
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.35rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: var(--tx);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all .15s;
+    }
+
+    .card-btn:hover { background: var(--tx); color: var(--bg); border-color: var(--tx); }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #facc15;
+      color: #000;
+      padding: 0.15rem 0.5rem;
+      border-radius: 12px;
+      margin-left: 0.4rem;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .info-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--tx);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .info-card p {
+      font-size: 0.75rem;
+      color: var(--tx2);
+      line-height: 1.6;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .security-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--tx2);
+      background: var(--card-bg);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: var(--card-glow);
+      line-height: 1.6;
+    }
+
+    /* --- CARTES PRIVÉES AVEC INTERFACE DE CODE --- */
+    .private-locked {
+      position: relative;
+    }
+
+    .private-card {
+      filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .private-card.unlocked {
+      filter: none;
+      pointer-events: auto;
+    }
+
+    .private-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(2px);
+      border-radius: 16px;
+      z-index: 5;
+      padding: 1rem;
+      transition: opacity 0.3s;
+    }
+
+    .private-overlay input {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--brd);
+      background: var(--bg2);
+      color: var(--tx);
+      margin-bottom: 0.5rem;
+      width: 80%;
+      text-align: center;
+      outline: none;
+    }
+
+    .private-overlay button {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      border: none;
+      background: var(--grad);
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .private-overlay button:hover { opacity: 0.9; }
+
+    .unlock-error {
+      color: #ff6b6b;
+      font-size: 0.65rem;
+      margin-top: 0.4rem;
+      min-height: 1.2em;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--brd);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      background: rgba(8,8,16,0.95);
+      backdrop-filter: blur(8px);
+    }
+
+    body.light footer {
+      background: rgba(245,245,245,0.95);
+    }
+
+    .footer-contact {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-size: 0.68rem;
+      color: var(--tx2);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color .15s;
+    }
+
+    .footer-link:hover { color: var(--tx); }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-copy { font-size: 0.68rem; color: var(--tx2); }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 600px) {
+      header          { padding: 0.75rem 1.25rem; flex-wrap: wrap; }
+      .main-nav       { order: 3; width: 100%; justify-content: center; gap: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--brd); }
+      .nav-link       { font-size: 0.65rem; letter-spacing: 0.08em; }
+      .floating-logo { left: 1.25rem; }
+      .floating-theme-toggle { right: 1.25rem; }
+      .hero          { padding: 2.5rem 1.25rem 2rem; }
+      .section-container { padding: 0 1.25rem 3rem; }
+      .tools-grid, .info-grid { grid-template-columns: 1fr; }
+      footer         { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body class="dark">
+
+<div class="hive-bar"></div>
+
+<header>
+  <span class="header-logo">HiveOS</span>
+  <nav class="main-nav">
+    <a href="#hero" class="nav-link active">Accueil</a>
+    <a href="#logiciels" class="nav-link">Logiciels</a>
+    <a href="#jeux" class="nav-link">Jeux</a>
+    <a href="#astuces" class="nav-link">Astuces</a>
+  </nav>
+  <button id="themeToggle" class="header-theme-toggle" aria-label="Changer le thème">🌙</button>
+</header>
+
+<section class="hero" id="hero">
+  <div class="hero-eyebrow">Plateforme d'outils</div>
+  <h1 class="hero-title">The H<span class="bee-i">i</span>ve <em>Beta</em></h1>
+  <p class="hero-sub">Une bibliothèque d'outils et de ressources centralisée, évoluant en temps réel pour simplifier le partage et garantir un accès instantané, que vous soyez sur Android, Apple ou PC.</p>
+</section>
+
+<section class="section-container" id="informations">
+  <div class="section-label attention-blink">
+    <span class="section-icon">⚠️</span> Attention
+  </div>
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="card-icon">🤖</span>
+      <h3>Les IA intégrées <span class="badge">(À venir)</span></h3>
+      <p>Cette fonctionnalité est en cours de développement. Elle permettra d'utiliser l'intelligence artificielle directement dans vos outils pour automatiser certaines tâches.</p>
+    </div>
+    <div class="info-card">
+      <span class="card-icon">🧒</span>
+      <h3>Espace enfants <span class="badge">(À venir)</span></h3>
+      <p>Un environnement dédié aux plus jeunes, avec des jeux et outils éducatifs adaptés. Accessible prochainement.</p>
+    </div>
+    <div class="info-card">
+      <span class="card-icon">📱💻</span>
+      <h3>Changer d'appareil</h3>
+      <p>Pour passer d'un appareil à un autre, téléchargez simplement le fichier <strong>.json</strong> depuis votre appareil actuel et transférez-le sur l'autre. Aucune connexion réseau n'est nécessaire, tout se fait hors-ligne.</p>
+    </div>
+  </div>
+  <div class="security-note">
+    🔒 <strong>Sécurité des données :</strong> Toutes vos informations sont stockées <strong>localement dans votre navigateur</strong>. Personne d'autre ne peut y accéder. Aucune donnée personnelle n'est transmise à un serveur. Zéro problème de sécurité.
+  </div>
+</section>
+
+<section class="section-container" id="logiciels">
+  <div class="section-label">
+    <span class="section-icon">📦</span> Logiciels
+  </div>
+  <div class="tools-grid">
+    <a class="tool-card" href="./Logiciels/Forge/">
+      <div class="card-icon">⚒️</div>
+      <div class="card-name">Forge</div>
+      <div class="card-desc">Outil de création et de gestion de projets.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Logiciels/Forgee/">
+      <div class="card-icon">🔧</div>
+      <div class="card-name">Forgee</div>
+      <div class="card-desc">Version alternative de Forge avec fonctionnalités avancées.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Logiciels/GenerateurPromptMail/">
+      <div class="card-icon">✉️</div>
+      <div class="card-name">GenerateurPromptMail</div>
+      <div class="card-desc">Génération de prompts pour emails personnalisés.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Logiciels/GestionClient/">
+      <div class="card-icon">📋</div>
+      <div class="card-name">GestionClient</div>
+      <div class="card-desc">Suivi de clientèle et gestion des dossiers.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Logiciels/Idealys/">
+      <div class="card-icon">💡</div>
+      <div class="card-name">Idealys</div>
+      <div class="card-desc">Capture d'idées et transformation en projets.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Logiciels/RucheVisualisation/">
+      <div class="card-icon">📊</div>
+      <div class="card-name">RucheVisualisation</div>
+      <div class="card-desc">Visualisation de données en mode collaboratif.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="section-container" id="jeux">
+  <div class="section-label">
+    <span class="section-icon">🎮</span> Jeux
+  </div>
+  <div class="tools-grid">
+    <a class="tool-card" href="./Jeux/MarioSnakTetrisMathematique/">
+      <div class="card-icon">🕹️</div>
+      <div class="card-name">MarioSnakTetrisMathematique</div>
+      <div class="card-desc">Mini-jeux éducatifs mélangeant réflexion et maths.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="section-container" id="astuces">
+  <div class="section-label">
+    <span class="section-icon">🧠</span> Astuces
+  </div>
+  <div class="tools-grid">
+    <a class="tool-card" href="./Astuces/Android17/">
+      <div class="card-icon">📱</div>
+      <div class="card-name">Android17</div>
+      <div class="card-desc">Astuces et guides pour Android.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./Astuces/RaccourciClavierApple/">
+      <div class="card-icon">⌨️</div>
+      <div class="card-name">RaccourciClavierApple</div>
+      <div class="card-desc">Liste des raccourcis clavier pour Mac.</div>
+      <div class="card-footer">
+        <span class="card-btn">Ouvrir →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- SECTION PRIVÉE (codes individuels) -->
+<section class="section-container" id="prive">
+  <div class="section-label">
+    <span class="section-icon">🔒</span> Privé
+  </div>
+  <div class="tools-grid">
+    <!-- MaquetteWebIA -->
+    <div class="private-locked">
+      <a class="tool-card private-card" href="./Prive/MaquetteWebIA/" data-code="azertynbvcxw">
+        <div class="card-icon">🖥️</div>
+        <div class="card-name">MaquetteWebIA</div>
+        <div class="card-desc">Maquettes pour projets web avec IA.</div>
+        <div class="card-footer">
+          <span class="card-btn">Ouvrir →</span>
+        </div>
+      </a>
+      <div class="private-overlay">
+        <input type="text" class="private-input" placeholder="Code d'accès" autocomplete="off">
+        <button class="private-unlock-btn">Débloquer</button>
+        <div class="unlock-error"></div>
+      </div>
+    </div>
+
+    <!-- SncfLogEquipe -->
+    <div class="private-locked">
+      <a class="tool-card private-card" href="./Prive/SncfLogEquipe/" data-code="sncf">
+        <div class="card-icon">🚄</div>
+        <div class="card-name">SncfLogEquipe</div>
+        <div class="card-desc">Outil interne de logistique SNCF.</div>
+        <div class="card-footer">
+          <span class="card-btn">Ouvrir →</span>
+        </div>
+      </a>
+      <div class="private-overlay">
+        <input type="text" class="private-input" placeholder="Code d'accès" autocomplete="off">
+        <button class="private-unlock-btn">Débloquer</button>
+        <div class="unlock-error"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-logo">HiveOS</span>
+  <span class="footer-copy">Outils faits maison — pas de tracking, pas de compte.</span>
+  <div class="footer-contact">
+    <a href="mailto:systemhiveos@gmail.com" class="footer-link">✉️ systemhiveos@gmail.com</a>
+    <span class="footer-link">💬 Discord — Hive_67</span>
+  </div>
+</footer>
+
+<script>
+  (function() {
+    // Thème jour/nuit
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    function setTheme(isLight) {
+      if (isLight) {
+        body.classList.add('light');
+        body.classList.remove('dark');
+        themeToggle.textContent = '☀️';
+        localStorage.setItem('hiveTheme', 'light');
+      } else {
+        body.classList.remove('light');
+        body.classList.add('dark');
+        themeToggle.textContent = '🌙';
+        localStorage.setItem('hiveTheme', 'dark');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('hiveTheme');
+    setTheme(savedTheme === 'light');
+
+    themeToggle.addEventListener('click', () => {
+      setTheme(!body.classList.contains('light'));
+    });
+
+    // Déverrouillage individuel des cartes privées
+    const privateContainers = document.querySelectorAll('.private-locked');
+    privateContainers.forEach(container => {
+      const card = container.querySelector('.private-card');
+      const overlay = container.querySelector('.private-overlay');
+      const input = container.querySelector('.private-input');
+      const button = container.querySelector('.private-unlock-btn');
+      const errorDiv = container.querySelector('.unlock-error');
+      const correctCode = card.getAttribute('data-code');
+
+      function tryUnlock() {
+        if (input.value.trim() === correctCode) {
+          card.classList.add('unlocked');
+          overlay.style.display = 'none';
+          errorDiv.textContent = '';
+        } else {
+          errorDiv.textContent = 'Code incorrect';
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      button.addEventListener('click', tryUnlock);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') tryUnlock();
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
