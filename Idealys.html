@@ -2,13 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Idéalys — HiveOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Press+Start+2P&family=Fredoka+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);transition:background .3s,color .3s;display:flex;flex-direction:column}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--tx);transition:background .3s,color .3s}
 
 /* ===== THEMES ===== */
 .theme-hiveos{--bg:#111;--bg2:#1c1c1c;--bg3:#262626;--bg4:#303030;--brd:#7d206f44;--tx:#f5f5f5;--tx2:#b8a7b5;--ac:#7d206f;--ok:#50fa7b;--warn:#ffb86c;--danger:#ff5555;--font-h:'Syne',sans-serif}
@@ -109,23 +108,17 @@ body.theme-vt100::before,body.theme-ibmpc::before{content:'';position:fixed;inse
 
 /* Theme menu */
 #theme-wrap{position:relative}
-#theme-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;overflow:hidden;z-index:500;min-width:160px;box-shadow:0 8px 24px #0008}
-#theme-menu.hidden{display:none}
 .theme-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:.8rem;color:var(--tx);transition:background .15s}
 .theme-item:hover{background:var(--bg3)}
 .theme-item.active{background:var(--bg3);color:var(--ac)}
 
 /* ===== APP LAYOUT ===== */
 #app{display:flex;flex:1;overflow:hidden;position:relative;z-index:1}
-#sidebar{width:180px;background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;padding:12px 8px;gap:4px;flex-shrink:0;transition:width .2s}
-#sidebar.collapsed{width:56px}
 .nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--tx2);transition:all .2s;font-size:.8rem;border:none;background:none;width:100%;text-align:left;white-space:nowrap;overflow:hidden}
 .nav-btn:hover{background:var(--bg3);color:var(--tx)}
 .nav-btn.active{background:var(--ac);color:#fff}
 .nav-btn .nav-icon{font-size:1.1rem;flex-shrink:0}
 .nav-label{overflow:hidden;transition:opacity .2s}
-#sidebar.collapsed .nav-label{opacity:0;width:0}
-#sidebar-toggle{margin-top:auto;align-self:flex-start}
 .nav-btn[data-view]{cursor:grab}
 .nav-btn[data-view].dragging{opacity:.35}
 .nav-btn[data-view].drag-over{border-top:2px solid var(--ac);margin-top:-2px}
@@ -278,18 +271,6 @@ rect.node-body{transition:stroke .2s,stroke-width .2s}
 .save-sep{border:none;border-top:1px solid var(--brd);margin:16px 0}
 
 /* ===== NOTEPAD ===== */
-#notepad{position:fixed;z-index:600;background:var(--bg2);border:1px solid var(--brd);border-radius:12px;box-shadow:0 8px 32px #0008;width:340px;min-width:200px;min-height:160px;display:flex;flex-direction:column;overflow:hidden}
-#notepad.hidden{display:none!important}
-#notepad-header{padding:7px 10px;background:var(--bg3);cursor:move;display:flex;align-items:center;justify-content:space-between;user-select:none;flex-shrink:0;border-radius:11px 11px 0 0;gap:6px;border-bottom:1px solid var(--brd)}
-#np-drag-handle{font-size:1.05rem;color:var(--tx2);cursor:move;line-height:1;flex-shrink:0;letter-spacing:-1px;opacity:.7}
-#notepad-header .np-title{font-size:.74rem;color:var(--tx2);flex:1}
-.np-btn{background:transparent;border:none;cursor:pointer;font-size:.75rem;color:var(--tx2);padding:2px 6px;border-radius:4px;transition:all .15s}
-.np-btn:hover{background:var(--bg4);color:var(--tx)}
-#notepad textarea{flex:1;border:none;background:transparent;color:var(--tx);font-family:'Space Mono',monospace;font-size:.78rem;padding:10px 12px;resize:none;min-height:0}
-#notepad textarea:focus{outline:none}
-#notepad-footer{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:var(--bg3);flex-shrink:0;border-radius:0 0 11px 11px;border-top:1px solid var(--brd)}
-#np-resize-handle{font-size:1.1rem;cursor:nesw-resize;color:var(--tx2);padding:2px 4px;user-select:none;transition:color .15s;line-height:1}
-#np-resize-handle:hover{color:var(--ac)}
 /* ===== QUICK IDEA FAB ===== */
 #quick-fab{position:fixed;bottom:24px;right:24px;z-index:590;background:var(--ac);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:1.4rem;cursor:pointer;box-shadow:0 4px 20px #0008;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
 #quick-fab:hover{transform:scale(1.1);box-shadow:0 8px 28px #000a}
@@ -483,40 +464,599 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
 .rsp-prio-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;font-size:.6rem;font-weight:700;color:#fff;flex-shrink:0;margin-left:4px;}
 .rsp-card{position:absolute;border-radius:10px;height:42px;display:flex;align-items:center;padding:0 12px 0 14px;cursor:pointer;border:2px solid transparent;font-family:'Space Mono',monospace;white-space:nowrap;background:linear-gradient(135deg,var(--bg2),var(--bg3));transition:box-shadow .15s,border-color .15s;}
 .rsp-card-accent{position:absolute;left:0;top:5px;bottom:5px;width:3px;border-radius:2px 0 0 2px;}
+    /* ══ STRIPE ══════════════════════════════════════════════════════════ */
+    .hive-stripe {
+      height:3px;
+      background:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
+      position:relative; z-index:300;
+    }
+
+    /* ══ HEADER ══════════════════════════════════════════════════════════ */
+    .hive-header {
+      position:sticky; top:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 1.25rem; height:50px;
+      background:var(--bg2);
+      transition:transform .3s,background .3s; gap:.75rem;
+    }
+    .hive-header.hidden { transform:translateY(-100%); }
+
+    /* Ligne bas du header — fondu aux extrémités */
+    .hive-header::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg, transparent, var(--ac) 15%, var(--ac) 85%, transparent);
+      pointer-events:none;
+    }
+    /* HiveOS : dégradé signature complet */
+    .theme-hiveos .hive-header::after,
+    .theme-hiveos.day .hive-header::after {
+      background:linear-gradient(90deg, transparent, #7d206f 8%, #b01678 30%, #c21758 50%, #da1d33 72%, #eb1925 92%, transparent);
+    }
+
+    .hive-logo-wrap {
+      display:flex; align-items:center; gap:.55rem;
+      cursor:pointer; user-select:none; flex-shrink:0;
+    }
+    .hive-logo {
+      font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
+      background:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      white-space:nowrap;
+    }
+    .hive-sep { width:1px; height:16px; background:var(--brd); flex-shrink:0; }
+    .hive-app-name    { font-size:.68rem; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .hive-app-version { font-size:.62rem; color:var(--tx2); opacity:.55; margin-left:.2rem; white-space:nowrap; }
+
+    .hive-btns { display:flex; align-items:center; gap:.1rem; flex-shrink:0; }
+    .hive-btn {
+      background:none; border:none; cursor:pointer; font-size:1.05rem;
+      padding:.3rem .35rem; border-radius:6px; color:var(--tx);
+      transition:background .15s; position:relative; line-height:1;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .hive-btn:hover { background:var(--bg3); }
+    .hive-btn::after {
+      content:attr(data-tip); position:absolute; top:calc(100% + 6px); right:0;
+      background:var(--bg4); color:var(--tx); font-size:.63rem;
+      font-family:'Space Mono',monospace; white-space:nowrap;
+      padding:.25rem .55rem; border-radius:5px; border:1px solid var(--brd);
+      pointer-events:none; opacity:0; transition:opacity .15s; z-index:999;
+    }
+    .hive-btn:hover::after { opacity:1; }
+
+    /* ══ MENU THÈMES ══════════════════════════════════════════════════════ */
+    .theme-wrap { position:relative; }
+    .theme-menu {
+      position:absolute; top:calc(100% + 8px); right:0;
+      background:var(--bg2); border:1px solid var(--brd); border-radius:10px;
+      padding:.4rem; min-width:195px;
+      box-shadow:0 8px 30px rgba(0,0,0,.35); z-index:600; display:none;
+    }
+    .theme-menu.open { display:block; }
+    .tm-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.42rem .7rem; border-radius:7px; cursor:pointer;
+      font-size:.78rem; font-family:'Space Mono',monospace;
+      color:var(--tx2); transition:background .12s,color .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .tm-item:hover, .tm-item.on { background:var(--bg3); color:var(--tx); }
+    .tm-item.family::after { content:'▶'; font-size:.58rem; opacity:.4; }
+    .tm-sub { padding-left:.5rem; display:none; }
+    .tm-sub.open { display:block; }
+    .tm-sub-item {
+      display:flex; align-items:center; gap:.5rem;
+      padding:.38rem .7rem; border-radius:7px; cursor:pointer;
+      font-size:.75rem; font-family:'Space Mono',monospace;
+      color:var(--tx2); transition:background .12s,color .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .tm-sub-item:hover, .tm-sub-item.on { background:var(--bg3); color:var(--tx); }
+
+    /* ══ LAYOUT ══════════════════════════════════════════════════════════ */
+    .app-layout { display:flex; min-height:calc(100vh - 53px); }
+
+    /* ══ SIDEBAR ══════════════════════════════════════════════════════════ */
+    .sidebar-toggle-btn,
+    .sidebar-toggle-bottom {
+      position:fixed; width:16px; height:28px;
+      background:var(--bg2);
+      border:1px solid var(--brd); border-left:none;
+      border-radius:0 6px 6px 0;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; z-index:160;
+      transition:left .25s cubic-bezier(.4,0,.2,1), top .3s, background .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sidebar-toggle-btn    { left:220px; top:53px; }
+    .sidebar-toggle-bottom { left:220px; bottom:.75rem; }
+    .sidebar-toggle-btn.header-hidden { top:0; }
+    .sidebar-toggle-btn:hover,
+    .sidebar-toggle-bottom:hover { background:var(--bg3); }
+    .sidebar-toggle-icon {
+      font-size:.5rem; color:var(--tx2);
+      line-height:1; user-select:none; transition:color .15s;
+    }
+    .sidebar-toggle-btn:hover .sidebar-toggle-icon,
+    .sidebar-toggle-bottom:hover .sidebar-toggle-icon { color:var(--tx); }
+
+    .sidebar {
+      position:fixed; left:0; top:53px; bottom:0; width:220px;
+      background:var(--bg2);
+      transition:width .25s cubic-bezier(.4,0,.2,1), top .3s;
+      overflow:hidden; display:flex; flex-direction:column; z-index:150;
+    }
+    .sidebar::after {
+      content:''; position:absolute; top:0; right:0; bottom:0; width:3px;
+      background:linear-gradient(180deg, transparent, var(--ac) 10%, var(--ac) 90%, transparent);
+      pointer-events:none; z-index:1;
+    }
+    .sidebar.header-hidden { top:0; }
+    .sidebar.collapsed     { width:0; }
+
+    .sidebar-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.65rem .85rem; border-bottom:1px solid var(--brd); flex-shrink:0; min-height:48px;
+      cursor:pointer; transition:background .12s; -webkit-tap-highlight-color:transparent;
+    }
+    .sidebar-head:hover { background:var(--bg3); }
+    .sidebar-title {
+      font-family:'Syne',sans-serif; font-size:.78rem; font-weight:800;
+      color:var(--tx); white-space:nowrap; overflow:hidden; transition:opacity .2s;
+    }
+    .sidebar-content { flex:1; overflow-y:auto; overflow-x:hidden; padding:.5rem 0; }
+    .sidebar-placeholder {
+      padding:1rem .85rem; font-size:.72rem; color:var(--tx2);
+      font-style:italic; opacity:.5; line-height:1.6;
+    }
+    .sidebar-item {
+      display:flex; align-items:center; gap:.65rem;
+      padding:.55rem .85rem; cursor:pointer;
+      font-size:.8rem; font-family:'Space Mono',monospace;
+      color:var(--tx2); white-space:nowrap;
+      transition:background .12s,color .12s; position:relative;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sidebar-item:hover, .sidebar-item.active { background:var(--bg3); color:var(--tx); }
+    .sidebar-item.active::after {
+      content:''; position:absolute; right:0; top:0; bottom:0;
+      width:3px; background:var(--ac); border-radius:3px 0 0 3px;
+    }
+    .sidebar-icon  { font-size:1rem; flex-shrink:0; }
+    .sidebar-label { overflow:hidden; text-overflow:ellipsis; }
+
+    .sidebar-backdrop {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.4); z-index:149;
+    }
+    .sidebar-backdrop.show { display:block; }
+
+    /* ══ CONTENU PRINCIPAL ════════════════════════════════════════════════ */
+    .main-wrap {
+      flex:1; min-width:0; margin-left:220px;
+      transition:margin-left .25s cubic-bezier(.4,0,.2,1);
+    }
+    .main-wrap.sidebar-collapsed { margin-left:0; }
+
+    /* ══ MODALS ══════════════════════════════════════════════════════════ */
+    .modal-ov {
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      z-index:800; display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-ov.open { display:flex; }
+    .modal {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      max-width:480px; width:100%; max-height:85vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,.4);
+    }
+    .modal-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 1.25rem; border-bottom:1px solid var(--brd); flex-shrink:0;
+    }
+    .modal-title { font-family:'Syne',sans-serif; font-size:.92rem; font-weight:800; color:var(--tx); }
+    .modal-x {
+      background:none; border:none; cursor:pointer; font-size:1.2rem;
+      color:var(--tx2); padding:.2rem .4rem; border-radius:4px;
+      transition:background .15s; line-height:1; flex-shrink:0;
+      -webkit-tap-highlight-color:transparent;
+      min-width:32px; min-height:32px; display:flex; align-items:center; justify-content:center;
+    }
+    .modal-x:hover { background:var(--bg3); color:var(--tx); }
+    .modal-body { padding:1.25rem; display:flex; flex-direction:column; gap:1rem; }
+
+    /* ══ BLOC-NOTES ══════════════════════════════════════════════════════ */
+    .notepad {
+      position:fixed; top:64px; right:1.25rem; width:320px;
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      box-shadow:0 10px 40px rgba(0,0,0,.4); z-index:400;
+      display:none; flex-direction:column;
+      overflow:hidden; min-width:260px; min-height:200px;
+    }
+    .notepad.open { display:flex; }
+    .np-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.6rem .9rem; background:var(--bg3);
+      border-radius:12px 12px 0 0; border-bottom:1px solid var(--brd);
+      cursor:move; user-select:none; flex-shrink:0;
+    }
+    .np-title { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:var(--tx); }
+    .np-x {
+      background:none; border:none; cursor:pointer; font-size:1rem;
+      color:var(--tx2); line-height:1; padding:.25rem .35rem; border-radius:4px;
+      transition:background .15s,color .15s; min-width:28px; min-height:28px;
+      display:flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .np-x:hover { background:var(--bg4); color:var(--tx); }
+    .np-ta {
+      font-family:'Space Mono',monospace; font-size:.78rem;
+      background:transparent; border:none; padding:.9rem;
+      color:var(--tx); resize:none; height:180px; outline:none; width:100%; line-height:1.6;
+    }
+    .np-hint { padding:0 .9rem .5rem; font-size:.63rem; color:var(--tx2); font-style:italic; }
+    .np-improve-menu {
+      border-top:1px solid var(--brd); padding:.5rem .75rem;
+      display:none; flex-direction:column; gap:.3rem;
+    }
+    .np-improve-menu.show { display:flex; }
+    .np-mode-btn {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.38rem .7rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      text-align:left; transition:background .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .np-mode-btn:hover { background:var(--bg4); }
+    .np-improve-result {
+      border-top:1px solid var(--brd); padding:.75rem .9rem;
+      display:none; flex-direction:column; gap:.5rem;
+    }
+    .np-improve-result.show { display:flex; }
+    .np-result-label { font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--tx2); }
+    .np-result-ta {
+      font-family:'Space Mono',monospace; font-size:.75rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:6px;
+      padding:.6rem; color:var(--tx); resize:none; height:100px; outline:none; width:100%;
+    }
+    .np-result-btns { display:flex; gap:.4rem; }
+    .np-resize-handle {
+      position:absolute; bottom:0; right:0; width:20px; height:20px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.65rem; color:var(--tx2); cursor:se-resize;
+      opacity:.4; transition:opacity .15s; user-select:none; border-radius:0 0 12px 0;
+    }
+    .np-resize-handle:hover { opacity:.9; }
+    .np-foot { display:flex; gap:.4rem; padding:.65rem .9rem; border-top:1px solid var(--brd); }
+    .np-btn {
+      flex:1; font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700;
+      padding:.38rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:background .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .np-btn:hover { background:var(--bg4); }
+    .np-btn.send { background:var(--ac); color:var(--bg); border-color:var(--ac); }
+    .np-btn.send:hover { opacity:.85; }
+
+    /* ══ SAUVEGARDE — VARIANTE B (liste avec explications intégrées) ═══════ */
+    .sv-list { display:flex; flex-direction:column; gap:.6rem; padding:1.25rem; }
+    .sv-row {
+      display:flex; align-items:flex-start; gap:.85rem;
+      padding:.85rem .9rem; border-radius:10px;
+      background:var(--bg3); border:2px solid transparent;
+      cursor:pointer; user-select:none;
+      transition:border-color .15s,background .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sv-row:hover { border-color:var(--ac); background:var(--bg4); }
+    .sv-row.sv-on { border-color:var(--ac); background:var(--bg4); }
+    .sv-row.sv-red:hover, .sv-row.sv-red.sv-on { border-color:#E5534B; }
+    .sv-row-icon {
+      flex-shrink:0; width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.55rem; line-height:1; margin-top:.1rem;
+    }
+    .sv-row-icon svg { display:block; }
+    .sv-row-text { flex:1; min-width:0; }
+    .sv-row-title {
+      font-family:'Syne',sans-serif; font-weight:800; font-size:.85rem;
+      color:var(--tx); margin-bottom:.3rem;
+    }
+    .sv-row-desc { font-size:.7rem; color:var(--tx2); line-height:1.6; }
+    #sv-panel {
+      padding:0 1.25rem 1.25rem;
+      flex-direction:column; gap:.65rem;
+      /* display contrôlé en JS via style.display = 'none' / 'flex' */
+    }
+    .sv-sub { font-size:.72rem; color:var(--tx2); line-height:1.5; }
+    .sv-info {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.65rem .85rem; font-size:.72rem; color:var(--tx2); line-height:1.55;
+    }
+    .sv-info.sv-warn { border-left:3px solid #E5534B; }
+    .sv-btn {
+      font-family:'Space Mono',monospace; font-size:.75rem; font-weight:700;
+      padding:.52rem .85rem; border-radius:7px; cursor:pointer; width:100%;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; text-align:left; -webkit-tap-highlight-color:transparent;
+    }
+    .sv-btn:hover { border-color:var(--ac); background:var(--bg4); color:var(--ac); }
+    .sv-btn.sv-prim { background:var(--ac); color:var(--bg); border-color:transparent; }
+    .sv-btn.sv-prim:hover { opacity:.85; }
+    .sv-btn.sv-dngr { border-color:#E5534B44; color:#C0392B; }
+    .sv-btn.sv-dngr:hover { background:#E5534B; color:#fff; border-color:#E5534B; }
+    .drop-zone {
+      border:2px dashed var(--brd); border-radius:10px; padding:1.5rem;
+      text-align:center; font-size:.78rem; color:var(--tx2);
+      cursor:pointer; font-family:'Space Mono',monospace;
+      transition:border-color .15s,background .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .drop-zone:hover, .drop-zone.dz-over { border-color:var(--ac); background:var(--bg3); }
+    .file-sel {
+      display:flex; align-items:center; gap:.5rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.55rem .75rem; font-size:.72rem; color:var(--tx2);
+      font-family:'Space Mono',monospace;
+    }
+    .imp-row { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+    .url-box {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.55rem .75rem; font-size:.68rem; color:var(--tx2);
+      word-break:break-all; max-height:72px; overflow-y:auto;
+      font-family:'Space Mono',monospace;
+    }
+    .reset-warn { text-align:center; font-size:.72rem; color:#E5534B; padding:.3rem; }
+
+    /* ══ ABOUT ════════════════════════════════════════════════════════════ */
+    .about-block { background:var(--bg3); border:1px solid var(--brd); border-radius:8px; padding:.9rem; }
+    .about-block-title { font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ac); margin-bottom:.6rem; }
+    .about-row { display:flex; justify-content:space-between; font-size:.78rem; gap:1rem; margin-bottom:.3rem; }
+    .about-row .lbl { font-weight:700; color:var(--tx); }
+    .about-row .val { color:var(--tx2); }
+    .about-text { font-size:.78rem; color:var(--tx2); line-height:1.65; }
+    .about-link { color:var(--ac); text-decoration:none; }
+    .about-link:hover { text-decoration:underline; }
+
+    /* Onglets À propos */
+    .about-tabs { display:flex; border-bottom:1px solid var(--brd); flex-shrink:0; }
+    .about-tab {
+      flex:1; padding:.65rem .5rem; text-align:center;
+      font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700;
+      color:var(--tx2); background:none; border:none; cursor:pointer;
+      border-bottom:2px solid transparent;
+      transition:color .15s,border-color .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .about-tab:hover  { color:var(--tx); }
+    .about-tab.active { color:var(--ac); border-bottom-color:var(--ac); }
+
+    /* Journal des mises à jour */
+    .cl-entry {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.75rem .9rem; margin-bottom:.65rem;
+    }
+    .cl-entry:last-child { margin-bottom:0; }
+    .cl-head {
+      display:flex; align-items:baseline; justify-content:space-between;
+      gap:.75rem; margin-bottom:.5rem;
+    }
+    .cl-version { font-family:'Syne',sans-serif; font-weight:800; font-size:.82rem; color:var(--tx); }
+    .cl-date    { font-size:.65rem; color:var(--tx2); opacity:.7; white-space:nowrap; }
+    .cl-changes { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.3rem; }
+    .cl-changes li { font-size:.72rem; color:var(--tx2); line-height:1.55; padding-left:1.1rem; position:relative; }
+    .cl-changes li::before { content:'›'; position:absolute; left:0; top:0; color:var(--ac); font-weight:700; }
+    .cl-empty { font-size:.75rem; color:var(--tx2); opacity:.55; font-style:italic; text-align:center; padding:1rem 0; }
+
+    /* ══ VISITE GUIDÉE ════════════════════════════════════════════════════ */
+    .tour-ov { position:fixed; inset:0; z-index:900; display:none; }
+    .tour-ov.open { display:block; }
+    .tour-bg {
+      position:fixed; inset:0; background:transparent; cursor:pointer; z-index:901;
+    }
+    .tour-bg.no-target { background:rgba(0,0,0,.75); }
+    .tour-hl {
+      position:fixed; z-index:902; pointer-events:none; display:none;
+      box-shadow:0 0 0 3px var(--ac), 0 0 0 9999px rgba(0,0,0,.78);
+      border-radius:6px; transition:top .2s,left .2s,width .2s,height .2s;
+    }
+    .tour-card {
+      position:fixed; top:64px; left:50%; transform:translateX(-50%);
+      background:var(--bg2); border:1px solid var(--brd);
+      border-radius:14px; padding:1.5rem; max-width:360px; width:calc(100vw - 2rem);
+      box-shadow:0 20px 60px rgba(0,0,0,.5); z-index:903; pointer-events:all;
+    }
+    .tour-eye   { font-size:.63rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ac); margin-bottom:.4rem; }
+    .tour-title { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800; color:var(--tx); margin-bottom:.65rem; }
+    .tour-text  { font-size:.78rem; line-height:1.7; color:var(--tx2); margin-bottom:1.2rem; }
+    .tour-nav   { display:flex; align-items:center; justify-content:space-between; }
+    .tour-dots  { display:flex; gap:.3rem; }
+    .tour-dot   { width:6px; height:6px; border-radius:50%; background:var(--brd); transition:background .15s; }
+    .tour-dot.on { background:var(--ac); }
+    .tour-btns  { display:flex; gap:.4rem; }
+    .tour-btn {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.4rem .85rem; border-radius:7px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .tour-btn.primary { background:var(--ac); color:var(--bg); border-color:transparent; }
+    .tour-btn:hover { opacity:.85; }
+
+    /* ══ MENU SECRET ══════════════════════════════════════════════════════ */
+    .secret-ov {
+      position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px);
+      z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .secret-ov.open { display:flex; }
+    .secret-modal {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:14px;
+      max-width:520px; width:100%; max-height:90vh; overflow-y:auto;
+      box-shadow:0 24px 80px rgba(0,0,0,.6);
+    }
+    .secret-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 1.25rem; border-bottom:1px solid var(--brd);
+      background:var(--bg3); border-radius:14px 14px 0 0;
+    }
+    .secret-head-left { display:flex; align-items:center; gap:.65rem; }
+    .secret-title { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:800; color:var(--tx); }
+    .secret-badge {
+      font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+      padding:.15rem .5rem; border-radius:20px; background:var(--ac); color:var(--bg);
+    }
+    .secret-body { padding:1.25rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .secret-section-title { font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--tx2); margin-bottom:.65rem; }
+    .timer-display {
+      font-family:'Space Mono',monospace; font-size:2.4rem; font-weight:700;
+      color:var(--ac); text-align:center; padding:.75rem 1rem;
+      background:var(--bg3); border-radius:8px; border:1px solid var(--brd);
+      letter-spacing:.08em; margin-bottom:.75rem;
+    }
+    .timer-btns { display:flex; gap:.5rem; }
+    .timer-btn {
+      flex:1; font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.5rem .4rem; border-radius:7px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .timer-btn:hover   { background:var(--bg4); }
+    .timer-btn.start   { background:var(--ac); color:var(--bg); border-color:var(--ac); }
+    .timer-btn.danger  { border-color:#E5534B44; color:#C0392B; }
+    .timer-btn.danger:hover { background:#E5534B; color:#fff; }
+    .timelog-ta {
+      font-family:'Space Mono',monospace; font-size:.75rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.75rem; color:var(--tx2); resize:vertical; min-height:120px;
+      outline:none; width:100%; line-height:1.75; transition:border-color .15s;
+    }
+    .timelog-ta:focus { border-color:var(--ac); color:var(--tx); }
+    .tlog-total-badge {
+      font-family:'Space Mono',monospace; font-size:.68rem; font-weight:700;
+      color:var(--ac); background:var(--bg4);
+      padding:.2rem .65rem; border-radius:20px; border:1px solid var(--brd);
+      white-space:nowrap; flex-shrink:0; transition:color .2s;
+    }
+    .btn-dl {
+      font-family:'Space Mono',monospace; font-size:.78rem; font-weight:700;
+      padding:.65rem 1rem; border-radius:7px; cursor:pointer; width:100%;
+      border:1px solid var(--ac); background:transparent; color:var(--ac);
+      transition:all .15s; text-align:center; -webkit-tap-highlight-color:transparent;
+    }
+    .btn-dl:hover { background:var(--ac); color:var(--bg); }
+    .btn-ghost {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.42rem .85rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:transparent; color:var(--tx2);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .btn-ghost:hover { border-color:var(--tx2); color:var(--tx); }
+
+    /* ══ RESPONSIVE MOBILE ════════════════════════════════════════════════ */
+    @media (max-width:768px) {
+      input, textarea { font-size:16px !important; }
+      .hive-app-name, .hive-app-version { display:none; }
+      .notepad { width:calc(100vw - 2rem); right:1rem; left:1rem; }
+      .sidebar-toggle-bottom { display:none; }
+      .sidebar {
+        transform:translateX(calc(-100% - 4px));
+        transition:transform .25s cubic-bezier(.4,0,.2,1), top .3s;
+        width:240px !important;
+      }
+      .sidebar.mobile-open   { transform:translateX(0); box-shadow:4px 0 24px rgba(0,0,0,.4); }
+      .sidebar-toggle-btn    { left:0 !important; }
+      .main-wrap, .main-wrap.sidebar-collapsed { margin-left:0; }
+      .sv-list { padding:1rem; gap:.5rem; }
+    }
+
+/* ===== HiveOS Pro layout integration ===== */
+html,body{height:100%;overflow:hidden}
+body{min-height:unset!important;display:flex;flex-direction:column}
+.hive-stripe{flex-shrink:0}
+.hive-header{flex-shrink:0}
+.app-layout{flex:1;min-height:0!important;overflow:hidden;display:flex}
+.main-wrap{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#main{flex:1;overflow:hidden;position:relative}
+.modal-ov .modal{padding:0}
+#theme-menu{overflow:visible;min-width:195px;border-radius:10px;padding:.4rem;z-index:600;display:none}
+#theme-menu.open{display:block}
+
 </style>
 </head>
 
 <body class="theme-hiveos" id="body">
 
-<!-- HEADER -->
-<div id="header">
-  <div id="logo"><span id="logo-text">Idéalys</span></div>
-  <div id="header-btns">
-    <span id="logo-sub">HiveOS</span>
-    <button class="hbtn" id="btn-notepad" title="Bloc-notes">📝</button>
-    <div id="theme-wrap">
-      <button class="hbtn" id="btn-theme" title="Thème">🎨</button>
-      <div id="theme-menu" class="hidden"></div>
-    </div>
-    <button class="hbtn" id="btn-daynight" title="Jour / Nuit">☀️</button>
-    <button class="hbtn" id="btn-save" title="Sauvegarde">💾</button>
-    <button class="hbtn" id="btn-help" title="Aide">❓</button>
-  </div>
-</div>
+<div class="hive-stripe"></div>
 
-<!-- APP -->
-<div id="app">
-  <nav id="sidebar">
-    <button class="nav-btn active" data-view="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="idees"><span class="nav-icon">💡</span><span class="nav-label">Idées</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="projets"><span class="nav-icon">📁</span><span class="nav-label">Projets</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="ruche"><span class="nav-icon">🐝</span><span class="nav-label">Ruche</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="kanban"><span class="nav-icon">📋</span><span class="nav-label">Kanban</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="liste"><span class="nav-icon">📑</span><span class="nav-label">Liste</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" data-view="prompts"><span class="nav-icon">🤖</span><span class="nav-label">Prompts</span><span class="nav-drag-handle">⠿</span></button>
-    <button class="nav-btn" id="sidebar-toggle" style="margin-top:auto"><span class="nav-icon">◀</span><span class="nav-label">Réduire</span></button>
-  </nav>
-  <main id="main">
+<header class="hive-header" id="hive-header">
+  <div class="hive-logo-wrap" id="hive-logo-wrap">
+    <span class="hive-logo">HiveOS</span>
+    <span class="hive-sep"></span>
+    <span class="hive-app-name"    id="hive-app-name"></span>
+    <span class="hive-app-version" id="hive-app-version"></span>
+  </div>
+  <div class="hive-btns">
+    <button class="hive-btn" id="btn-notepad"  data-tip="Bloc-notes"  onclick="toggleNotepad()">📝</button>
+    <div class="theme-wrap">
+      <button class="hive-btn" id="btn-theme" data-tip="Thème" onclick="toggleThemeMenu()">🎨</button>
+      <div class="theme-menu" id="theme-menu">
+        <div class="tm-item on" data-t="theme-hiveos"    onclick="setTheme(this)">🐝 HiveOS</div>
+        <div class="tm-item"    data-t="theme-problue"   onclick="setTheme(this)">🔷 Pro Bleu</div>
+        <div class="tm-item"    data-t="theme-bleu"      onclick="setTheme(this)">🔵 Bleu</div>
+        <div class="tm-item"    data-t="theme-dracula"   onclick="setTheme(this)">🧛 Dracula</div>
+        <div class="tm-item"    data-t="theme-picsou"    onclick="setTheme(this)">🪙 Picsou</div>
+        <div class="tm-item"    data-t="theme-cyberpunk" onclick="setTheme(this)">⚡ Cyberpunk</div>
+        <div class="tm-item"    data-t="theme-spectre"   onclick="setTheme(this)">👾 Spectre</div>
+        <div class="tm-item family" onclick="toggleFam('win')">🪟 Windows</div>
+        <div class="tm-sub" id="fam-win">
+          <div class="tm-sub-item" data-t="theme-windows95"   onclick="setTheme(this)">Windows 95</div>
+          <div class="tm-sub-item" data-t="theme-win-vintage" onclick="setTheme(this)">Windows Vintage</div>
+        </div>
+        <div class="tm-item family" onclick="toggleFam('term')">💻 Terminal</div>
+        <div class="tm-sub" id="fam-term">
+          <div class="tm-sub-item" data-t="theme-terminal" onclick="setTheme(this)">Terminal</div>
+          <div class="tm-sub-item" data-t="theme-matrix"   onclick="setTheme(this)">Matrix</div>
+          <div class="tm-sub-item" data-t="theme-vt100"    onclick="setTheme(this)">VT100</div>
+          <div class="tm-sub-item" data-t="theme-ibmpc"    onclick="setTheme(this)">IBM PC</div>
+        </div>
+        <div class="tm-item" data-t="theme-bunker" onclick="setTheme(this)">🏚 Bunker</div>
+      </div>
+    </div>
+    <button class="hive-btn" id="btn-daynight" data-tip="Jour / Nuit" onclick="toggleDayNight()">☀️</button>
+    <button class="hive-btn" id="btn-save"     data-tip="Sauvegarde"  onclick="openProSaveModal()">💾</button>
+    <button class="hive-btn" id="btn-help"     data-tip="Aide"        onclick="startSystemTour()">❓</button>
+  </div>
+</header>
+
+
+<div class="app-layout">
+
+  <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()">
+    <span class="sidebar-toggle-icon" id="sidebar-toggle-icon">◀</span>
+  </button>
+
+  <button class="sidebar-toggle-bottom" id="sidebar-toggle-bottom" onclick="toggleSidebar()">
+    <span class="sidebar-toggle-icon" id="sidebar-toggle-icon-bottom">◀</span>
+  </button>
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head" onclick="toggleSidebar()">
+      <span class="sidebar-title">Menu</span>
+    </div>
+    <div class="sidebar-content" id="sidebar-content">
+      <div class="nav-btn" data-view="dashboard" title="Tableau de bord">🏠<span>Dashboard</span></div>
+      <div class="nav-btn" data-view="idees" title="Idées">💡<span>Idées</span></div>
+      <div class="nav-btn" data-view="projets" title="Projets">📁<span>Projets</span></div>
+      <div class="nav-btn" data-view="ruche" title="Carte mentale">🕸️<span>Ruche</span></div>
+      <div class="nav-btn" data-view="kanban" title="Kanban">📋<span>Kanban</span></div>
+      <div class="nav-btn" data-view="liste" title="Liste">📝<span>Liste</span></div>
+      <div class="nav-btn" data-view="prompts" title="Prompts IA">🤖<span>Prompts</span></div>
+      <div class="nav-drag-handle" id="sidebar-drag-handle">⠿ Réorganiser</div>
+    </div>
+  </aside>
+
+  <div class="main-wrap" id="app-content"><main id="main">
     <div id="view-dashboard" class="view active"></div>
     <div id="view-idees" class="view" style="padding:0;flex-direction:column"></div>
     <div id="view-projets" class="view" style="overflow-y:auto;padding:24px;flex-direction:column;gap:0"></div>
@@ -583,26 +1123,16 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
       </div>
       <div id="liste-content"></div>
     </div>
-  </main>
+  </main></div>
+
 </div>
 
-<!-- NOTEPAD -->
-<div id="notepad" class="hidden">
-  <div id="notepad-header">
-    <span id="np-drag-handle" title="Déplacer">⠿</span>
-    <span class="np-title">📝 Bloc-notes</span>
-    <button class="np-btn" id="notepad-close" title="Fermer">✕</button>
-  </div>
-  <textarea id="notepad-ta" placeholder="Notes libres…"></textarea>
-  <div id="notepad-footer">
-    <span id="np-resize-handle" title="Redimensionner">⤡</span>
-    <button class="np-btn" id="notepad-copy" title="Copier tout">📋 Copier</button>
-  </div>
-</div>
 
+<!-- QUICK IDEA FAB -->
 <!-- QUICK IDEA FAB -->
 <button id="quick-fab" title="Capturer une idée rapidement">💡</button>
 
+<!-- QUICK PANEL -->
 <!-- QUICK PANEL -->
 <div id="quick-panel" class="hidden">
   <div style="display:flex;align-items:center;justify-content:space-between">
@@ -638,6 +1168,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<!-- SAVE MODAL (app) -->
 <!-- SAVE MODAL -->
 <div class="modal-overlay hidden" id="save-modal">
   <div class="modal" style="max-width:600px">
@@ -681,6 +1212,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<!-- IDEA MODAL -->
 <!-- IDEA MODAL -->
 <div class="modal-overlay hidden" id="idea-modal">
   <div class="modal">
@@ -768,6 +1300,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<!-- RENAME MODAL -->
 <!-- CONFIRM MODAL -->
 <div class="modal-overlay hidden" id="rename-modal">
   <div class="modal" style="max-width:380px">
@@ -782,6 +1315,8 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
     </div>
   </div>
 </div>
+
+<!-- LAYOUT PROFILES MODAL -->
 <div class="modal-overlay hidden" id="layout-profiles-modal">
   <div class="modal" style="max-width:400px;display:flex;flex-direction:column;max-height:80vh">
     <button class="modal-close" id="layout-profiles-close">✕</button>
@@ -793,6 +1328,8 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
     </div>
   </div>
 </div>
+
+<!-- CONFIRM MODAL -->
 <div class="modal-overlay hidden" id="confirm-modal">
   <div class="modal">
     <h3 id="confirm-title">Confirmer</h3>
@@ -804,6 +1341,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<!-- REPORT MODAL -->
 <div class="modal-overlay hidden" id="report-modal">
   <div class="modal" style="max-width:540px;width:95%">
     <button class="modal-close" id="report-close">✕</button>
@@ -821,6 +1359,7 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+<!-- TOUR OVERLAY (app) -->
 <!-- TOUR — 4 panneaux + boîte -->
 <div id="tour-overlay" class="hidden">
   <div class="tour-panel" id="tp-top"></div>
@@ -840,10 +1379,807 @@ h2.view-title{font-family:var(--font-h,'Syne',sans-serif);font-size:1.2rem;color
   </div>
 </div>
 
+
+<!-- PRO NOTEPAD -->
+<!-- BLOC-NOTES -->
+<div class="notepad" id="notepad">
+  <div class="np-head" id="np-drag">
+    <span class="np-title">📝 Bloc-notes</span>
+    <button class="np-x" id="np-close-btn">✕</button>
+  </div>
+  <textarea class="np-ta" id="np-ta" placeholder="Tes notes ici..."></textarea>
+  <div class="np-hint">💡 Note tes bugs, suggestions ou demandes — améliore, copie ou envoie.</div>
+  <div class="np-improve-menu" id="np-improve-menu">
+    <button class="np-mode-btn" onclick="runImprove('dev')">🔧 Instructions dev</button>
+    <button class="np-mode-btn" onclick="runImprove('list')">📋 Liste structurée</button>
+    <button class="np-mode-btn" onclick="runImprove('correct')">✏️ Correction + clarté</button>
+    <button class="np-mode-btn" onclick="runImprove('short')">⚡ Résumé court</button>
+    <button class="np-mode-btn" onclick="runImprove('prompt')">🤖 Transformer en prompt</button>
+  </div>
+  <div class="np-improve-result" id="np-improve-result">
+    <div class="np-result-label">Résultat IA</div>
+    <textarea class="np-result-ta" id="np-result-ta" readonly></textarea>
+    <div class="np-result-btns">
+      <button class="np-btn" onclick="npResultReplace()">Remplacer</button>
+      <button class="np-btn" onclick="npResultCopy()">Copier</button>
+      <button class="np-btn" id="np-result-close">✕</button>
+    </div>
+  </div>
+  <div class="np-resize-handle" id="np-resize">⠿</div>
+  <div class="np-foot">
+    <button class="np-btn" id="np-improve-toggle">✨ Améliorer</button>
+    <button class="np-btn" id="np-copy-btn">📋 Copier</button>
+    <button class="np-btn send" id="np-send-btn">📨 Envoyer</button>
+  </div>
+</div>
+
+<!-- PRO SAVE MODAL -->
+<div class="modal-ov" id="save-ov">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">💾 Sauvegarde</span>
+      <button class="modal-x" onclick="closeModal('save-ov')">✕</button>
+    </div>
+    <div class="sv-list">
+      <div class="sv-row" data-a="export">
+        <div class="sv-row-icon">📤</div>
+        <div class="sv-row-text">
+          <div class="sv-row-title">Exporter</div>
+          <div class="sv-row-desc">C'est ta sauvegarde personnelle. Le fichier <strong style="color:var(--tx)">.json</strong> téléchargé contient toutes tes données — conserve-le précieusement. Tu pourras t'en servir plus tard pour restaurer exactement cet état, sur cet appareil ou sur un autre.</div>
+        </div>
+      </div>
+
+      <div class="sv-row" data-a="import">
+        <div class="sv-row-icon">📥</div>
+        <div class="sv-row-text">
+          <div class="sv-row-title">Importer</div>
+          <div class="sv-row-desc">Sélectionne un fichier <strong style="color:var(--tx)">.json</strong> créé via « Exporter », puis valide. Toutes les données qu'il contient sont rechargées automatiquement pour retrouver l'état exact de la sauvegarde au moment de sa création. <strong style="color:var(--tx)">Fusionner</strong> combine avec les données actuelles, <strong style="color:var(--tx)">Remplacer</strong> repart uniquement avec son contenu.</div>
+        </div>
+      </div>
+
+      <div class="sv-row" data-a="share">
+        <div class="sv-row-icon">
+          <!--
+            Icône style "outline" : téléphone — flèche ↔ — écran PC + pied + socle.
+            Formes simples, traits épais, sans détails internes : lisible à toute taille.
+          -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="34" height="17" aria-hidden="true">
+            <!-- ── TÉLÉPHONE (portrait) ── -->
+            <rect x="4" y="4" width="22" height="42" rx="6"
+                  fill="none" stroke="var(--ac)" stroke-width="4"/>
+            <!-- bouton home -->
+            <circle cx="15" cy="40" r="1.8" fill="var(--ac)"/>
+            <!-- ── FLÈCHE DOUBLE ↔ ── -->
+            <line x1="33" y1="25" x2="67" y2="25"
+                  stroke="var(--tx2)" stroke-width="4" stroke-linecap="round"/>
+            <polyline points="40,16 33,25 40,34"
+                      fill="none" stroke="var(--tx2)" stroke-width="4"
+                      stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="60,16 67,25 60,34"
+                      fill="none" stroke="var(--tx2)" stroke-width="4"
+                      stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- ── ÉCRAN PC (paysage + pied + socle) ── -->
+            <rect x="70" y="6" width="28" height="22" rx="3"
+                  fill="none" stroke="var(--ac)" stroke-width="4"/>
+            <line x1="84" y1="28" x2="84" y2="36"
+                  stroke="var(--ac)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="75" y1="40" x2="93" y2="40"
+                  stroke="var(--ac)" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sv-row-text">
+          <div class="sv-row-title">Partager</div>
+          <div class="sv-row-desc">Encode l'état actuel dans un lien. Copie ce lien et ouvre-le sur un autre appareil (téléphone ↔ PC) pour y retrouver instantanément les mêmes données — fonctionne même sur iPhone, sans fichier ni téléchargement.</div>
+        </div>
+      </div>
+
+      <div class="sv-row sv-red" data-a="reset">
+        <div class="sv-row-icon">♻️</div>
+        <div class="sv-row-text">
+          <div class="sv-row-title">Réinitialiser</div>
+          <div class="sv-row-desc">Efface toutes les données saisies et remet l'application dans sa configuration d'origine. <strong style="color:var(--tx)">Action irréversible</strong> — à utiliser pour repartir de zéro.</div>
+        </div>
+      </div>
+    </div>
+    <div id="sv-panel" style="display:none;"></div>
+  </div>
+</div>
+<input type="file" id="sv-file-inp" accept=".json" style="display:none">
+
+<!-- PRO ABOUT -->
+<div class="modal-ov" id="about-ov">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">À propos</span>
+      <button class="modal-x" onclick="closeModal('about-ov')">✕</button>
+    </div>
+    <div class="about-tabs">
+      <button class="about-tab active" data-page="info" onclick="showAboutPage('info')">ℹ️ Infos</button>
+      <button class="about-tab"        data-page="log"  onclick="showAboutPage('log')">📋 Journal des mises à jour</button>
+    </div>
+    <div class="modal-body" id="about-page-info">
+      <div class="about-block">
+        <div class="about-block-title">L'application</div>
+        <div class="about-row"><span class="lbl">Nom</span>     <span class="val" id="ab-name"></span></div>
+        <div class="about-row"><span class="lbl">Version</span> <span class="val" id="ab-version"></span></div>
+        <div class="about-text" id="ab-desc" style="margin:.4rem 0"></div>
+        <a class="about-link" id="ab-url" href="#" target="_blank"></a>
+      </div>
+      <div class="about-block">
+        <div class="about-block-title">HiveOS</div>
+        <div class="about-text">
+          HiveOS est un système d'interface développé par Hive (Quentin).<br>
+          Toutes les apps sur <a class="about-link" href="https://hivetools.netlify.app" target="_blank">hivetools.netlify.app</a><br>
+          Aucun compte requis. Vos données restent sur votre appareil.
+        </div>
+      </div>
+    </div>
+    <div class="modal-body" id="about-page-log" style="display:none;">
+      <div id="about-changelog-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRO TOUR -->
+<div class="tour-ov" id="tour-ov">
+  <div class="tour-bg"  id="tour-bg"></div>
+  <div class="tour-hl"  id="tour-hl"></div>
+  <div class="tour-card" id="tour-card">
+    <div class="tour-eye"   id="tour-eye"></div>
+    <div class="tour-title" id="tour-title"></div>
+    <div class="tour-text"  id="tour-text"></div>
+    <div class="tour-nav">
+      <div class="tour-dots" id="tour-dots"></div>
+      <div class="tour-btns">
+        <button class="tour-btn" id="tour-prev" onclick="tNav(-1)">←</button>
+        <button class="tour-btn primary" id="tour-next" onclick="tNav(1)">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRO SECRET -->
+<div class="secret-ov" id="secret-ov">
+  <div class="secret-modal">
+    <div class="secret-head">
+      <div class="secret-head-left">
+        <span class="secret-title">⚙️ Menu Développeur</span>
+        <span class="secret-badge">Ctrl + Shift + D</span>
+      </div>
+      <button class="modal-x" onclick="closeSecret()">✕</button>
+    </div>
+    <div class="secret-body">
+      <div>
+        <div class="secret-section-title">⏱ Pointeuse</div>
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start"  id="btn-timer-start" onclick="timerStart()">▶ Démarrer</button>
+          <button class="timer-btn"        onclick="timerPause()">⏸ Pause</button>
+          <button class="timer-btn danger" onclick="timerStop()">⏹ Stop &amp; Log</button>
+          <button class="timer-btn"        onclick="timerReset()">🔄 Reset</button>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;">
+          <div class="secret-section-title" style="margin-bottom:0;">📋 Journal de temps</div>
+          <span id="tlog-total" class="tlog-total-badge">Total : —</span>
+        </div>
+        <textarea class="timelog-ta" id="timelog-ta" placeholder="Aucune session enregistrée..."></textarea>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+          <button class="btn-ghost" id="btn-copy-tlog" style="flex:1;" onclick="copyTimelog()">📋 Copier</button>
+          <button class="btn-ghost"                    style="flex:1;" onclick="clearTimelog()">🗑 Effacer</button>
+        </div>
+      </div>
+      <div>
+        <div class="secret-section-title">📦 Export développeur</div>
+        <div style="font-size:.72rem;color:var(--tx2);line-height:1.65;margin-bottom:.75rem;">
+          Télécharge l'intégralité du programme avec toutes tes données intégrées dans un seul fichier <code style="font-family:'Space Mono',monospace;background:var(--bg3);padding:.1rem .35rem;border-radius:4px;">.html</code>. Cette sauvegarde permet de restaurer l'application dans l'état exact où elle se trouvait au moment de l'export.
+        </div>
+        <button class="btn-dl" onclick="downloadHTML()">📦 Télécharger le fichier HTML complet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+
+const APP = { name:"Idéalys", version:"v2.0", description:"Gestionnaire d'idées, projets et carte mentale", author:"HiveOS — Hive (Quentin)", url:"https://hivetools.netlify.app" };
+
+const CHANGELOG = [{ version:'v2.0', date:'16/06/2026', changes:["Intégration HiveOS Pro v2.0","Nouveau système de thèmes","Notepad système","Export/Import amélioré"] },{ version:'v1.0', date:'01/06/2026', changes:["Version initiale"] }];
+
 /*__SEED_START__*/
 const SEED_DATA={"ideas":[],"categories":[],"mapPositions":{},"prompts":[]};
 /*__SEED_END__*/
+
+const TOUR_APP = [];
+
+const $ = id => document.getElementById(id);
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function copyText(text, btn, label) {
+  const ok = () => {
+    if (!btn) return;
+    const o = btn.textContent;
+    btn.textContent = label || '✓ Copié';
+    setTimeout(() => btn.textContent = o, 2000);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(() => fbCopy(text,ok));
+  } else fbCopy(text, ok);
+}
+function fbCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); if(cb) cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+let currentTheme = localStorage.getItem('app-theme')    || 'theme-hiveos';
+let isDayMode    = localStorage.getItem('app-day-mode') === '1';
+
+function applyTheme() {
+  document.body.className = currentTheme + (isDayMode ? ' day' : '');
+  $('btn-daynight').textContent = isDayMode ? '🌙' : '☀️';
+  document.querySelectorAll('[data-t]').forEach(el =>
+    el.classList.toggle('on', el.dataset.t === currentTheme));
+}
+function setTheme(el) {
+  currentTheme = el.dataset.t;
+  localStorage.setItem('app-theme', currentTheme);
+  applyTheme();
+  $('theme-menu').classList.remove('open');
+}
+function toggleDayNight() {
+  isDayMode = !isDayMode;
+  localStorage.setItem('app-day-mode', isDayMode ? '1' : '0');
+  applyTheme();
+}
+function toggleThemeMenu() { $('theme-menu').classList.toggle('open'); }
+function toggleFam(id)     { $('fam-'+id).classList.toggle('open'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.theme-wrap')) $('theme-menu').classList.remove('open');
+});
+
+let lastY = 0;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const hide = y > lastY && y > 80;
+  $('hive-header').classList.toggle('hidden', hide);
+  $('sidebar').classList.toggle('header-hidden', hide);
+  $('sidebar-toggle-btn').classList.toggle('header-hidden', hide);
+  lastY = y;
+}, { passive:true });
+
+/* ════════════════════════════════════════════════════════════════════════
+   SIDEBAR
+════════════════════════════════════════════════════════════════════════ */
+let sidebarCollapsed = localStorage.getItem('hiveos-sidebar') === '1'; // état desktop, persisté
+let mobileOpen       = false;                                          // état mobile, non persisté
+
+function applySidebar() {
+  const isMobile  = window.innerWidth <= 768;
+  const sidebar   = $('sidebar');
+  const backdrop  = $('sidebar-backdrop');
+  const content   = $('app-content');
+
+  if (isMobile) {
+    sidebar.classList.remove('collapsed');
+    sidebar.classList.toggle('mobile-open', mobileOpen);
+    backdrop.classList.toggle('show', mobileOpen);
+    content.classList.remove('sidebar-collapsed');
+  } else {
+    sidebar.classList.remove('mobile-open');
+    backdrop.classList.remove('show');
+    sidebar.classList.toggle('collapsed', sidebarCollapsed);
+    content.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+  }
+
+  const open  = isMobile ? mobileOpen : !sidebarCollapsed;
+  const arrow = open ? '◀' : '▶';
+  const left  = (!isMobile && sidebarCollapsed) ? '0px' : '220px';
+
+  [$('sidebar-toggle-icon'), $('sidebar-toggle-icon-bottom')].forEach(i => { if (i) i.textContent = arrow; });
+  [$('sidebar-toggle-btn'),  $('sidebar-toggle-bottom')].forEach(b => { if (b) b.style.left = left; });
+}
+
+function toggleSidebar() {
+  if (window.innerWidth <= 768) {
+    mobileOpen = !mobileOpen;
+  } else {
+    sidebarCollapsed = !sidebarCollapsed;
+    localStorage.setItem('hiveos-sidebar', sidebarCollapsed ? '1' : '0');
+  }
+  applySidebar();
+}
+
+window.addEventListener('resize', applySidebar);
+
+/* Swipe mobile pour ouvrir/fermer la sidebar */
+(function() {
+  let sx=0, sy=0;
+  document.addEventListener('touchstart', e => { sx=e.touches[0].clientX; sy=e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    if (window.innerWidth > 768) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = Math.abs(e.changedTouches[0].clientY - sy);
+    if (dy > 50) return;
+    if (sx < 20 && dx > 60 && !mobileOpen) toggleSidebar();
+    if (dx < -60 && mobileOpen)            toggleSidebar();
+  }, {passive:true});
+})();
+
+function openModal(id)       { $(id).classList.add('open'); }
+function closeModal(id)      { $(id).classList.remove('open'); }
+/* Fermeture exclusivement via la croix — pas de clic extérieur, pas d'Échap */
+
+const NP_KEY = 'hiveos_notepad';
+
+function toggleNotepad() { $('notepad').classList.toggle('open'); }
+
+/* Fix croix mobile — stopPropagation pour éviter le conflit avec le drag */
+$('np-close-btn').addEventListener('click',   e => { e.stopPropagation(); $('notepad').classList.remove('open'); });
+$('np-close-btn').addEventListener('touchend',e => { e.stopPropagation(); e.preventDefault(); $('notepad').classList.remove('open'); });
+
+$('np-copy-btn').addEventListener('click', () => copyText($('np-ta').value, $('np-copy-btn'), '✓ Copié'));
+$('np-send-btn').addEventListener('click', () => {
+  const t = $('np-ta').value.trim(); if (!t) return;
+  window.location.href = `mailto:systemhiveos@gmail.com?subject=${encodeURIComponent(`[${APP.name} ${APP.version}] — Notes & Retours`)}&body=${encodeURIComponent(t)}`;
+});
+$('np-improve-toggle').addEventListener('click', () => {
+  $('np-improve-menu').classList.toggle('show');
+  $('np-improve-result').classList.remove('show');
+});
+$('np-result-close').addEventListener('click', () => {
+  $('np-improve-result').classList.remove('show');
+  $('np-improve-menu').classList.remove('show');
+});
+
+function npResultReplace() {
+  $('np-ta').value = $('np-result-ta').value;
+  $('np-improve-result').classList.remove('show');
+  localStorage.setItem(NP_KEY, $('np-ta').value);
+}
+function npResultCopy() { copyText($('np-result-ta').value); }
+
+const IMPROVE_PROMPTS = {
+  dev:     "Reformule ce texte en instructions claires et actionnables pour un développeur. Verbes d'action, points si nécessaire.",
+  list:    "Transforme ce texte en liste numérotée. Chaque point : une action ou bug distinct. Court et précis.",
+  correct: "Corrige le français et améliore la clarté sans changer le fond. Ton naturel.",
+  short:   "Résume en 2-3 phrases maximum.",
+  prompt:  ""
+};
+
+async function runImprove(mode) {
+  const text = $('np-ta').value.trim(); if (!text) return;
+  $('np-improve-menu').classList.remove('show');
+  $('np-result-ta').value = '⏳ Génération en cours...';
+  $('np-improve-result').classList.add('show');
+  if (mode === 'prompt') {
+    IMPROVE_PROMPTS.prompt = `Transforme ce texte en un prompt clair prêt pour n'importe quelle IA. Contexte : ${APP.name} — ${APP.description}. Formule la demande de façon précise.`;
+  }
+  const apiKey = localStorage.getItem('hiveos_api_key');
+  if (!apiKey) { $('np-result-ta').value = '⚠️ Clé API non configurée.\nOuvrez le menu secret (Ctrl+Shift+D) pour la configurer.'; return; }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-api-key':apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1000, system:IMPROVE_PROMPTS[mode], messages:[{role:'user',content:text}] })
+    });
+    const data = await res.json();
+    $('np-result-ta').value = data.content?.[0]?.text || 'Erreur de génération.';
+  } catch(e) { $('np-result-ta').value = 'Erreur — vérifiez votre connexion et votre clé API.'; }
+}
+
+$('np-ta').addEventListener('input', () => localStorage.setItem(NP_KEY, $('np-ta').value));
+
+/* Drag bloc-notes — mouse + touch (ignore le touchstart sur la croix) */
+(function() {
+  const win = $('notepad'), handle = $('np-drag'); let ox, oy;
+  function startD(cx,cy) { ox=cx-win.offsetLeft; oy=cy-win.offsetTop; win.style.right='unset'; }
+  function moveD(cx,cy)  { win.style.left=(cx-ox)+'px'; win.style.top=(cy-oy)+'px'; }
+  handle.addEventListener('mousedown', e => {
+    if (e.target.closest('.np-x')) return;
+    startD(e.clientX,e.clientY);
+    const mv=e2=>moveD(e2.clientX,e2.clientY);
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',mv),{once:true});
+  });
+  handle.addEventListener('touchstart', e => { if(e.target.closest('.np-x')) return; const t=e.touches[0]; startD(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+  handle.addEventListener('touchmove',  e => { const t=e.touches[0]; moveD(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+})();
+
+/* Redimensionnement bloc-notes */
+(function() {
+  const win=$('notepad'), handle=$('np-resize'), ta=$('np-ta'); let sx,sy,sw,th;
+  function startR(cx,cy) { sx=cx; sy=cy; sw=win.offsetWidth; th=ta.offsetHeight; }
+  function doR(cx,cy) { win.style.width=Math.max(260,sw+(cx-sx))+'px'; ta.style.height=Math.max(80,th+(cy-sy))+'px'; }
+  handle.addEventListener('mousedown',e=>{ startR(e.clientX,e.clientY); e.preventDefault(); e.stopPropagation();
+    const mv=e2=>doR(e2.clientX,e2.clientY);
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',mv),{once:true});
+  });
+  handle.addEventListener('touchstart',e=>{ const t=e.touches[0]; startR(t.clientX,t.clientY); e.stopPropagation(); },{passive:false});
+  handle.addEventListener('touchmove', e=>{ const t=e.touches[0]; doR(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+})();
+
+let svImportData = null;
+
+/* — Ouvre la modale avec reset du panel — */
+function openProSaveModal() {
+  svImportData = null;
+  document.querySelectorAll('.sv-row').forEach(t => t.classList.remove('sv-on'));
+  $('sv-panel').style.display = 'none';
+  $('sv-panel').innerHTML = '';
+  $('sv-file-inp').value = '';
+  openModal('save-ov');
+}
+
+/* — Affiche le sous-panel de l'action choisie — */
+function showSvPanel(action) {
+  const p = $('sv-panel');
+  p.innerHTML = '';
+  p.style.display = 'flex';
+  document.querySelectorAll('.sv-row').forEach(t => t.classList.toggle('sv-on', t.dataset.a === action));
+  switch(action) {
+    case 'export': buildSvExport(p); break;
+    case 'import': buildSvImport(p); break;
+    case 'share':  buildSvShare(p);  break;
+    case 'reset':  buildSvReset(p);  break;
+  }
+}
+
+/* Bind les lignes au clic */
+document.querySelectorAll('.sv-row').forEach(t =>
+  t.addEventListener('click', () => showSvPanel(t.dataset.a))
+);
+
+/* Bind le file input une seule fois globalement */
+$('sv-file-inp').addEventListener('change', e => {
+  if (e.target.files[0]) { readSvFile(e.target.files[0]); e.target.value = ''; }
+});
+
+/* ── Exporter ─────────────────────────────────────────────────────────── */
+function buildSvExport(p) {
+  const json  = JSON.stringify(getAppState(), null, 2);
+  const fname = APP.name.replace(/\s+/g,'-').toLowerCase() + '-' + new Date().toISOString().slice(0,10) + '.json';
+  p.innerHTML = `
+    <div class="sv-info">${fname}<br><small style="opacity:.65;">${(new Blob([json]).size/1024).toFixed(1)} Ko · ${new Date().toLocaleString('fr-FR')}</small></div>
+    <button class="sv-btn sv-prim" id="do-sv-exp">📤 Télécharger le fichier</button>
+    <p class="sv-sub" style="opacity:.65;">⚠️ Safari iOS : le fichier s'ouvre dans une nouvelle page — utilise « Partager » comme alternative.</p>
+  `;
+  $('do-sv-exp').addEventListener('click', async () => {
+    const blob = new Blob([json], { type:'application/json' });
+    if (window.showSaveFilePicker) {
+      try {
+        const h = await window.showSaveFilePicker({ suggestedName:fname, types:[{description:'JSON',accept:{'application/json':['.json']}}] });
+        const w = await h.createWritable(); await w.write(blob); await w.close(); return;
+      } catch(e) { if(e.name==='AbortError') return; }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = fname; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+}
+
+/* ── Restaurer ────────────────────────────────────────────────────────── */
+function buildSvImport(p) {
+  p.innerHTML = `
+    <div class="drop-zone" id="sv-drop">📂 Clique ou glisse un fichier JSON</div>
+    <div id="sv-fi" style="display:none;"></div>
+    <div class="imp-row" id="sv-imp-row" style="display:none;">
+      <button class="sv-btn sv-prim" id="do-sv-merge">🔀 Fusionner</button>
+      <button class="sv-btn sv-dngr" id="do-sv-rpl">🔄 Remplacer</button>
+    </div>
+  `;
+  const dz = $('sv-drop');
+  dz.addEventListener('click', () => { $('sv-file-inp').value=''; $('sv-file-inp').click(); });
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dz-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dz-over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dz-over'); readSvFile(e.dataTransfer.files[0]); });
+
+  $('do-sv-merge').addEventListener('click', () => {
+    if (!svImportData) return;
+    setAppState(Object.assign({}, getAppState(), svImportData));
+    localStorage.setItem('app_data_state', JSON.stringify(getAppState()));
+    closeModal('save-ov');
+  });
+  $('do-sv-rpl').addEventListener('click', () => {
+    if (!svImportData) return;
+    setAppState(svImportData);
+    localStorage.setItem('app_data_state', JSON.stringify(getAppState()));
+    closeModal('save-ov');
+  });
+}
+
+function readSvFile(file) {
+  const r = new FileReader();
+  r.onload = ev => {
+    const fi = $('sv-fi');
+    try {
+      svImportData = JSON.parse(ev.target.result);
+      fi.className = 'file-sel'; fi.style.display = '';
+      fi.innerHTML = `📄 ${file.name} <small style="opacity:.6;font-size:.65rem;">(${(file.size/1024).toFixed(1)} Ko)</small>`;
+      $('sv-imp-row').style.display = '';
+    } catch {
+      fi.className = 'sv-info'; fi.style.display = '';
+      fi.innerHTML = '<span style="color:#E5534B;">❌ Fichier JSON invalide.</span>';
+      $('sv-imp-row').style.display = 'none';
+      svImportData = null;
+    }
+  };
+  r.readAsText(file);
+}
+
+/* ── Partager ─────────────────────────────────────────────────────────── */
+function buildSvShare(p) {
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(getAppState()))));
+  const url = window.location.href.split('#')[0] + '#d=' + encoded;
+  p.innerHTML = `
+    <div class="url-box">${url}</div>
+    <button class="sv-btn sv-prim" id="do-sv-url">🔗 Copier le lien</button>
+  `;
+  $('do-sv-url').addEventListener('click', () => copyText(url, $('do-sv-url'), '✓ Lien copié !'));
+}
+
+/* ── Réinitialiser (double confirmation) ─────────────────────────────── */
+function buildSvReset(p) {
+  p.innerHTML = `
+    <div class="sv-info sv-warn">⚠️ Action irréversible. Le bloc-notes et les préférences de thème <strong>ne seront pas</strong> effacés.</div>
+    <button class="sv-btn sv-dngr" id="sv-rst1">♻️ Je confirme la réinitialisation</button>
+  `;
+  $('sv-rst1').addEventListener('click', () => {
+    p.innerHTML += `
+      <div class="reset-warn">⚠️ Dernière confirmation — toutes les données seront supprimées.</div>
+      <button class="sv-btn sv-dngr" id="sv-rst2">🗑 Confirmer et réinitialiser</button>
+    `;
+    $('sv-rst2').addEventListener('click', () => {
+      localStorage.removeItem('app_data_state');
+      setAppState({});
+      closeModal('save-ov');
+    });
+  });
+}
+
+function openAbout() {
+  $('ab-name').textContent    = APP.name;
+  $('ab-version').textContent = APP.version;
+  $('ab-desc').textContent    = APP.description;
+  $('ab-url').textContent     = APP.url;
+  $('ab-url').href            = APP.url;
+  renderChangelog();
+  showAboutPage('info');
+  openModal('about-ov');
+}
+
+/* Bascule entre la page Infos et le Journal des mises à jour */
+function showAboutPage(page) {
+  $('about-page-info').style.display = page === 'info' ? '' : 'none';
+  $('about-page-log').style.display  = page === 'log'  ? '' : 'none';
+  document.querySelectorAll('.about-tab').forEach(t => t.classList.toggle('active', t.dataset.page === page));
+}
+
+/* Construit la liste du journal des mises à jour depuis CHANGELOG */
+function renderChangelog() {
+  const el = $('about-changelog-list');
+  if (!CHANGELOG.length) { el.innerHTML = '<p class="cl-empty">Aucune entrée pour le moment.</p>'; return; }
+  el.innerHTML = CHANGELOG.map(e => `
+    <div class="cl-entry">
+      <div class="cl-head">
+        <span class="cl-version">${e.version}</span>
+        <span class="cl-date">${e.date}</span>
+      </div>
+      <ul class="cl-changes">${e.changes.map(c => `<li>${c}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+}
+
+let logoTimer=null, logoTriggered=false;
+
+function logoStart() {
+  logoTriggered = false;
+  $('hive-logo-wrap').style.opacity = '.6';
+  logoTimer = setTimeout(() => {
+    logoTriggered = true;
+    $('hive-logo-wrap').style.opacity = '';
+    openSecret();
+  }, 3000);
+}
+function logoEnd() {
+  clearTimeout(logoTimer);
+  $('hive-logo-wrap').style.opacity = '';
+  if (!logoTriggered) openAbout();
+  logoTriggered = false;
+}
+function logoCancel() {
+  clearTimeout(logoTimer);
+  $('hive-logo-wrap').style.opacity = '';
+  logoTriggered = false;
+}
+
+$('hive-logo-wrap').addEventListener('mousedown',   () => logoStart());
+$('hive-logo-wrap').addEventListener('mouseup',     () => logoEnd());
+$('hive-logo-wrap').addEventListener('mouseleave',  () => logoCancel());
+$('hive-logo-wrap').addEventListener('touchstart',  () => logoStart(), {passive:true});
+$('hive-logo-wrap').addEventListener('touchend',    e  => { e.preventDefault(); logoEnd(); });
+$('hive-logo-wrap').addEventListener('touchcancel', () => logoCancel());
+
+const TOUR_SYSTEM = [
+  { target:null,
+    eye:'Bienvenue',
+    title:`Bienvenue dans ${APP.name} 👋`,
+    text:APP.description },
+  { target:'#hive-logo-wrap',
+    eye:'Étape 1/6',
+    title:'Le logo HiveOS',
+    text:'Appuie sur le logo pour ouvrir une fenêtre d\'explication du logiciel.' },
+  { target:'#btn-notepad',
+    eye:'Étape 2/6',
+    title:'📝 Bloc-notes',
+    text:'Enregistre tes notes perso. Améliore avec l\'IA directement dans le bloc-notes, transforme-les en prompt ou remonte directement les améliorations, ajouts ou bugs de l\'application au développeur — le tout en un seul clic.' },
+  { target:'#btn-theme',
+    eye:'Étape 3/6',
+    title:'🎨 Thème',
+    text:'Plusieurs thèmes possibles car un environnement qui donne envie est un environnement productif.' },
+  { target:'#btn-daynight',
+    eye:'Étape 4/6',
+    title:'☀️/🌙 Jour / Nuit',
+    text:'Bascule entre mode sombre et mode clair, dans l\'identité visuelle du thème actif.' },
+  { target:'#btn-save',
+    eye:'Étape 5/6',
+    title:'💾 Sauvegarde',
+    text:'Exportez, importez, partagez par URL ou réinitialisez vos données.' },
+  { target:'#btn-help',
+    eye:'Étape 6/6',
+    title:'❓ Aide',
+    text:'Cliquez ici à tout moment pour revoir cette présentation depuis le début.' },
+  ...TOUR_APP
+];
+let tourIdx = 0;
+
+function startSystemTour() { tourIdx=0; renderTour(); $('tour-ov').classList.add('open'); }
+function closeTour() { $('tour-ov').classList.remove('open'); $('tour-hl').style.display='none'; localStorage.setItem('hiveos_tour_done','true'); }
+
+$('tour-bg').addEventListener('click', () => tNav(1));
+document.addEventListener('keydown', e => {
+  if (!$('tour-ov').classList.contains('open')) return;
+  if (e.key==='Escape')     { closeTour(); return; }
+  if (e.key==='ArrowLeft')  { tNav(-1);   return; }
+  tNav(1);
+});
+
+function tNav(dir) {
+  if (dir===-1) { tourIdx=Math.max(0,tourIdx-1); renderTour(); return; }
+  if (tourIdx>=TOUR_SYSTEM.length-1) { closeTour(); return; }
+  tourIdx++; renderTour();
+}
+
+function renderTour() {
+  const s = TOUR_SYSTEM[tourIdx];
+  $('tour-eye').textContent   = s.eye   || '';
+  $('tour-title').textContent = s.title || '';
+  $('tour-text').textContent  = s.text  || '';
+  $('tour-prev').style.visibility = tourIdx===0 ? 'hidden' : 'visible';
+  $('tour-next').textContent = tourIdx===TOUR_SYSTEM.length-1 ? 'Terminer ✓' : 'Suivant →';
+
+  const dots=$('tour-dots'); dots.innerHTML='';
+  TOUR_SYSTEM.forEach((_,i)=>{ const d=document.createElement('div'); d.className='tour-dot'+(i===tourIdx?' on':''); dots.appendChild(d); });
+
+  const hl=$('tour-hl'), bg=$('tour-bg');
+  if (s.target) {
+    const el=document.querySelector(s.target);
+    if (el) {
+      const r=el.getBoundingClientRect();
+      hl.style.top=    (r.top-5)    +'px';
+      hl.style.left=   (r.left-5)   +'px';
+      hl.style.width=  (r.width+10) +'px';
+      hl.style.height= (r.height+10)+'px';
+      hl.style.display='block';
+      bg.classList.remove('no-target');
+    } else { hl.style.display='none'; bg.classList.add('no-target'); }
+  } else { hl.style.display='none'; bg.classList.add('no-target'); }
+}
+
+function openSecret()     { $('timelog-ta').value=localStorage.getItem('hiveos_timelog')||''; $('secret-ov').classList.add('open'); updateLogTotal(); }
+function closeSecret()    { $('secret-ov').classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.ctrlKey&&e.shiftKey&&e.key==='D'){e.preventDefault();openSecret();} });
+
+let timerSec=0, timerRunning=false, timerInterval=null;
+
+function updateTimerDisplay() {
+  $('timer-display').textContent = `${pad(Math.floor(timerSec/3600))}:${pad(Math.floor((timerSec%3600)/60))}:${pad(timerSec%60)}`;
+}
+function timerStart() {
+  if(timerRunning) return; timerRunning=true;
+  $('btn-timer-start').textContent='▶ En cours...';
+  timerInterval=setInterval(()=>{timerSec++;updateTimerDisplay();},1000);
+}
+function timerPause() {
+  if(!timerRunning) return; timerRunning=false; clearInterval(timerInterval);
+  $('btn-timer-start').textContent='▶ Reprendre';
+}
+function timerStop()  { timerPause(); if(timerSec>0) logTime(); timerSec=0; updateTimerDisplay(); $('btn-timer-start').textContent='▶ Démarrer'; }
+function timerReset() { timerPause(); timerSec=0; updateTimerDisplay(); $('btn-timer-start').textContent='▶ Démarrer'; }
+
+function logTime() {
+  if(timerSec<1) return;
+  const h=Math.floor(timerSec/3600), m=Math.floor((timerSec%3600)/60), s=timerSec%60;
+  const dur=h>0?`${h}h ${pad(m)}min`:m>0?`${m}min ${pad(s)}s`:`${s}s`;
+  const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const entry=`${date}  ─  ${APP.name}  ─  ${dur}\n`;
+  const updated=(localStorage.getItem('hiveos_timelog')||'')+entry;
+  localStorage.setItem('hiveos_timelog',updated);
+  $('timelog-ta').value=updated;
+  updateLogTotal();
+}
+function clearTimelog() { if(!confirm('Effacer le journal ?')) return; localStorage.removeItem('hiveos_timelog'); $('timelog-ta').value=''; updateLogTotal(); }
+window.addEventListener('beforeunload', () => { if(timerRunning) logTime(); });
+
+/* ════════════════════════════════════════════════════════════════════════
+   JOURNAL DE TEMPS — CALCUL TOTAL & COPIE
+════════════════════════════════════════════════════════════════════════ */
+/* Parse une ligne du journal et retourne les secondes correspondantes.
+   Formats gérés : "2h 30min"  |  "15min 45s"  |  "30s" */
+function parseLogSec(line) {
+  let s = 0;
+  const h   = line.match(/(\d+)h/);   if(h)   s += parseInt(h[1])   * 3600;
+  const m   = line.match(/(\d+)min/); if(m)   s += parseInt(m[1])   * 60;
+  const sec = line.match(/(\d+)s\b/); if(sec) s += parseInt(sec[1]);
+  return s;
+}
+
+/* Additionne toutes les lignes du journal */
+function calcLogTotal() {
+  return (localStorage.getItem('hiveos_timelog') || '')
+    .split('\n').filter(l => l.trim()).reduce((acc, l) => acc + parseLogSec(l), 0);
+}
+
+/* Formate un total en secondes → "Xh Ymin" ou "Ymin Zs" ou "Zs" */
+function fmtTotal(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if(h > 0) return `${h}h ${pad(m)}min`;
+  if(m > 0) return `${m}min ${pad(s)}s`;
+  return `${s}s`;
+}
+
+/* Met à jour le badge total dans l'interface */
+function updateLogTotal() {
+  const el = $('tlog-total'); if(!el) return;
+  const t  = calcLogTotal();
+  el.textContent = t > 0 ? `Total : ${fmtTotal(t)}` : 'Total : —';
+}
+
+/* Copie le journal entier + total formaté dans le presse-papier */
+function copyTimelog() {
+  const log = (localStorage.getItem('hiveos_timelog') || '').trimEnd();
+  if (!log) return;
+  const sep = '─'.repeat(38);
+  const txt = `${log}\n\n${sep}\nTotal  :  ${fmtTotal(calcLogTotal())}`;
+  copyText(txt, $('btn-copy-tlog'), '✓ Copié !');
+}
+
+async function downloadHTML() {
+  let html = document.documentElement.outerHTML;
+  html = html.replace(
+    /\/SEED_START\/([\s\S]*?)\/SEED_END\//,
+    `/SEED_START/\nconst SAVED_DATA=${JSON.stringify(getAppState(),null,2)};\n/SEED_END/`
+  );
+  const filename = APP.name.replace(/\s+/g,'-').toLowerCase()+'.html';
+  const blob = new Blob([html],{type:'text/html;charset=utf-8'});
+  if (window.showSaveFilePicker) {
+    try {
+      const h=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Page Web',accept:{'text/html':['.html']}}]});
+      const w=await h.createWritable(); await w.write(blob); await w.close(); return;
+    } catch(e) { if(e.name==='AbortError') return; }
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ===== getAppState / setAppState (HiveOS Pro save system) ===== */
+function getAppState(){return{ideas:state.ideas,categories:state.categories,mapPositions:state.mapPositions,prompts:state.prompts||[],rucheLayouts:state.rucheLayouts||[]};}
+function setAppState(s){if(!s)return;if(s.ideas)state.ideas=s.ideas;if(s.categories)state.categories=s.categories;if(s.mapPositions)state.mapPositions=s.mapPositions;if(s.prompts)state.prompts=s.prompts;if(s.rucheLayouts)state.rucheLayouts=s.rucheLayouts;persistState();refreshView();}
+
+/* ════════════════ IDEALYS APP CODE ════════════════ */
 
 const STATUSES=[{id:'backlog',label:'Idées',emoji:'💡',color:'#6272a4'},{id:'in_progress',label:'En cours',emoji:'🔥',color:'#ff79c6'},{id:'paused',label:'En pause',emoji:'⏸️',color:'#ffb86c'},{id:'archived',label:'Amélioration continue',emoji:'🔄',color:'#8892a4'},{id:'done',label:'Terminées',emoji:'✅',color:'#50fa7b'}];
 const PRIORITIES=[{id:'low',label:'Basse',emoji:'🟢'},{id:'medium',label:'Moyenne',emoji:'🟡'},{id:'high',label:'Haute',emoji:'🟠'},{id:'critical',label:'Critique',emoji:'🔴'}];
@@ -888,17 +2224,7 @@ function applySidebarOrder(){
   order.forEach(view=>{const btn=sb.querySelector(`.nav-btn[data-view="${view}"]`);if(btn)sb.insertBefore(btn,toggle)});
 }
 
-/* ===== THEME ===== */
-function applyTheme(){
-  document.getElementById('body').className='theme-'+ui.theme+(ui.dayMode?' day':'');
-  document.getElementById('btn-daynight').textContent=ui.dayMode?'🌙':'☀️';
-  saveTheme();
-}
-function buildThemeMenu(){
-  const m=document.getElementById('theme-menu');
-  m.innerHTML=THEMES.map(t=>`<div class="theme-item${ui.theme===t.id?' active':''}" data-theme="${t.id}">${t.emoji} ${t.label}</div>`).join('');
-  m.querySelectorAll('.theme-item').forEach(el=>{el.addEventListener('click',()=>{ui.theme=el.dataset.theme;applyTheme();buildThemeMenu();m.classList.add('hidden')})});
-}
+/* ===== THEME ===== (Idealys applyTheme/buildThemeMenu removed — Pro versions used) */
 
 /* ===== ROUTER ===== */
 function switchView(v){
@@ -1042,7 +2368,6 @@ function renderDashboard(){
   el.querySelectorAll('.dash-flt-item').forEach(item=>item.addEventListener('click',()=>openIdeaModal(item.dataset.id)));
   const fltClose=el.querySelector('#dash-flt-close');if(fltClose)fltClose.addEventListener('click',()=>{ui.dashFilter=null;renderDashboard()});
   el.querySelectorAll('.idea-mini[data-id]').forEach(el2=>el2.addEventListener('click',()=>openIdeaModal(el2.dataset.id)));
-  el.querySelector('#dash-add-btn').addEventListener('click',()=>openIdeaModal());
   el.querySelector('#dash-report-btn').addEventListener('click',openReportModal);
   el.querySelectorAll('.tag-dash-chip').forEach(chip=>chip.addEventListener('click',()=>{ui.filterTag=chip.dataset.tag;switchView('projets')}));
   el.querySelectorAll('.done-del').forEach(b=>b.addEventListener('click',()=>confirm2('Supprimer ?','Supprimer cette idée terminée ?',()=>{state.ideas=state.ideas.filter(i=>i.id!==b.dataset.id);persistState();renderDashboard()})));
@@ -1156,6 +2481,7 @@ function removeConnection(fromId,toId){
 }
 
 function drawNode(parent,idea){
+  const id = idea.id;
   const pos=getPos(idea.id);
   const st=STATUSES.find(s=>s.id===idea.status)||STATUSES[0];
   const pr=PRIORITIES.find(p=>p.id===idea.priority)||PRIORITIES[1];
@@ -1428,7 +2754,6 @@ function initRucheEvents(){
   document.getElementById('ruche-zoom-out').addEventListener('click',()=>{ui.ruche.scale=Math.max(.2,ui.ruche.scale*.8);applyRucheTransform()});
   document.getElementById('ruche-fit').addEventListener('click',fitRuche);
   document.getElementById('ruche-autolayout').addEventListener('click',autoLayoutRuche);
-  document.getElementById('ruche-add-btn').addEventListener('click',()=>openIdeaModal());
   document.getElementById('ruche-connect-btn').addEventListener('click',()=>{
     ui.ruche.connectMode=!ui.ruche.connectMode;
     if(ui.ruche.connectMode){ui.ruche.delinkMode=false;document.getElementById('ruche-delink-btn').classList.remove('active')}
@@ -1640,7 +2965,6 @@ function renderListe(){
     s.addEventListener('input',()=>{ui.liste.search=s.value;renderListeContent()});
     document.getElementById('liste-group').addEventListener('change',ev=>{ui.liste.groupBy=ev.target.value;renderListeContent()});
     document.getElementById('liste-sort').addEventListener('change',ev=>{ui.liste.sortBy=ev.target.value;renderListeContent()});
-    document.getElementById('liste-add-btn').addEventListener('click',()=>openIdeaModal());
   }
 }
 
@@ -1894,7 +3218,7 @@ function refreshView(){
 
 /* ===== SAVE/EXPORT/IMPORT ===== */
 function getExport(){return{ideas:state.ideas,categories:state.categories,mapPositions:state.mapPositions,prompts:state.prompts||[]}}
-function openSaveModal(){document.getElementById('save-json').value=JSON.stringify(getExport(),null,2);document.getElementById('save-modal').classList.remove('hidden')}
+function openAppSaveModal(){document.getElementById('save-json').value=JSON.stringify(getExport(),null,2);document.getElementById('save-modal').classList.remove('hidden')}
 async function downloadJson(){
   const json=JSON.stringify(getExport(),null,2);
   if(window.showSaveFilePicker){
@@ -1985,7 +3309,7 @@ function downloadApp(){
 function factoryReset(){
   confirm2('Remise à zéro usine ?','Toutes les données seront effacées. Le bloc-notes sera conservé.',()=>{
     state={ideas:[],categories:[],mapPositions:{},prompts:[]};
-    persistState();ui.theme='hiveos';ui.dayMode=false;applyTheme();
+    persistState();ui.theme='hiveos';ui.dayMode=false;currentTheme='theme-hiveos';isDayMode=false;localStorage.setItem('app-theme',currentTheme);localStorage.setItem('app-day-mode','0');applyTheme();
     document.getElementById('save-modal').classList.add('hidden');switchView('dashboard');toast('Remise à zéro effectuée');
   });
 }
@@ -2147,52 +3471,9 @@ function endTour(){
 
 /* ===== NOTEPAD ===== */
 function initNotepad(){
-  const pad=document.getElementById('notepad');
-  const header=document.getElementById('notepad-header');
-  let dragging=false,ox=0,oy=0;
-  pad.style.top=(window.innerHeight-340)+'px';
-  pad.style.left=(window.innerWidth-360)+'px';
-
-  // Drag from header
-  header.addEventListener('mousedown',ev=>{
-    if(ev.target.closest('.np-btn'))return;
-    dragging=true;
-    const r=pad.getBoundingClientRect();
-    ox=ev.clientX-r.left;oy=ev.clientY-r.top;ev.preventDefault();
-  });
-  window.addEventListener('mousemove',ev=>{
-    if(!dragging)return;
-    let nx=ev.clientX-ox,ny=ev.clientY-oy;
-    nx=Math.max(0,Math.min(window.innerWidth-pad.offsetWidth,nx));
-    ny=Math.max(0,Math.min(window.innerHeight-pad.offsetHeight,ny));
-    pad.style.left=nx+'px';pad.style.top=ny+'px';
-  });
-  window.addEventListener('mouseup',()=>{dragging=false});
-
-  // Resize from bottom-left handle (⤡ — drags left=wider, down=taller)
-  const rh=document.getElementById('np-resize-handle');
-  rh.addEventListener('mousedown',ev=>{
-    ev.preventDefault();ev.stopPropagation();
-    const sx=ev.clientX,sy=ev.clientY;
-    const sw=pad.offsetWidth,sh=pad.offsetHeight;
-    const sl=pad.getBoundingClientRect().left;
-    function mv(e){
-      const nw=Math.max(200,sw+(sx-e.clientX));
-      const nh=Math.max(160,sh+(e.clientY-sy));
-      const nl=Math.max(0,sl-(nw-sw));
-      pad.style.width=nw+'px';pad.style.height=nh+'px';pad.style.left=nl+'px';
-    }
-    function up(){window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up)}
-    window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
-  });
-
-  document.getElementById('notepad-ta').addEventListener('input',ev=>{
-    try{localStorage.setItem('hiveos_notepad',ev.target.value)}catch(e){}
-  });
-  document.getElementById('notepad-copy').addEventListener('click',()=>{
-    copyToClipboard(document.getElementById('notepad-ta').value,'Notes copiées !');
-  });
-  document.getElementById('notepad-close').addEventListener('click',()=>{pad.classList.add('hidden')});
+  /* HiveOS Pro notepad is self-wired (toggleNotepad + Pro drag/resize listeners).
+     This Idealys initializer is kept as a guarded no-op to avoid touching
+     elements that no longer exist in the integrated layout. */
 }
 
 /* ===== QUICK IDEA PANEL (FAB) ===== */
@@ -3000,12 +4281,38 @@ function deleteLayoutById(layoutId){
 /* ===== UTILITY ===== */
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-/* ===== INIT ===== */
+/* ===== INIT (adapted for HiveOS Pro integration) ===== */
 function init(){
-  loadState();applyTheme();buildThemeMenu();initNotepad();initTagInput();initQuickPanel();
-
-  document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{btn.addEventListener('click',()=>switchView(btn.dataset.view))});
-  // Sidebar drag-to-reorder
+  loadState();
+  // Sync ui.theme with Pro's currentTheme
+  const savedTheme=localStorage.getItem('app-theme');
+  if(savedTheme){
+    currentTheme=savedTheme.startsWith('theme-')?savedTheme:'theme-'+savedTheme;
+    ui.theme=currentTheme.replace('theme-','');
+  }
+  const savedDay=localStorage.getItem('app-day-mode');
+  if(savedDay){isDayMode=savedDay==='1';ui.dayMode=isDayMode;}
+  applyTheme();   // Pro's applyTheme
+  applySidebar(); // Pro's applySidebar
+  $('hive-app-name').textContent=APP.name;
+  $('hive-app-version').textContent=APP.version;
+  const np=localStorage.getItem(NP_KEY); if(np&&$('np-ta')) $('np-ta').value=np;
+  initNotepad();
+  initTagInput();
+  initQuickPanel();
+  // Wire header buttons
+  const btnSave=$('btn-save');
+  if(btnSave)btnSave.onclick=()=>openAppSaveModal();
+  const btnHelp=$('btn-help');
+  if(btnHelp)btnHelp.onclick=()=>startTour();
+  // Wire sidebar nav-btn clicks
+  document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      switchView(btn.dataset.view);
+      if(window.innerWidth<=768)toggleSidebar();
+    });
+  });
+  // Sidebar drag reorder (desktop)
   applySidebarOrder();
   document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
     btn.setAttribute('draggable','true');
@@ -3024,11 +4331,6 @@ function init(){
       ui.sidebarOrder=order;applySidebarOrder();saveSidebarOrder();
     });
   });
-  document.getElementById('sidebar-toggle').addEventListener('click',()=>{
-    const sb=document.getElementById('sidebar');sb.classList.toggle('collapsed');
-    document.querySelector('#sidebar-toggle .nav-icon').textContent=sb.classList.contains('collapsed')?'▶':'◀';
-  });
-
   // Touch drag-to-reorder sidebar
   let sbTouchDrag=null;
   document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
@@ -3063,17 +4365,8 @@ function init(){
     sbTouchDrag=null;
   });
 
-  // Header
-  document.getElementById('btn-notepad').addEventListener('click',()=>{
-    const pad=document.getElementById('notepad');pad.classList.toggle('hidden');
-    if(!pad.classList.contains('hidden'))document.getElementById('notepad-ta').focus();
-  });
-  document.getElementById('btn-theme').addEventListener('click',ev=>{ev.stopPropagation();document.getElementById('theme-menu').classList.toggle('hidden')});
-  document.addEventListener('click',()=>document.getElementById('theme-menu').classList.add('hidden'));
-  document.getElementById('btn-daynight').addEventListener('click',()=>{ui.dayMode=!ui.dayMode;applyTheme()});
-  document.getElementById('btn-save').addEventListener('click',openSaveModal);
-  document.getElementById('btn-help').addEventListener('click',startTour);
-
+  // Report modal
+  document.getElementById('report-close').addEventListener('click',()=>document.getElementById('report-modal').classList.add('hidden'));
   // Report modal
   document.getElementById('report-close').addEventListener('click',()=>document.getElementById('report-modal').classList.add('hidden'));
 
@@ -3082,7 +4375,7 @@ function init(){
   document.getElementById('report-copy').addEventListener('click',()=>copyToClipboard(document.getElementById('report-text').value,_reportMode==='prompt'?'🤖 Prompt copié !':'📋 Compte-rendu copié !'));
   document.getElementById('report-email').addEventListener('click',()=>{const txt=encodeURIComponent(document.getElementById('report-text').value);window.open(`mailto:?subject=${encodeURIComponent('Compte-rendu Idealys')}&body=${txt}`)});
   document.getElementById('report-share').addEventListener('click',()=>{if(navigator.share)navigator.share({title:'Compte-rendu Idealys',text:document.getElementById('report-text').value}).catch(()=>{})});
-
+  // Save modal (app)
   // Save modal
   document.getElementById('save-close').addEventListener('click',()=>document.getElementById('save-modal').classList.add('hidden'));
   document.getElementById('save-copy-json').addEventListener('click',copyJson);
@@ -3092,21 +4385,20 @@ function init(){
   document.getElementById('copy-url').addEventListener('click',copyUrl);
   document.getElementById('dl-app').addEventListener('click',downloadApp);
   document.getElementById('factory-reset').addEventListener('click',factoryReset);
-
-
+  // Layout profiles modal
   // Layout profiles modal
   document.getElementById('layout-profiles-close').addEventListener('click',closeLayoutModal);
   document.getElementById('layout-profiles-save').addEventListener('click',saveLayoutProfile);
   document.getElementById('layout-profiles-name').addEventListener('keydown',ev=>{if(ev.key==='Enter')saveLayoutProfile();else if(ev.key==='Escape')closeLayoutModal();});
   document.getElementById('ruche-profiles-btn').addEventListener('click',()=>openLayoutModal('ruche'));
-
+  // Rename modal
   // Rename modal
   document.getElementById('rename-close').addEventListener('click',closeRenameModal);
   document.getElementById('rename-cancel').addEventListener('click',closeRenameModal);
   document.getElementById('rename-save').addEventListener('click',saveRename);
   document.getElementById('rename-input').addEventListener('keydown',ev=>{if(ev.key==='Enter')saveRename();else if(ev.key==='Escape')closeRenameModal()});
   document.addEventListener('dblclick',ev=>{const el=ev.target.closest('[data-rename-id]');if(el){ev.stopPropagation();openRenameModal(el.dataset.renameId)}});
-
+  // Idea modal
   // Idea modal
   document.getElementById('idea-close').addEventListener('click',closeIdeaModal);
   document.getElementById('idea-cancel').addEventListener('click',closeIdeaModal);
@@ -3122,7 +4414,7 @@ function init(){
     ui.modalSteps.push({id:genId(),title:inp.value.trim(),done:false,order:ui.modalSteps.length});inp.value='';renderModalSteps();
   });
   document.getElementById('f-step-input').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();document.getElementById('f-step-add').click()}});
-
+  // Tour (app)
   // Tour
   document.getElementById('tour-close').addEventListener('click',endTour);
   document.getElementById('tour-next').addEventListener('click',()=>{ui.tourStep++;showTourStep()});
@@ -3137,14 +4429,14 @@ function init(){
     if(ev.key==='Escape')endTour();
     else if(!['Tab','Shift','Control','Alt','Meta'].includes(ev.key)){ui.tourStep++;showTourStep()}
   });
-
   initSubMap();
   switchView('dashboard');
-  if(!localStorage.getItem('idealys-toured')){localStorage.setItem('idealys-toured','1');setTimeout(startTour,700)}
+  if(!localStorage.getItem('idealys-toured')){localStorage.setItem('idealys-toured','1');setTimeout(startTour,700);}
 }
-
 window.addEventListener('load',init);
+
 </script>
+
 <div id="ruche-submap-panel">
   <div id="rsp-header">
     <button class="btn" id="rsp-close">← Retour</button>
@@ -3161,5 +4453,6 @@ window.addEventListener('load',init);
   </div>
   <div id="rsp-bottom"></div>
 </div>
+
 </body>
 </html>
