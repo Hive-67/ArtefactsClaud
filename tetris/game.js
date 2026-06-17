@@ -730,7 +730,7 @@
     layoutEditing = true;
     closeAllOverlays();
     $('#touch-controls').classList.add('visible', 'editing');
-    $('#btn-done-layout').classList.add('visible');
+    $('#layout-toolbar').classList.add('visible');
     $('#layout-hint').classList.add('visible');
     $$('.tc-btn').forEach(btn => {
       let dragging = false;
@@ -754,12 +754,12 @@
       window.addEventListener('mouseup', btn._drag.mu);
     });
   }
-  function disableLayoutEdit() {
+  // Sortie d'édition. save=true : enregistre les positions ; save=false : annule.
+  function exitLayoutEdit(save) {
     layoutEditing = false;
     $('#touch-controls').classList.remove('editing');
-    $('#btn-done-layout').classList.remove('visible');
+    $('#layout-toolbar').classList.remove('visible');
     $('#layout-hint').classList.remove('visible');
-    // sauvegarder les positions (centres en %)
     const layout = {};
     $$('.tc-btn').forEach(btn => {
       layout[btn.dataset.action] = buttonCenterPct(btn);
@@ -773,10 +773,20 @@
         btn._drag = null;
       }
     });
-    Settings.btnLayout = layout;
-    persist();
+    if (save) { Settings.btnLayout = layout; persist(); }
+    // si on annule, applyButtonLayout restaure la disposition précédente (Settings inchangé)
     applyButtonLayout();
     updateTouchVisibility();
+    openSettings(); // retour au menu des paramètres
+  }
+  // Remet la disposition par défaut sans quitter l'édition (annulable ensuite)
+  function previewDefaultLayout() {
+    const d = defaultLayout();
+    $$('.tc-btn').forEach(btn => {
+      const p = d[btn.dataset.action];
+      if (p) placeButtonCenter(btn, p.x, p.y);
+    });
+    SFX('click'); vibrate(10);
   }
 
   function isTouchDevice() {
@@ -982,7 +992,9 @@
     $('#btn-opacity').addEventListener('input', e => { Settings.btnOpacity = e.target.value / 100; $('#out-btn-opacity').textContent = e.target.value + '%'; applyButtonLayout(); persist(); });
     $('#btn-edit-layout').addEventListener('click', () => { hideOverlay('overlay-settings'); enableLayoutEdit(); });
     $('#btn-reset-layout').addEventListener('click', () => { Settings.btnLayout = defaultLayout(); applyButtonLayout(); persist(); SFX('click'); });
-    $('#btn-done-layout').addEventListener('click', () => { disableLayoutEdit(); if (!State.running) { openSettings(); } });
+    $('#btn-done-layout').addEventListener('click', () => { SFX('click'); exitLayoutEdit(true); });
+    $('#btn-cancel-layout').addEventListener('click', () => { SFX('click'); exitLayoutEdit(false); });
+    $('#btn-default-layout').addEventListener('click', previewDefaultLayout);
 
     // Clavier
     window.addEventListener('keydown', onKeyDown);
