@@ -677,14 +677,18 @@
   }
   function defaultLayout() {
     // pourcentages relatifs à l'écran (mobile)
+    // DROITE = déplacements (gauche / droite / descente)
+    // GAUCHE = rotations + chute instantanée + réserve
     return {
-      left:      { x: 5,  y: 78 },
-      right:     { x: 22, y: 78 },
-      softdrop:  { x: 13.5, y: 90 },
-      harddrop:  { x: 78, y: 78 },
-      rotateCW:  { x: 65, y: 90 },
-      rotateCCW: { x: 88, y: 90 },
-      hold:      { x: 78, y: 66 },
+      // --- côté droit : déplacements ---
+      left:      { x: 60, y: 78 },
+      right:     { x: 80, y: 78 },
+      softdrop:  { x: 70, y: 89 },
+      // --- côté gauche : rotations, chute, réserve ---
+      rotateCCW: { x: 3,  y: 78 },
+      rotateCW:  { x: 21, y: 78 },
+      harddrop:  { x: 12, y: 89 },
+      hold:      { x: 12, y: 66 },
     };
   }
   function enableLayoutEdit() {
@@ -899,7 +903,7 @@
     $('#btn-pause').addEventListener('click', togglePause);
     $('#btn-mute').addEventListener('click', () => {
       Settings.musicOn = !Settings.musicOn;
-      $('#btn-mute').textContent = Settings.musicOn ? '🔊' : '🔇';
+      $('#btn-mute').textContent = Settings.musicOn ? '🎵' : '🔇';
       TetAudio.setMusicEnabled(Settings.musicOn);
       if (Settings.musicOn) TetAudio.startMusic();
       persist();
@@ -931,7 +935,7 @@
     // sliders & switches
     $('#vol-music').addEventListener('input', e => { Settings.volMusic = e.target.value / 100; $('#out-vol-music').textContent = e.target.value + '%'; TetAudio.setMusicVolume(Settings.volMusic); persist(); });
     $('#vol-sfx').addEventListener('input', e => { Settings.volSfx = e.target.value / 100; $('#out-vol-sfx').textContent = e.target.value + '%'; TetAudio.setSfxVolume(Settings.volSfx); persist(); });
-    $('#chk-music-on').addEventListener('change', e => { Settings.musicOn = e.target.checked; TetAudio.setMusicEnabled(Settings.musicOn); if (Settings.musicOn) TetAudio.startMusic(); $('#btn-mute').textContent = Settings.musicOn ? '🔊' : '🔇'; persist(); });
+    $('#chk-music-on').addEventListener('change', e => { Settings.musicOn = e.target.checked; TetAudio.setMusicEnabled(Settings.musicOn); if (Settings.musicOn) TetAudio.startMusic(); $('#btn-mute').textContent = Settings.musicOn ? '🎵' : '🔇'; persist(); });
     $('#chk-ghost').addEventListener('change', e => { Settings.ghost = e.target.checked; persist(); });
     $('#chk-grid').addEventListener('change', e => { Settings.grid = e.target.checked; persist(); });
     $('#chk-particles').addEventListener('change', e => { Settings.particles = e.target.checked; persist(); });
@@ -976,7 +980,7 @@
     refreshHomeStats();
     $('#start-level').value = best.level > 1 ? Math.min(best.level, 25) : 1;
     $('#start-level-out').textContent = $('#start-level').value;
-    $('#btn-mute').textContent = Settings.musicOn ? '🔊' : '🔇';
+    $('#btn-mute').textContent = Settings.musicOn ? '🎵' : '🔇';
     bindUI();
     bindTouchButtons();
     bindSwipe();
