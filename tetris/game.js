@@ -112,7 +112,7 @@
     volMusic: 0.6, volSfx: 0.8, musicOn: true, track: 'korobeiniki',
     theme: 'theme-neon', ghost: true, grid: true, particles: true, shake: true,
     das: 130, arr: 30, swipe: true, vibrate: true,
-    touchOn: true, btnSize: 62, btnOpacity: 0.85, btnLayout: null,
+    touchOn: true, btnSize: 64, btnOpacity: 0.9, btnLayout: null, layoutV: 2,
   };
   const SAVE_KEY = 'tetriste_v1';
   function loadSave() {
@@ -120,7 +120,11 @@
       const raw = localStorage.getItem(SAVE_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        Object.assign(Settings, d.settings || {});
+        const s = d.settings || {};
+        Object.assign(Settings, s);
+        // migration : un ancien format de disposition est ignoré au profit du nouveau défaut
+        if (s.layoutV !== 2) Settings.btnLayout = null;
+        Settings.layoutV = 2;
         best = d.best || { score: 0, level: 1 };
       }
     } catch (e) {}
@@ -663,8 +667,39 @@
     }, { passive: true });
   }
 
-  // ---------------- Édition du layout des boutons ----------------
+  // ---------------- Placement des boutons tactiles ----------------
+  // Les positions sont mémorisées par le CENTRE du bouton, en pourcentage
+  // de l'écran. Le placement réel est recadré pour que le bouton reste
+  // toujours entièrement visible, quelle que soit la taille d'écran.
   let layoutEditing = false;
+
+  function safeInset(side) {
+    // lit la marge de sécurité (encoches / barre gestuelle) si disponible
+    const v = getComputedStyle(document.documentElement)
+      .getPropertyValue('--safe-' + side);
+    const n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function placeButtonCenter(btn, cxPct, cyPct) {
+    const W = window.innerWidth, H = window.innerHeight;
+    const size = Settings.btnSize;
+    const m = 10; // marge minimale aux bords
+    const sb = safeInset('bottom'), st = safeInset('top');
+    let cx = (cxPct / 100) * W;
+    let cy = (cyPct / 100) * H;
+    cx = Math.max(size / 2 + m, Math.min(W - size / 2 - m, cx));
+    cy = Math.max(size / 2 + m + st, Math.min(H - size / 2 - m - sb, cy));
+    btn.style.left = (cx - size / 2) + 'px';
+    btn.style.top = (cy - size / 2) + 'px';
+  }
+  function buttonCenterPct(btn) {
+    const size = Settings.btnSize;
+    const cx = (parseFloat(btn.style.left) || 0) + size / 2;
+    const cy = (parseFloat(btn.style.top) || 0) + size / 2;
+    return { x: cx / window.innerWidth * 100, y: cy / window.innerHeight * 100 };
+  }
+
   function applyButtonLayout() {
     const tc = $('#touch-controls');
     tc.style.setProperty('--btn-size', Settings.btnSize + 'px');
@@ -672,23 +707,23 @@
     const layout = Settings.btnLayout || defaultLayout();
     $$('.tc-btn').forEach(btn => {
       const pos = layout[btn.dataset.action];
-      if (pos) { btn.style.left = pos.x + '%'; btn.style.top = pos.y + '%'; }
+      if (pos) placeButtonCenter(btn, pos.x, pos.y);
     });
   }
   function defaultLayout() {
-    // pourcentages relatifs à l'écran (mobile)
+    // centres en % de l'écran — manettes en bas, façon pouce gauche/droit.
     // DROITE = déplacements (gauche / droite / descente)
     // GAUCHE = rotations + chute instantanée + réserve
     return {
-      // --- côté droit : déplacements ---
-      left:      { x: 60, y: 78 },
-      right:     { x: 80, y: 78 },
-      softdrop:  { x: 70, y: 89 },
+      // --- côté droit : déplacements (croix directionnelle) ---
+      left:      { x: 72, y: 80 },
+      right:     { x: 90, y: 80 },
+      softdrop:  { x: 81, y: 90 },
       // --- côté gauche : rotations, chute, réserve ---
-      rotateCCW: { x: 3,  y: 78 },
-      rotateCW:  { x: 21, y: 78 },
-      harddrop:  { x: 12, y: 89 },
-      hold:      { x: 12, y: 66 },
+      rotateCCW: { x: 10, y: 80 },
+      rotateCW:  { x: 27, y: 80 },
+      harddrop:  { x: 18.5, y: 90 },
+      hold:      { x: 10, y: 68 },
     };
   }
   function enableLayoutEdit() {
@@ -696,23 +731,22 @@
     closeAllOverlays();
     $('#touch-controls').classList.add('visible', 'editing');
     $('#btn-done-layout').classList.add('visible');
-    const tc = $('#touch-controls');
+    $('#layout-hint').classList.add('visible');
     $$('.tc-btn').forEach(btn => {
       let dragging = false;
       const move = (clientX, clientY) => {
-        const x = Math.max(0, Math.min(92, (clientX / window.innerWidth) * 100));
-        const y = Math.max(0, Math.min(92, (clientY / window.innerHeight) * 100));
-        btn.style.left = x + '%'; btn.style.top = y + '%';
+        // le bouton suit le doigt par son centre (pas de saut), avec recadrage
+        placeButtonCenter(btn, clientX / window.innerWidth * 100, clientY / window.innerHeight * 100);
       };
       btn._drag = {
-        ts: (e) => { dragging = true; },
+        ts: (e) => { dragging = true; vibrate(8); },
         tm: (e) => { if (!dragging) return; const t = e.touches[0]; move(t.clientX, t.clientY); e.preventDefault(); },
         te: () => { dragging = false; },
-        md: () => { dragging = true; },
+        md: (e) => { dragging = true; e.preventDefault(); },
         mm: (e) => { if (dragging) move(e.clientX, e.clientY); },
         mu: () => { dragging = false; },
       };
-      btn.addEventListener('touchstart', btn._drag.ts);
+      btn.addEventListener('touchstart', btn._drag.ts, { passive: false });
       btn.addEventListener('touchmove', btn._drag.tm, { passive: false });
       btn.addEventListener('touchend', btn._drag.te);
       btn.addEventListener('mousedown', btn._drag.md);
@@ -724,13 +758,11 @@
     layoutEditing = false;
     $('#touch-controls').classList.remove('editing');
     $('#btn-done-layout').classList.remove('visible');
-    // sauvegarder positions
+    $('#layout-hint').classList.remove('visible');
+    // sauvegarder les positions (centres en %)
     const layout = {};
     $$('.tc-btn').forEach(btn => {
-      layout[btn.dataset.action] = {
-        x: parseFloat(btn.style.left) || 0,
-        y: parseFloat(btn.style.top) || 0,
-      };
+      layout[btn.dataset.action] = buttonCenterPct(btn);
       if (btn._drag) {
         btn.removeEventListener('touchstart', btn._drag.ts);
         btn.removeEventListener('touchmove', btn._drag.tm);
@@ -743,6 +775,7 @@
     });
     Settings.btnLayout = layout;
     persist();
+    applyButtonLayout();
     updateTouchVisibility();
   }
 
@@ -956,8 +989,8 @@
     window.addEventListener('keyup', onKeyUp);
 
     // Resize
-    window.addEventListener('resize', () => { if ($('#screen-game').classList.contains('active')) { fitCanvas(); render(); } });
-    window.addEventListener('orientationchange', () => setTimeout(() => { fitCanvas(); render(); }, 200));
+    window.addEventListener('resize', () => { applyButtonLayout(); if ($('#screen-game').classList.contains('active')) { fitCanvas(); render(); } });
+    window.addEventListener('orientationchange', () => setTimeout(() => { applyButtonLayout(); fitCanvas(); render(); }, 200));
 
     // pause si l'onglet perd le focus
     document.addEventListener('visibilitychange', () => { if (document.hidden && State.running && !State.paused && !State.over) togglePause(); });

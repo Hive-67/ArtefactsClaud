@@ -15,6 +15,9 @@
   --radius:16px;
   --shadow:0 10px 40px rgba(0,0,0,.45);
   --cell:30px;
+  /* marges de sécurité (encoches / barre gestuelle) exposées au JS */
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
 }
 
 /* ---------- Thèmes ---------- */
@@ -202,8 +205,17 @@ body{
 .tc-btn[data-action="hold"]{ --tc-color:#ffac4a; }
 .touch-controls.editing .tc-btn{outline:2px dashed var(--accent);cursor:grab;animation:wiggle .4s ease infinite;}
 @keyframes wiggle{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg);}}
-.done-layout{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:60;display:none;}
+.done-layout{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:60;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5);}
 .done-layout.visible{display:block;}
+.layout-hint{
+  position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
+  z-index:60;display:none;max-width:90vw;text-align:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08080f;
+  padding:12px 18px;border-radius:14px;font-weight:700;font-size:15px;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);animation:hintpulse 1.6s ease-in-out infinite;
+}
+.layout-hint.visible{display:block;}
+@keyframes hintpulse{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(1.03);}}
 
 /* ============================ OVERLAYS ============================ */
 .overlay{
