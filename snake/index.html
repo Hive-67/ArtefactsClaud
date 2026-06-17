@@ -395,6 +395,21 @@
     let flashCells= []; // [{x,y,color,alpha}]
     let level     = 1;
 
+    // Rounded rect compatible tous navigateurs (ctx.roundRect trop récent)
+    function rRect(cx, x, y, w, h, r) {
+      cx.beginPath();
+      cx.moveTo(x + r, y);
+      cx.lineTo(x + w - r, y);
+      cx.arcTo(x + w, y,     x + w, y + r,     r);
+      cx.lineTo(x + w, y + h - r);
+      cx.arcTo(x + w, y + h, x + w - r, y + h, r);
+      cx.lineTo(x + r, y + h);
+      cx.arcTo(x,     y + h, x,     y + h - r, r);
+      cx.lineTo(x,     y + r);
+      cx.arcTo(x,     y,     x + r, y,         r);
+      cx.closePath();
+    }
+
     // ── Sprite cache (drawn once into offscreen canvases) ──────────────────
     const spriteHead   = buildHead();
     const spriteGoodA  = buildApple(false);
@@ -409,8 +424,7 @@
       g.addColorStop(0, '#7fff00');
       g.addColorStop(1, '#2e8b00');
       cx.fillStyle = g;
-      cx.beginPath();
-      cx.roundRect(2, 2, CELL-4, CELL-4, 6);
+      rRect(cx, 2, 2, CELL-4, CELL-4, 6);
       cx.fill();
       // eyes
       cx.fillStyle = '#fff';
@@ -886,8 +900,7 @@
         sg.addColorStop(1, `rgb(${r1},${g1},${b1})`);
         ctx.fillStyle = sg;
 
-        ctx.beginPath();
-        ctx.roundRect(px + margin, py + margin, segSize, segSize, 5);
+        rRect(ctx, px + margin, py + margin, segSize, segSize, 5);
         ctx.fill();
 
         // Scale pattern every other segment
