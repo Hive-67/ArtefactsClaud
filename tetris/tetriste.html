@@ -987,7 +987,7 @@ const TetAudio = (function () {
 
   // ---------------- DOM ----------------
   const $ = s => document.querySelector(s);
-  const $ = s => Array.from(document.querySelectorAll(s));
+  const $$ = s => Array.from(document.querySelectorAll(s));
   const app = $('#app');
   const boardCanvas = $('#board-canvas'), bctx = boardCanvas.getContext('2d');
   const fxCanvas = $('#fx-canvas'), fctx = fxCanvas.getContext('2d');
@@ -1453,7 +1453,7 @@ const TetAudio = (function () {
   //  CONTRÔLES TACTILES
   // ============================================================
   function bindTouchButtons() {
-    $('.tc-btn').forEach(btn => {
+    $$('.tc-btn').forEach(btn => {
       const action = btn.dataset.action;
       let held = null;
       const press = (e) => {
@@ -1525,7 +1525,7 @@ const TetAudio = (function () {
     tc.style.setProperty('--btn-size', Settings.btnSize + 'px');
     tc.style.setProperty('--btn-opacity', Settings.btnOpacity);
     const layout = Settings.btnLayout || defaultLayout();
-    $('.tc-btn').forEach(btn => {
+    $$('.tc-btn').forEach(btn => {
       const pos = layout[btn.dataset.action];
       if (pos) { btn.style.left = pos.x + '%'; btn.style.top = pos.y + '%'; }
     });
@@ -1548,7 +1548,7 @@ const TetAudio = (function () {
     $('#touch-controls').classList.add('visible', 'editing');
     $('#btn-done-layout').classList.add('visible');
     const tc = $('#touch-controls');
-    $('.tc-btn').forEach(btn => {
+    $$('.tc-btn').forEach(btn => {
       let dragging = false;
       const move = (clientX, clientY) => {
         const x = Math.max(0, Math.min(92, (clientX / window.innerWidth) * 100));
@@ -1577,7 +1577,7 @@ const TetAudio = (function () {
     $('#btn-done-layout').classList.remove('visible');
     // sauvegarder positions
     const layout = {};
-    $('.tc-btn').forEach(btn => {
+    $$('.tc-btn').forEach(btn => {
       layout[btn.dataset.action] = {
         x: parseFloat(btn.style.left) || 0,
         y: parseFloat(btn.style.top) || 0,
@@ -1610,12 +1610,12 @@ const TetAudio = (function () {
   //  ÉCRANS / OVERLAYS
   // ============================================================
   function showScreen(id) {
-    $('.screen').forEach(s => s.classList.remove('active'));
+    $$('.screen').forEach(s => s.classList.remove('active'));
     $('#' + id).classList.add('active');
   }
   function showOverlay(id) { $('#' + id).classList.add('active'); }
   function hideOverlay(id) { $('#' + id).classList.remove('active'); }
-  function closeAllOverlays() { $('.overlay').forEach(o => o.classList.remove('active')); }
+  function closeAllOverlays() { $$('.overlay').forEach(o => o.classList.remove('active')); }
 
   function startGame(marathon = false) {
     TetAudio.unlock();
@@ -1773,10 +1773,10 @@ const TetAudio = (function () {
     // Settings
     $('#btn-close-settings').addEventListener('click', () => { hideOverlay('overlay-settings'); if (State.paused) showOverlay('overlay-pause'); });
     $('#btn-close-help').addEventListener('click', () => hideOverlay('overlay-help'));
-    $('.settings-tabs .tab').forEach(tab => {
+    $$('.settings-tabs .tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        $('.settings-tabs .tab').forEach(t => t.classList.remove('active'));
-        $('.tab-panel').forEach(p => p.classList.remove('active'));
+        $$('.settings-tabs .tab').forEach(t => t.classList.remove('active'));
+        $$('.tab-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         $(`.tab-panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
         SFX('click');
