@@ -65,7 +65,7 @@ let lang='en';
 const L={
  en:{
   and:'&',sub:"A Wizard's Workshop",start:'▶  START GAME',again:'PLAY AGAIN',
-  goal:'Goal:',lbl:'World',sc:'Score:',combo:'COMBO!',hint:'← Grab & Fling →',
+  goal:'Goal:',lbl:'World',sc:'Score:',combo:'COMBO!',hint:'↑ Drag projectiles UP at enemies ↑',
   boss:'⚠ BOSS ⚠',poison:'POISON! -❤',done:'Complete!',nxt:'World',
   sgoal:'Score Goal:',over:'GAME OVER',win:'VICTORY!',
   conquered:'You conquered all 8 worlds!',fscore:'Final Score:',
@@ -80,7 +80,7 @@ const L={
   tuts:[
    "Click glowing targets to collect mana.\nCombos multiply your points!",
    "Watch out for POISON targets (red glow)!\nClicking one costs you a life.",
-   "Grab a projectile at the bottom,\nDRAG upward then RELEASE to fling!",
+   "Grab a projectile at the bottom,\nDRAG toward enemies then RELEASE to shoot!",
    "Aim at enemies crossing the screen!\nHit them before they escape.",
    "Reach the score goal before time runs out\nto advance to the next world!"
   ],
@@ -89,7 +89,7 @@ const L={
  },
  fr:{
   and:'&',sub:"L'Atelier du Sorcier",start:'▶  JOUER',again:'REJOUER',
-  goal:'Objectif:',lbl:'Monde',sc:'Score:',combo:'COMBO!',hint:'← Attraper & Lancer →',
+  goal:'Objectif:',lbl:'Monde',sc:'Score:',combo:'COMBO!',hint:'↑ Glisse les projectiles VERS les ennemis ↑',
   boss:'⚠ BOSS ⚠',poison:'POISON ! -❤',done:'Terminé !',nxt:'Monde',
   sgoal:'Objectif:',over:'GAME OVER',win:'VICTOIRE !',
   conquered:'Tu as conquis les 8 mondes !',fscore:'Score Final:',
@@ -104,7 +104,7 @@ const L={
   tuts:[
    "Clique sur les cibles lumineuses pour collecter la mana.\nLes combos multiplient tes points !",
    "Attention aux cibles EMPOISONNÉES (lueur rouge) !\nLes cliquer coûte une vie.",
-   "Attrape un projectile en bas,\nGLISSE vers le haut puis RELÂCHE pour lancer !",
+   "Attrape un projectile en bas,\nGLISSE vers les ennemis et RELÂCHE pour tirer !",
    "Vise les ennemis qui traversent l'écran !\nFrappe-les avant qu'ils s'échappent.",
    "Atteins l'objectif avant la fin du temps\npour passer au monde suivant !"
   ],
@@ -395,7 +395,7 @@ function drawTargets(){
         // Timer ring
         if(!t.isPowerup){
             ctx.beginPath();ctx.arc(0,0,r+7,-Math.PI/2,-Math.PI/2+Math.PI*2*tr);
-            ctx.strokeStyle=tr>0.3?'#44ff88':'#ff4444';ctx.lineWidth=3;ctx.stroke();
+            ctx.strokeStyle=t.poison?'#ff0044':(tr>0.3?'#44ff88':'#ff4444');ctx.lineWidth=t.poison?4:3;ctx.stroke();
         }
         // Soul special: ghostly ring
         if(t.isSoul){
@@ -449,7 +449,18 @@ function drawPowerupIcon(cx,ptype,sz,spin){
 }
 
 function drawTIcon(cx,name,sz,poison){
-    cx.fillStyle=poison?'rgba(255,0,68,0.85)':'rgba(255,255,255,0.88)';
+    if(poison){
+        // Skull icon
+        cx.fillStyle='rgba(255,40,80,0.9)';
+        cx.beginPath();cx.arc(0,-sz*0.1,sz*0.72,0,Math.PI*2);cx.fill();
+        cx.fillRect(-sz*0.35,-sz*0.1,sz*0.7,sz*0.7);
+        cx.fillStyle='#1a0008';cx.beginPath();
+        cx.arc(-sz*0.24,-sz*0.14,sz*0.22,0,Math.PI*2);cx.arc(sz*0.24,-sz*0.14,sz*0.22,0,Math.PI*2);cx.fill();
+        cx.fillStyle='rgba(255,40,80,0.9)';cx.beginPath();
+        for(let t=0;t<3;t++){cx.rect(-sz*0.3+t*sz*0.26,sz*0.36,sz*0.18,sz*0.3);}cx.fill();
+        return;
+    }
+    cx.fillStyle='rgba(255,255,255,0.88)';
     cx.beginPath();
     if(name==='mushroom'){cx.arc(0,-sz*0.15,sz*0.75,Math.PI,0);cx.fill();cx.fillRect(-sz*0.22,-sz*0.15,sz*0.44,sz*0.65);}
     else if(name==='crystal'){cx.moveTo(0,-sz);cx.lineTo(sz*0.55,0);cx.lineTo(0,sz);cx.lineTo(-sz*0.55,0);cx.closePath();cx.fill();}
@@ -563,7 +574,26 @@ function tickProjectiles(dt){
     });
 }
 function drawProjectiles(){
-    for(const sx of SLOTS){ctx.save();ctx.globalAlpha=0.28;ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(sx,SLOT_Y,28,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    // Launch platform bar
+    ctx.save();
+    const pg2=ctx.createLinearGradient(0,SLOT_Y-40,0,H);
+    pg2.addColorStop(0,'rgba(30,20,60,0)');pg2.addColorStop(1,'rgba(20,10,50,0.7)');
+    ctx.fillStyle=pg2;ctx.fillRect(0,SLOT_Y-40,W,H-(SLOT_Y-40));
+    ctx.restore();
+    // Slot rings
+    const now2=Date.now()/1000;
+    for(const sx of SLOTS){
+        ctx.save();
+        ctx.shadowBlur=14;ctx.shadowColor='rgba(180,140,255,0.8)';
+        ctx.globalAlpha=0.55+Math.sin(now2*2+sx)*0.15;
+        ctx.strokeStyle='rgba(200,170,255,0.85)';ctx.lineWidth=2.5;
+        ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(sx,SLOT_Y,30,0,Math.PI*2);ctx.stroke();
+        ctx.setLineDash([]);ctx.restore();
+    }
+    // "DRAG ↑" labels above slots
+    ctx.save();ctx.textAlign='center';ctx.font='bold 12px Arial';ctx.fillStyle='rgba(200,170,255,0.65)';
+    for(const sx of SLOTS){ctx.fillText('▲ DRAG',sx,SLOT_Y-40);}
+    ctx.restore();
     for(const p of projectiles){
         if(drag&&drag===p)continue;
         ctx.save();ctx.translate(p.x,p.y);ctx.scale(p.scale,p.scale);
@@ -586,7 +616,7 @@ function drawTrajectory(){
     if(!drag)return;
     const dx=dragAt.x-dragFrom.x,dy=dragAt.y-dragFrom.y;
     if(Math.abs(dx)<8&&Math.abs(dy)<8){drawHeld();return;}
-    let vx=-dx*1.15,vy=-dy*1.15;const dt2=0.045;let px=drag.x,py=drag.y;
+    let vx=dx*1.15,vy=dy*1.15;const dt2=0.045;let px=drag.x,py=drag.y;
     ctx.save();ctx.setLineDash([7,6]);ctx.strokeStyle='rgba(255,255,200,0.65)';ctx.lineWidth=2.5;
     ctx.beginPath();ctx.moveTo(px,py);
     for(let i=0;i<35;i++){px+=vx*dt2;py+=vy*dt2;vy+=580*dt2;ctx.lineTo(px,py);if(py>H||px<0||px>W)break;}
@@ -653,8 +683,15 @@ function drawEnemies(){
         ctx.save();ctx.translate(e.x,e.y+Math.sin(e.wave)*7);ctx.scale(e.scale,e.scale);
         ctx.shadowBlur=e.boss?30:14;ctx.shadowColor=e.col;ctx.fillStyle=e.flash>0?'#ffffff':e.col;
         ctx.beginPath();ctx.arc(0,0,e.sz,0,Math.PI*2);ctx.fill();
-        ctx.shadowBlur=0;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-e.sz*0.27,-e.sz*0.22,e.sz*0.14,0,Math.PI*2);ctx.arc(e.sz*0.27,-e.sz*0.22,e.sz*0.14,0,Math.PI*2);ctx.fill();
-        ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,e.sz*0.15,e.sz*0.35,0,Math.PI);ctx.stroke();
+        // Angry brows
+        ctx.shadowBlur=0;ctx.strokeStyle='#000';ctx.lineWidth=e.sz*0.09;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(-e.sz*0.48,-e.sz*0.36);ctx.lineTo(-e.sz*0.14,-e.sz*0.28);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(e.sz*0.14,-e.sz*0.28);ctx.lineTo(e.sz*0.48,-e.sz*0.36);ctx.stroke();
+        // Red angry eyes
+        ctx.fillStyle='#ff2200';ctx.beginPath();ctx.arc(-e.sz*0.28,-e.sz*0.18,e.sz*0.14,0,Math.PI*2);ctx.arc(e.sz*0.28,-e.sz*0.18,e.sz*0.14,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-e.sz*0.24,-e.sz*0.2,e.sz*0.055,0,Math.PI*2);ctx.arc(e.sz*0.32,-e.sz*0.2,e.sz*0.055,0,Math.PI*2);ctx.fill();
+        // Frown
+        ctx.strokeStyle='#000';ctx.lineWidth=e.sz*0.09;ctx.beginPath();ctx.arc(0,e.sz*0.35,e.sz*0.32,Math.PI,0,true);ctx.stroke();
         if(e.boss){ctx.strokeStyle='rgba(255,100,255,0.5)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,e.sz+9,0,Math.PI*2);ctx.stroke();}
         if(e.maxHp>1){const bw=e.sz*2.3;ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(-e.sz*1.15,-e.sz-15,bw,7);ctx.fillStyle=e.boss?`hsl(${280+e.hp/e.maxHp*60},100%,60%)`:'#44ff66';ctx.fillRect(-e.sz*1.15,-e.sz-15,bw*(e.hp/e.maxHp),7);}
         ctx.restore();
@@ -806,7 +843,7 @@ canvas.addEventListener('mousedown',e=>{
     if(captureHeld)return; // while holding soul, nothing else
     // 2) Projectile grab
     for(const p2 of projectiles){
-        if(Math.hypot(p.x-p2.x,p.y-p2.y)<p2.sz+18){drag=p2;dragFrom={x:p.x,y:p.y};dragAt={x:p.x,y:p.y};SFX.fling();return;}
+        if(Math.hypot(p.x-p2.x,p.y-p2.y)<p2.sz+32){drag=p2;dragFrom={x:p.x,y:p.y};dragAt={x:p.x,y:p.y};SFX.fling();return;}
     }
     // 3) Chain targets
     if(chainGroup.length>0){
@@ -853,7 +890,8 @@ canvas.addEventListener('mousemove',e=>{
     if(drag)dragAt=p;
 });
 
-canvas.addEventListener('mouseup',e=>{
+function handleMouseUp(e){
+    if(state!==S.PLAY&&state!==S.TUTORIAL)return;
     if(captureHeld){
         const p=cPos(e);let deposited=false;
         for(const z of dropZones){
@@ -872,13 +910,15 @@ canvas.addEventListener('mouseup',e=>{
     const p=cPos(e);const dx=p.x-dragFrom.x,dy=p.y-dragFrom.y,dist=Math.hypot(dx,dy);
     if(dist>28){
         const spd=Math.min(dist*1.15,1250);
-        flying.push({x:drag.x,y:drag.y,vx:(-dx/dist)*spd,vy:(-dy/dist)*spd,col:drag.col,trailCol:drag.trailCol,sz:drag.sz,dmg:drag.dmg,pts:[]});
+        flying.push({x:drag.x,y:drag.y,vx:(dx/dist)*spd,vy:(dy/dist)*spd,col:drag.col,trailCol:drag.trailCol,sz:drag.sz,dmg:drag.dmg,pts:[]});
         const si=drag.slot;projectiles=projectiles.filter(pp=>pp!==drag);
         setTimeout(()=>{if(state===S.PLAY&&!projectiles.find(pp=>pp.slot===si))addSlot(si);},1500);
         SFX.fling();
     }
     drag=null;
-});
+}
+canvas.addEventListener('mouseup',handleMouseUp);
+window.addEventListener('mouseup',e=>{if(drag||captureHeld)handleMouseUp(e);});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
 // ── POWER-UPS ─────────────────────────────────────────────────────────────────
