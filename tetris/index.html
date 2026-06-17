@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a16" />
+  <meta name="description" content="Tétriste — un jeu de Tetris moderne, complet et fluide avec 25 niveaux, musiques et effets sonores." />
+  <title>Tétriste · Le jeu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="theme-neon">
+
+    <!-- ===================== ÉCRAN DE CHARGEMENT / ACCUEIL ===================== -->
+    <section id="screen-home" class="screen active">
+      <div class="home-inner">
+        <h1 class="logo">
+          <span class="logo-letter" style="--i:0">T</span><span class="logo-letter" style="--i:1">É</span><span class="logo-letter" style="--i:2">T</span><span class="logo-letter" style="--i:3">R</span><span class="logo-letter" style="--i:4">I</span><span class="logo-letter" style="--i:5">S</span><span class="logo-letter" style="--i:6">T</span><span class="logo-letter" style="--i:7">E</span>
+        </h1>
+        <p class="tagline">Empile, aligne, explose. Vingt-cinq niveaux t'attendent.</p>
+
+        <div class="home-stats">
+          <div class="hs"><span class="hs-label">Meilleur score</span><span class="hs-val" id="home-best">0</span></div>
+          <div class="hs"><span class="hs-label">Niveau max</span><span class="hs-val" id="home-best-level">1</span></div>
+        </div>
+
+        <div class="home-buttons">
+          <button class="btn btn-primary" id="btn-play">▶ Jouer</button>
+          <button class="btn" id="btn-marathon">🏁 Marathon</button>
+          <button class="btn" id="btn-open-settings">⚙ Paramètres</button>
+          <button class="btn" id="btn-open-help">❔ Comment jouer</button>
+        </div>
+
+        <div class="start-level-picker">
+          <label>Niveau de départ</label>
+          <div class="level-slider-wrap">
+            <input type="range" id="start-level" min="1" max="25" value="1" />
+            <output id="start-level-out">1</output>
+          </div>
+        </div>
+      </div>
+      <div class="bg-grid" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===================== ÉCRAN DE JEU ===================== -->
+    <section id="screen-game" class="screen">
+      <div class="game-layout">
+
+        <!-- Colonne gauche (desktop) : HOLD + stats -->
+        <aside class="panel panel-left">
+          <div class="mini-box">
+            <h3>Réserve</h3>
+            <canvas id="hold-canvas" width="120" height="120"></canvas>
+          </div>
+          <div class="stat-box">
+            <div class="stat"><span>Score</span><b id="ui-score">0</b></div>
+            <div class="stat"><span>Lignes</span><b id="ui-lines">0</b></div>
+            <div class="stat"><span>Niveau</span><b id="ui-level">1</b></div>
+            <div class="stat"><span>Temps</span><b id="ui-time">0:00</b></div>
+          </div>
+        </aside>
+
+        <!-- Plateau central -->
+        <div class="board-wrap">
+          <div class="board-header">
+            <button class="icon-btn" id="btn-pause" title="Pause">⏸</button>
+            <div class="level-bar">
+              <div class="level-bar-fill" id="level-bar-fill"></div>
+              <span class="level-bar-text">Niv. <b id="ui-level-2">1</b></span>
+            </div>
+            <button class="icon-btn" id="btn-mute" title="Son">🔊</button>
+          </div>
+          <div class="canvas-stack">
+            <canvas id="board-canvas" width="300" height="600"></canvas>
+            <canvas id="fx-canvas" width="300" height="600"></canvas>
+            <div class="combo-popup" id="combo-popup"></div>
+          </div>
+        </div>
+
+        <!-- Colonne droite (desktop) : NEXT -->
+        <aside class="panel panel-right">
+          <div class="mini-box">
+            <h3>Suivant</h3>
+            <canvas id="next-canvas" width="120" height="380"></canvas>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Contrôles tactiles mobiles (positionnables) -->
+      <div id="touch-controls" class="touch-controls">
+        <button class="tc-btn" data-action="left" style="--gx:0;--gy:1">◀</button>
+        <button class="tc-btn" data-action="right" style="--gx:2;--gy:1">▶</button>
+        <button class="tc-btn" data-action="softdrop" style="--gx:1;--gy:2">▼</button>
+        <button class="tc-btn" data-action="rotateCW" style="--gx:4;--gy:1">⟳</button>
+        <button class="tc-btn" data-action="rotateCCW" style="--gx:3;--gy:2">⟲</button>
+        <button class="tc-btn" data-action="harddrop" style="--gx:5;--gy:1">⤓</button>
+        <button class="tc-btn" data-action="hold" style="--gx:4;--gy:2">H</button>
+      </div>
+    </section>
+
+    <!-- ===================== OVERLAYS ===================== -->
+    <!-- Pause -->
+    <div id="overlay-pause" class="overlay">
+      <div class="overlay-card">
+        <h2>Pause</h2>
+        <div class="overlay-buttons">
+          <button class="btn btn-primary" id="btn-resume">Reprendre</button>
+          <button class="btn" id="btn-pause-settings">⚙ Paramètres</button>
+          <button class="btn" id="btn-restart">↻ Recommencer</button>
+          <button class="btn btn-danger" id="btn-quit">⏏ Quitter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="overlay-gameover" class="overlay">
+      <div class="overlay-card">
+        <h2 class="go-title">Partie terminée</h2>
+        <div class="go-stats">
+          <div class="go-row"><span>Score</span><b id="go-score">0</b></div>
+          <div class="go-row"><span>Lignes</span><b id="go-lines">0</b></div>
+          <div class="go-row"><span>Niveau</span><b id="go-level">1</b></div>
+          <div class="go-row go-best"><span>Record</span><b id="go-best">0</b></div>
+        </div>
+        <div class="overlay-buttons">
+          <button class="btn btn-primary" id="btn-again">↻ Rejouer</button>
+          <button class="btn" id="btn-go-home">🏠 Accueil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level up flash -->
+    <div id="levelup-flash" class="levelup-flash"><span></span></div>
+
+    <!-- ===================== PARAMÈTRES ===================== -->
+    <div id="overlay-settings" class="overlay overlay-wide">
+      <div class="overlay-card settings-card">
+        <header class="settings-head">
+          <h2>⚙ Paramètres</h2>
+          <button class="icon-btn" id="btn-close-settings">✕</button>
+        </header>
+        <nav class="settings-tabs">
+          <button class="tab active" data-tab="audio">Audio</button>
+          <button class="tab" data-tab="visuel">Visuel</button>
+          <button class="tab" data-tab="controles">Contrôles</button>
+          <button class="tab" data-tab="boutons">Boutons</button>
+        </nav>
+
+        <div class="settings-body">
+          <!-- AUDIO -->
+          <div class="tab-panel active" data-panel="audio">
+            <div class="field">
+              <label>Volume musique <output id="out-vol-music">60%</output></label>
+              <input type="range" id="vol-music" min="0" max="100" value="60" />
+            </div>
+            <div class="field">
+              <label>Volume effets <output id="out-vol-sfx">80%</output></label>
+              <input type="range" id="vol-sfx" min="0" max="100" value="80" />
+            </div>
+            <div class="field">
+              <label>Musique de fond</label>
+              <div class="music-list" id="music-list"></div>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-music-on" checked /><span class="slider"></span></label>
+              <span>Activer la musique</span>
+            </div>
+          </div>
+
+          <!-- VISUEL -->
+          <div class="tab-panel" data-panel="visuel">
+            <div class="field">
+              <label>Thème de couleurs</label>
+              <div class="theme-list" id="theme-list"></div>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-ghost" checked /><span class="slider"></span></label>
+              <span>Pièce fantôme (ghost)</span>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-grid" checked /><span class="slider"></span></label>
+              <span>Afficher la grille</span>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-particles" checked /><span class="slider"></span></label>
+              <span>Effets de particules</span>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-shake" checked /><span class="slider"></span></label>
+              <span>Secousse d'écran</span>
+            </div>
+          </div>
+
+          <!-- CONTRÔLES -->
+          <div class="tab-panel" data-panel="controles">
+            <div class="field">
+              <label>Sensibilité du déplacement auto (DAS) <output id="out-das">130 ms</output></label>
+              <input type="range" id="das" min="60" max="300" value="130" step="10" />
+            </div>
+            <div class="field">
+              <label>Vitesse de répétition (ARR) <output id="out-arr">30 ms</output></label>
+              <input type="range" id="arr" min="0" max="100" value="30" step="5" />
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-swipe" checked /><span class="slider"></span></label>
+              <span>Gestes tactiles (swipe)</span>
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-vibrate" checked /><span class="slider"></span></label>
+              <span>Vibration (mobile)</span>
+            </div>
+            <div class="keymap" id="keymap"></div>
+          </div>
+
+          <!-- BOUTONS (placement mobile) -->
+          <div class="tab-panel" data-panel="boutons">
+            <p class="hint">Glisse les boutons pour les placer où tu veux. Idéal pour adapter le jeu à ta main.</p>
+            <div class="field">
+              <label>Taille des boutons <output id="out-btn-size">62 px</output></label>
+              <input type="range" id="btn-size" min="44" max="96" value="62" />
+            </div>
+            <div class="field">
+              <label>Opacité <output id="out-btn-opacity">85%</output></label>
+              <input type="range" id="btn-opacity" min="20" max="100" value="85" />
+            </div>
+            <div class="field row">
+              <label class="switch"><input type="checkbox" id="chk-touch-on" checked /><span class="slider"></span></label>
+              <span>Afficher les boutons tactiles</span>
+            </div>
+            <button class="btn" id="btn-edit-layout">✥ Repositionner les boutons</button>
+            <button class="btn" id="btn-reset-layout">↺ Disposition par défaut</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AIDE -->
+    <div id="overlay-help" class="overlay overlay-wide">
+      <div class="overlay-card settings-card">
+        <header class="settings-head">
+          <h2>❔ Comment jouer</h2>
+          <button class="icon-btn" id="btn-close-help">✕</button>
+        </header>
+        <div class="help-body">
+          <div class="help-grid">
+            <div class="help-item"><kbd>← →</kbd><span>Déplacer</span></div>
+            <div class="help-item"><kbd>↓</kbd><span>Descente douce</span></div>
+            <div class="help-item"><kbd>Espace</kbd><span>Chute instantanée</span></div>
+            <div class="help-item"><kbd>↑</kbd> / <kbd>X</kbd><span>Rotation horaire</span></div>
+            <div class="help-item"><kbd>Z</kbd> / <kbd>Ctrl</kbd><span>Rotation anti-horaire</span></div>
+            <div class="help-item"><kbd>C</kbd> / <kbd>Maj</kbd><span>Réserve (hold)</span></div>
+            <div class="help-item"><kbd>P</kbd> / <kbd>Échap</kbd><span>Pause</span></div>
+          </div>
+          <h3>Sur mobile</h3>
+          <p>Utilise les boutons tactiles, ou les gestes : glisse pour déplacer, glisse vers le bas pour chute rapide, tape pour tourner. Tout est repositionnable dans les paramètres.</p>
+          <h3>Score</h3>
+          <p>1 ligne = 100 · 2 lignes = 300 · 3 lignes = 500 · <b>Tetris</b> (4 lignes) = 800 (× niveau). Les combos et les chutes rapportent des points bonus. Atteins le niveau 25 et au-delà : la vitesse devient infernale !</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton de validation pour le mode édition de layout -->
+    <button id="btn-done-layout" class="btn btn-primary done-layout">✓ Terminé</button>
+
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
