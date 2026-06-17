@@ -672,6 +672,7 @@
   // de l'écran. Le placement réel est recadré pour que le bouton reste
   // toujours entièrement visible, quelle que soit la taille d'écran.
   let layoutEditing = false;
+  let layoutReturnScreen = 'screen-home';
 
   function safeInset(side) {
     // lit la marge de sécurité (encoches / barre gestuelle) si disponible
@@ -728,7 +729,14 @@
   }
   function enableLayoutEdit() {
     layoutEditing = true;
+    // mémoriser l'écran d'origine pour y revenir ensuite
+    const active = document.querySelector('.screen.active');
+    layoutReturnScreen = active ? active.id : 'screen-home';
     closeAllOverlays();
+    // afficher le plateau comme repère, même si aucune partie n'est en cours
+    if (!State.grid || State.grid.length === 0) State.grid = makeGrid();
+    showScreen('screen-game');
+    fitCanvas(); applyButtonLayout(); render();
     $('#touch-controls').classList.add('visible', 'editing');
     $('#layout-toolbar').classList.add('visible');
     $('#layout-hint').classList.add('visible');
@@ -776,8 +784,10 @@
     if (save) { Settings.btnLayout = layout; persist(); }
     // si on annule, applyButtonLayout restaure la disposition précédente (Settings inchangé)
     applyButtonLayout();
+    // revenir à l'écran d'origine (accueil ou jeu) puis rouvrir les paramètres
+    showScreen(layoutReturnScreen);
     updateTouchVisibility();
-    openSettings(); // retour au menu des paramètres
+    openSettings();
   }
   // Remet la disposition par défaut sans quitter l'édition (annulable ensuite)
   function previewDefaultLayout() {

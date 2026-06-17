@@ -444,18 +444,19 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           </div>
         </aside>
       </div>
-
-      <!-- Contrôles tactiles mobiles (positionnables) -->
-      <div id="touch-controls" class="touch-controls">
-        <button class="tc-btn" data-action="left" style="--gx:0;--gy:1">◀</button>
-        <button class="tc-btn" data-action="right" style="--gx:2;--gy:1">▶</button>
-        <button class="tc-btn" data-action="softdrop" style="--gx:1;--gy:2">▼</button>
-        <button class="tc-btn" data-action="rotateCW" style="--gx:4;--gy:1">⟳</button>
-        <button class="tc-btn" data-action="rotateCCW" style="--gx:3;--gy:2">⟲</button>
-        <button class="tc-btn" data-action="harddrop" style="--gx:5;--gy:1">⤓</button>
-        <button class="tc-btn" data-action="hold" style="--gx:4;--gy:2">H</button>
-      </div>
     </section>
+
+    <!-- Contrôles tactiles mobiles (positionnables) — au niveau de l'app
+         pour rester affichables même hors de l'écran de jeu (édition). -->
+    <div id="touch-controls" class="touch-controls">
+      <button class="tc-btn" data-action="left">◀</button>
+      <button class="tc-btn" data-action="right">▶</button>
+      <button class="tc-btn" data-action="softdrop">▼</button>
+      <button class="tc-btn" data-action="rotateCW">⟳</button>
+      <button class="tc-btn" data-action="rotateCCW">⟲</button>
+      <button class="tc-btn" data-action="harddrop">⤓</button>
+      <button class="tc-btn" data-action="hold">H</button>
+    </div>
 
     <!-- ===================== OVERLAYS ===================== -->
     <!-- Pause -->
@@ -1580,6 +1581,7 @@ const TetAudio = (function () {
   // de l'écran. Le placement réel est recadré pour que le bouton reste
   // toujours entièrement visible, quelle que soit la taille d'écran.
   let layoutEditing = false;
+  let layoutReturnScreen = 'screen-home';
 
   function safeInset(side) {
     // lit la marge de sécurité (encoches / barre gestuelle) si disponible
@@ -1636,7 +1638,14 @@ const TetAudio = (function () {
   }
   function enableLayoutEdit() {
     layoutEditing = true;
+    // mémoriser l'écran d'origine pour y revenir ensuite
+    const active = document.querySelector('.screen.active');
+    layoutReturnScreen = active ? active.id : 'screen-home';
     closeAllOverlays();
+    // afficher le plateau comme repère, même si aucune partie n'est en cours
+    if (!State.grid || State.grid.length === 0) State.grid = makeGrid();
+    showScreen('screen-game');
+    fitCanvas(); applyButtonLayout(); render();
     $('#touch-controls').classList.add('visible', 'editing');
     $('#layout-toolbar').classList.add('visible');
     $('#layout-hint').classList.add('visible');
@@ -1684,8 +1693,10 @@ const TetAudio = (function () {
     if (save) { Settings.btnLayout = layout; persist(); }
     // si on annule, applyButtonLayout restaure la disposition précédente (Settings inchangé)
     applyButtonLayout();
+    // revenir à l'écran d'origine (accueil ou jeu) puis rouvrir les paramètres
+    showScreen(layoutReturnScreen);
     updateTouchVisibility();
-    openSettings(); // retour au menu des paramètres
+    openSettings();
   }
   // Remet la disposition par défaut sans quitter l'édition (annulable ensuite)
   function previewDefaultLayout() {
