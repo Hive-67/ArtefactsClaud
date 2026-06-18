@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>HiveOS — RoadMap Bunker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <style>
+
+    /* ══ THÈMES — VERSION LITE (2 × 2 MODES) ══════════════════════════════ */
+    .theme-hiveos          { --bg:#111;    --bg2:#1c1c1c; --bg3:#262626; --bg4:#303030; --brd:#7d206f33; --tx:#f5f5f5; --tx2:#b8a7b5; --ac:#b01678; }
+    .theme-hiveos.day      { --bg:#fef9f4; --bg2:#f5eaf0; --bg3:#ecdae6; --bg4:#e0c8d8; --brd:rgba(125,32,111,.12); --tx:#180812; --tx2:#5f4057; --ac:#9a145f; }
+    .theme-bleu            { --bg:#06080f; --bg2:#0b0e1c; --bg3:#141828; --bg4:#1e2438; --brd:#2a306040; --tx:#e8eaf8; --tx2:#8890c8; --ac:#4f8ef7; }
+    .theme-bleu.day        { --bg:#f4f6ff; --bg2:#eaedff; --bg3:#d8deff; --bg4:#c4ccff; --brd:#8896e840; --tx:#070b24; --tx2:#3040a0; --ac:#1a4fc4; }
+
+    /* Fond spécial — halos 4 coins (uniquement HiveOS jour) */
+    body.theme-hiveos.day {
+      background:
+        radial-gradient(ellipse 75% 75% at -5% -5%,   rgba(125,32,111,.22) 0%,transparent 60%),
+        radial-gradient(ellipse 75% 75% at 105% 105%,  rgba(220,30,50,.18)  0%,transparent 60%),
+        radial-gradient(ellipse 50% 50% at 105% -5%,   rgba(176,22,120,.12) 0%,transparent 55%),
+        radial-gradient(ellipse 50% 50% at -5% 105%,   rgba(192,23,88,.10)  0%,transparent 55%),
+        #fef9f4;
+    }
+
+    /* ══ BASE ════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Space Mono',monospace;
+      background:var(--bg); color:var(--tx);
+      min-height:100vh; transition:background .3s,color .3s;
+      -webkit-font-smoothing:antialiased; overflow-x:hidden;
+    }
+
+    /* ══ STRIPE ══════════════════════════════════════════════════════════ */
+    .hive-stripe {
+      height:3px;
+      background:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
+      position:relative; z-index:300;
+    }
+
+    /* ══ HEADER ══════════════════════════════════════════════════════════ */
+    .hive-header {
+      position:sticky; top:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 1.25rem; height:50px;
+      background:var(--bg2);
+      transition:transform .3s,background .3s; gap:.75rem;
+    }
+    .hive-header.hidden { transform:translateY(-100%); }
+
+    .hive-header::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg, transparent, var(--ac) 15%, var(--ac) 85%, transparent);
+      pointer-events:none;
+    }
+    .theme-hiveos .hive-header::after,
+    .theme-hiveos.day .hive-header::after {
+      background:linear-gradient(90deg, transparent, #7d206f 8%, #b01678 30%, #c21758 50%, #da1d33 72%, #eb1925 92%, transparent);
+    }
+
+    .hive-logo-wrap {
+      display:flex; align-items:center; gap:.4rem;
+      cursor:default; user-select:none; flex-shrink:0;
+    }
+    .hive-logo {
+      font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
+      background:linear-gradient(90deg,#7d206f,#b01678,#c21758,#da1d33,#eb1925);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      white-space:nowrap;
+    }
+    .badge-lite {
+      font-family:'Caveat',cursive; font-weight:600; font-size:1.05rem;
+      color:var(--tx2); line-height:1; margin-top:3px; white-space:nowrap;
+    }
+    .hive-sep { width:1px; height:16px; background:var(--brd); flex-shrink:0; }
+    .hive-app-name    { font-size:.68rem; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .hive-app-version { font-size:.62rem; color:var(--tx2); opacity:.55; margin-left:.2rem; white-space:nowrap; }
+
+    .hive-btns { display:flex; align-items:center; gap:.1rem; flex-shrink:0; }
+    .hive-btn {
+      background:none; border:none; cursor:pointer; font-size:1.05rem;
+      padding:.3rem .35rem; border-radius:6px; color:var(--tx);
+      transition:background .15s; position:relative; line-height:1;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .hive-btn:hover { background:var(--bg3); }
+    .hive-btn::after {
+      content:attr(data-tip); position:absolute; top:calc(100% + 6px); right:0;
+      background:var(--bg4); color:var(--tx); font-size:.63rem;
+      font-family:'Space Mono',monospace; white-space:nowrap;
+      padding:.25rem .55rem; border-radius:5px; border:1px solid var(--brd);
+      pointer-events:none; opacity:0; transition:opacity .15s; z-index:999;
+    }
+    .hive-btn:hover::after { opacity:1; }
+
+    /* ══ MENU THÈMES — VERSION LITE ═══════════════════════════════════════ */
+    .theme-wrap { position:relative; }
+    .theme-menu {
+      position:absolute; top:calc(100% + 8px); right:0;
+      background:var(--bg2); border:1px solid var(--brd); border-radius:10px;
+      padding:.4rem; min-width:140px;
+      box-shadow:0 8px 30px rgba(0,0,0,.35); z-index:600; display:none;
+    }
+    .theme-menu.open { display:block; }
+    .tm-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.42rem .7rem; border-radius:7px; cursor:pointer;
+      font-size:.78rem; font-family:'Space Mono',monospace;
+      color:var(--tx2); transition:background .12s,color .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .tm-item:hover, .tm-item.on { background:var(--bg3); color:var(--tx); }
+
+    /* ══ LAYOUT — PAS DE SIDEBAR ═══════════════════════════════════════════ */
+    .app-layout { display:flex; flex-direction:column; min-height:calc(100vh - 53px); }
+    .main-wrap { flex:1; padding:1.5rem 2rem; }
+
+    /* ══ CONTENU ROADMAP ══════════════════════════════════════════════════ */
+    .roadmap-header {
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
+      margin-bottom:1.5rem; gap:1rem;
+    }
+    .roadmap-title {
+      font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800;
+      color:var(--tx); display:flex; align-items:center; gap:.8rem;
+    }
+    .roadmap-title .icon { font-size:2rem; }
+
+    .progress-card {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      padding:1.2rem 1.5rem; margin-bottom:2rem;
+    }
+    .progress-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
+    .progress-bar-bg {
+      height:8px; background:var(--bg4); border-radius:10px; overflow:hidden; width:100%;
+    }
+    .progress-bar-fill {
+      height:100%; width:0%; background:var(--ac); border-radius:10px;
+      transition:width .4s ease;
+    }
+    .progress-stats { font-size:.85rem; color:var(--tx2); }
+
+    /* Sections pliables */
+    .section-details {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      margin-bottom:1.2rem; overflow:hidden;
+      transition:border-color .2s;
+    }
+    .section-details[open] { border-color:var(--ac); }
+    .section-summary {
+      display:flex; align-items:center; gap:1rem;
+      padding:1rem 1.2rem; cursor:pointer; font-weight:700;
+      font-size:1.1rem; color:var(--tx); list-style:none;
+      transition:background .15s;
+    }
+    .section-summary::-webkit-details-marker { display:none; }
+    .section-summary:hover { background:var(--bg3); }
+    .section-icon { font-size:1.6rem; }
+    .section-title { flex:1; color:var(--tx); }
+    .section-badge {
+      font-size:.7rem; font-weight:600; padding:.2rem .8rem; border-radius:20px;
+      background:var(--bg4); color:var(--tx2);
+    }
+    .chevron { margin-left:auto; transition:transform .2s; color:var(--tx2); }
+    .section-details[open] .chevron { transform:rotate(180deg); }
+
+    .section-content { padding:0 1.2rem 1.2rem; }
+
+    .task-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+    .task-item {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.8rem 1rem; display:flex; align-items:flex-start; gap:.8rem;
+      transition:background .15s;
+    }
+    .task-item:hover { background:var(--bg4); }
+    .task-item.done { opacity:.7; border-color:var(--ac); }
+    .task-check {
+      margin-top:.2rem; width:18px; height:18px; accent-color:var(--ac); cursor:pointer; flex-shrink:0;
+    }
+    .task-content { flex:1; }
+    .task-title { font-weight:700; font-size:.9rem; color:var(--tx); margin-bottom:.2rem; }
+    .task-desc { font-size:.8rem; color:var(--tx2); line-height:1.5; }
+    .task-item.done .task-title { text-decoration:line-through; color:var(--tx2); }
+
+    .note-box {
+      background:var(--bg3); border-left:4px solid var(--ac); padding:.8rem 1rem;
+      border-radius:0 8px 8px 0; margin-top:1rem; font-style:italic;
+      color:var(--tx2); font-size:.85rem;
+    }
+
+    /* Arborescence visuelle */
+    .tree {
+      font-family:'Fira Code','Courier New',monospace;
+      font-size:.95rem; line-height:2; color:var(--tx);
+      white-space:pre; overflow-x:auto; background:var(--bg3);
+      padding:1.2rem; border-radius:8px; border:1px solid var(--brd);
+    }
+    .tree .folder { color:#f4b436; font-weight:600; }
+    .tree .file   { color:#38bdf8; }
+    .tree .comment { color:var(--tx2); font-style:italic; }
+    .tree .branch { color:var(--tx2); }
+
+    /* ══ MODALS — inchangées ══════════════════════════════════════════════ */
+    .modal-ov {
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      z-index:800; display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-ov.open { display:flex; }
+    .modal {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      max-width:480px; width:100%; max-height:85vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,.4);
+    }
+    .modal-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 1.25rem; border-bottom:1px solid var(--brd); flex-shrink:0;
+    }
+    .modal-title { font-family:'Syne',sans-serif; font-size:.92rem; font-weight:800; color:var(--tx); }
+    .modal-x {
+      background:none; border:none; cursor:pointer; font-size:1.2rem;
+      color:var(--tx2); padding:.2rem .4rem; border-radius:4px;
+      transition:background .15s; line-height:1; flex-shrink:0;
+      -webkit-tap-highlight-color:transparent;
+      min-width:32px; min-height:32px; display:flex; align-items:center; justify-content:center;
+    }
+    .modal-x:hover { background:var(--bg3); color:var(--tx); }
+    .modal-body { padding:1.25rem; display:flex; flex-direction:column; gap:1rem; }
+
+    /* ══ SAUVEGARDE — sections empilées ═══════════════════════════════════ */
+    .sv-section { display:flex; flex-direction:column; gap:.6rem; }
+    .sv-section + .sv-section { padding-top:1.2rem; border-top:1px solid var(--brd); }
+    .sv-section-label {
+      font-family:'Syne',sans-serif; font-weight:800; font-size:.72rem;
+      text-transform:uppercase; letter-spacing:.06em; color:var(--ac);
+    }
+    .sv-section-desc { font-size:.7rem; color:var(--tx2); line-height:1.6; }
+    .sv-json-preview {
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.65rem .85rem; font-size:.64rem; color:var(--tx2); line-height:1.55;
+      font-family:'Space Mono',monospace; max-height:100px; overflow-y:auto;
+      white-space:pre-wrap; word-break:break-all;
+    }
+    .sv-import-ta {
+      font-family:'Space Mono',monospace; font-size:.68rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.65rem .85rem; color:var(--tx); resize:none; height:90px;
+      outline:none; width:100%; line-height:1.5;
+      transition:border-color .15s;
+    }
+    .sv-import-ta::placeholder { color:var(--tx2); opacity:.5; }
+    .sv-import-ta:focus { border-color:var(--ac); }
+    .sv-btn {
+      font-family:'Space Mono',monospace; font-size:.75rem; font-weight:700;
+      padding:.52rem .85rem; border-radius:7px; cursor:pointer; width:100%;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; text-align:center; -webkit-tap-highlight-color:transparent;
+    }
+    .sv-btn:hover { border-color:var(--ac); background:var(--bg4); color:var(--ac); }
+    .sv-btn.sv-prim { background:var(--ac); color:var(--bg); border-color:transparent; }
+    .sv-btn.sv-prim:hover { opacity:.85; }
+    .sv-btn.sv-warn { border-color:#E5A62B44; color:#c07a00; }
+    .sv-btn.sv-warn:hover { background:#E5A62B; color:#fff; border-color:#E5A62B; }
+    .sv-btn.sv-dngr { border-color:#E5534B44; color:#C0392B; }
+    .sv-btn.sv-dngr:hover { background:#E5534B; color:#fff; border-color:#E5534B; }
+    .sv-btns-row { display:flex; gap:.5rem; }
+    .sv-btns-row .sv-btn { width:auto; flex:1; }
+
+    /* ══ MENU SECRET ══════════════════════════════════════════════════════ */
+    .secret-ov {
+      position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px);
+      z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem;
+    }
+    .secret-ov.open { display:flex; }
+    .secret-modal {
+      background:var(--bg2); border:1px solid var(--brd); border-radius:14px;
+      max-width:520px; width:100%; max-height:90vh; overflow-y:auto;
+      box-shadow:0 24px 80px rgba(0,0,0,.6);
+    }
+    .secret-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 1.25rem; border-bottom:1px solid var(--brd);
+      background:var(--bg3); border-radius:14px 14px 0 0;
+    }
+    .secret-head-left { display:flex; align-items:center; gap:.65rem; }
+    .secret-title { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:800; color:var(--tx); }
+    .secret-badge {
+      font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+      padding:.15rem .5rem; border-radius:20px; background:var(--ac); color:var(--bg);
+    }
+    .secret-body { padding:1.25rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .secret-section-title { font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--tx2); margin-bottom:.65rem; }
+    .timer-display {
+      font-family:'Space Mono',monospace; font-size:2.4rem; font-weight:700;
+      color:var(--ac); text-align:center; padding:.75rem 1rem;
+      background:var(--bg3); border-radius:8px; border:1px solid var(--brd);
+      letter-spacing:.08em; margin-bottom:.75rem;
+    }
+    .timer-btns { display:flex; gap:.5rem; }
+    .timer-btn {
+      flex:1; font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.5rem .4rem; border-radius:7px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .timer-btn:hover   { background:var(--bg4); }
+    .timer-btn.start   { background:var(--ac); color:var(--bg); border-color:var(--ac); }
+    .timer-btn.danger  { border-color:#E5534B44; color:#C0392B; }
+    .timer-btn.danger:hover { background:#E5534B; color:#fff; }
+    .timelog-ta {
+      font-family:'Space Mono',monospace; font-size:.75rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:8px;
+      padding:.75rem; color:var(--tx2); resize:vertical; min-height:120px;
+      outline:none; width:100%; line-height:1.75; transition:border-color .15s;
+    }
+    .timelog-ta:focus { border-color:var(--ac); color:var(--tx); }
+    .tlog-total-badge {
+      font-family:'Space Mono',monospace; font-size:.68rem; font-weight:700;
+      color:var(--ac); background:var(--bg4);
+      padding:.2rem .65rem; border-radius:20px; border:1px solid var(--brd);
+      white-space:nowrap; flex-shrink:0; transition:color .2s;
+    }
+    .btn-dl {
+      font-family:'Space Mono',monospace; font-size:.78rem; font-weight:700;
+      padding:.65rem 1rem; border-radius:7px; cursor:pointer; width:100%;
+      border:1px solid var(--ac); background:transparent; color:var(--ac);
+      transition:all .15s; text-align:center; -webkit-tap-highlight-color:transparent;
+    }
+    .btn-dl:hover { background:var(--ac); color:var(--bg); }
+    .btn-ghost {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.42rem .85rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:transparent; color:var(--tx2);
+      transition:all .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .btn-ghost:hover { border-color:var(--tx2); color:var(--tx); }
+
+    /* ══ BLOC-NOTES — inchangé ════════════════════════════════════════════ */
+    .notepad {
+      position:fixed; top:64px; right:1.25rem; width:320px;
+      background:var(--bg2); border:1px solid var(--brd); border-radius:12px;
+      box-shadow:0 10px 40px rgba(0,0,0,.4); z-index:400;
+      display:none; flex-direction:column;
+      overflow:hidden; min-width:260px; min-height:200px;
+    }
+    .notepad.open { display:flex; }
+    .np-head {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.6rem .9rem; background:var(--bg3);
+      border-radius:12px 12px 0 0; border-bottom:1px solid var(--brd);
+      cursor:move; user-select:none; flex-shrink:0;
+    }
+    .np-title { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:var(--tx); }
+    .np-x {
+      background:none; border:none; cursor:pointer; font-size:1rem;
+      color:var(--tx2); line-height:1; padding:.25rem .35rem; border-radius:4px;
+      transition:background .15s,color .15s; min-width:28px; min-height:28px;
+      display:flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .np-x:hover { background:var(--bg4); color:var(--tx); }
+    .np-ta {
+      font-family:'Space Mono',monospace; font-size:.78rem;
+      background:transparent; border:none; padding:.9rem;
+      color:var(--tx); resize:none; height:180px; outline:none; width:100%; line-height:1.6;
+    }
+    .np-hint { padding:0 .9rem .5rem; font-size:.63rem; color:var(--tx2); font-style:italic; }
+    .np-improve-menu {
+      border-top:1px solid var(--brd); padding:.5rem .75rem;
+      display:none; flex-direction:column; gap:.3rem;
+    }
+    .np-improve-menu.show { display:flex; }
+    .np-mode-btn {
+      font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+      padding:.38rem .7rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      text-align:left; transition:background .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .np-mode-btn:hover { background:var(--bg4); }
+    .np-improve-result {
+      border-top:1px solid var(--brd); padding:.75rem .9rem;
+      display:none; flex-direction:column; gap:.5rem;
+    }
+    .np-improve-result.show { display:flex; }
+    .np-result-label { font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--tx2); }
+    .np-result-ta {
+      font-family:'Space Mono',monospace; font-size:.75rem;
+      background:var(--bg3); border:1px solid var(--brd); border-radius:6px;
+      padding:.6rem; color:var(--tx); resize:none; height:100px; outline:none; width:100%;
+    }
+    .np-result-btns { display:flex; gap:.4rem; }
+    .np-resize-handle {
+      position:absolute; bottom:0; right:0; width:20px; height:20px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.65rem; color:var(--tx2); cursor:se-resize;
+      opacity:.4; transition:opacity .15s; user-select:none; border-radius:0 0 12px 0;
+    }
+    .np-resize-handle:hover { opacity:.9; }
+    .np-foot { display:flex; gap:.4rem; padding:.65rem .9rem; border-top:1px solid var(--brd); }
+    .np-btn {
+      flex:1; font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700;
+      padding:.38rem; border-radius:6px; cursor:pointer;
+      border:1px solid var(--brd); background:var(--bg3); color:var(--tx);
+      transition:background .15s; -webkit-tap-highlight-color:transparent;
+    }
+    .np-btn:hover { background:var(--bg4); }
+    .np-btn.send { background:var(--ac); color:var(--bg); border-color:var(--ac); }
+    .np-btn.send:hover { opacity:.85; }
+
+    /* ══ RESPONSIVE MOBILE ════════════════════════════════════════════════ */
+    @media (max-width:768px) {
+      input, textarea { font-size:16px !important; }
+      .hive-app-name, .hive-app-version { display:none; }
+      .notepad { width:calc(100vw - 2rem); right:1rem; left:1rem; }
+      .main-wrap { padding:1rem; }
+    }
+  </style>
+</head>
+<body class="theme-hiveos">
+
+<div class="hive-stripe"></div>
+
+<header class="hive-header" id="hive-header">
+  <div class="hive-logo-wrap">
+    <span class="hive-logo">HiveOS</span>
+    <span class="badge-lite">lite</span>
+    <span class="hive-sep"></span>
+    <span class="hive-app-name"    id="hive-app-name"></span>
+    <span class="hive-app-version" id="hive-app-version"></span>
+  </div>
+  <div class="hive-btns">
+    <button class="hive-btn" id="btn-notepad"  data-tip="Bloc-notes"  onclick="toggleNotepad()">📝</button>
+    <div class="theme-wrap">
+      <button class="hive-btn" id="btn-theme" data-tip="Thème" onclick="toggleThemeMenu()">🎨</button>
+      <div class="theme-menu" id="theme-menu">
+        <div class="tm-item on" data-t="theme-hiveos" onclick="setTheme(this)">🐝 HiveOS</div>
+        <div class="tm-item"    data-t="theme-bleu"   onclick="setTheme(this)">🔵 Bleu</div>
+      </div>
+    </div>
+    <button class="hive-btn" id="btn-daynight" data-tip="Jour / Nuit" onclick="toggleDayNight()">☀️</button>
+    <button class="hive-btn" id="btn-save"     data-tip="Sauvegarde"  onclick="openSaveModal()">💾</button>
+  </div>
+</header>
+
+<div class="app-layout">
+  <main class="main-wrap" id="app-content">
+    <!-- ROADMAP CONTENU RENDU PAR JAVASCRIPT -->
+    <div id="roadmap-container"></div>
+  </main>
+</div>
+
+<!-- BLOC-NOTES -->
+<div class="notepad" id="notepad">
+  <div class="np-head" id="np-drag">
+    <span class="np-title">📝 Bloc-notes</span>
+    <button class="np-x" id="np-close-btn">✕</button>
+  </div>
+  <textarea class="np-ta" id="np-ta" placeholder="Tes notes ici..."></textarea>
+  <div class="np-hint">💡 Note tes bugs, suggestions ou demandes — améliore, copie ou envoie.</div>
+  <div class="np-improve-menu" id="np-improve-menu">
+    <button class="np-mode-btn" onclick="runImprove('dev')">🔧 Instructions dev</button>
+    <button class="np-mode-btn" onclick="runImprove('list')">📋 Liste structurée</button>
+    <button class="np-mode-btn" onclick="runImprove('correct')">✏️ Correction + clarté</button>
+    <button class="np-mode-btn" onclick="runImprove('short')">⚡ Résumé court</button>
+    <button class="np-mode-btn" onclick="runImprove('prompt')">🤖 Transformer en prompt</button>
+  </div>
+  <div class="np-improve-result" id="np-improve-result">
+    <div class="np-result-label">Résultat IA</div>
+    <textarea class="np-result-ta" id="np-result-ta" readonly></textarea>
+    <div class="np-result-btns">
+      <button class="np-btn" onclick="npResultReplace()">Remplacer</button>
+      <button class="np-btn" onclick="npResultCopy()">Copier</button>
+      <button class="np-btn" id="np-result-close">✕</button>
+    </div>
+  </div>
+  <div class="np-resize-handle" id="np-resize">⠿</div>
+  <div class="np-foot">
+    <button class="np-btn" id="np-improve-toggle">✨ Améliorer</button>
+    <button class="np-btn" id="np-copy-btn">📋 Copier</button>
+    <button class="np-btn send" id="np-send-btn">📨 Envoyer</button>
+  </div>
+</div>
+
+<!-- SAUVEGARDE -->
+<div class="modal-ov" id="save-ov">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">💾 Sauvegarde &amp; Données</span>
+      <button class="modal-x" onclick="closeModal('save-ov')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="sv-section">
+        <div class="sv-section-label">🔗 SAUVEGARDER DANS L'URL</div>
+        <div class="sv-section-desc">Encode toutes tes données dans le # de l'URL et la copie dans le presse-papier. Colle cette URL dans n'importe quel navigateur pour retrouver exactement où tu en étais.</div>
+        <button class="sv-btn sv-prim" id="do-sv-url">💾 Sauvegarder + copier l'URL</button>
+      </div>
+      <div class="sv-section">
+        <div class="sv-section-label">📤 EXPORTER EN JSON</div>
+        <div class="sv-section-desc">Sauvegarde complète de toutes tes données. Utilisable pour importer sur un autre fichier ou garder un backup local.</div>
+        <pre class="sv-json-preview" id="sv-json-preview"></pre>
+        <div class="sv-btns-row">
+          <button class="sv-btn" id="do-sv-copy-json">📋 Copier</button>
+          <button class="sv-btn sv-prim" id="do-sv-dl-json">⬇ Télécharger .json</button>
+        </div>
+      </div>
+      <div class="sv-section">
+        <div class="sv-section-label">📥 IMPORTER UN JSON</div>
+        <div class="sv-section-desc">Colle un JSON exporté précédemment. Fusionner garde tes données actuelles et ajoute les nouvelles. Remplacer écrase tout.</div>
+        <textarea class="sv-import-ta" id="sv-import-ta" placeholder="Colle ton JSON ici…"></textarea>
+        <div class="sv-btns-row">
+          <button class="sv-btn sv-warn" id="do-sv-merge">⚠️ Fusionner</button>
+          <button class="sv-btn sv-dngr" id="do-sv-rpl">🔄 Remplacer tout</button>
+        </div>
+      </div>
+      <div class="sv-section">
+        <div class="sv-section-label">♻️ REMISE À ZÉRO</div>
+        <div class="sv-section-desc">Efface toutes les données saisies et remet le fichier dans son état d'origine — comme s'il venait d'être téléchargé. Cette action est irréversible.</div>
+        <button class="sv-btn sv-dngr" id="do-sv-reset">🔄 Remettre à zéro (valeur d'usine)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU SECRET -->
+<div class="secret-ov" id="secret-ov">
+  <div class="secret-modal">
+    <div class="secret-head">
+      <div class="secret-head-left">
+        <span class="secret-title">⚙️ Menu Développeur</span>
+        <span class="secret-badge">Ctrl + Shift + D</span>
+      </div>
+      <button class="modal-x" onclick="closeSecret()">✕</button>
+    </div>
+    <div class="secret-body">
+      <div>
+        <div class="secret-section-title">⏱ Pointeuse</div>
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start"  id="btn-timer-start" onclick="timerStart()">▶ Démarrer</button>
+          <button class="timer-btn"        onclick="timerPause()">⏸ Pause</button>
+          <button class="timer-btn danger" onclick="timerStop()">⏹ Stop &amp; Log</button>
+          <button class="timer-btn"        onclick="timerReset()">🔄 Reset</button>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;">
+          <div class="secret-section-title" style="margin-bottom:0;">📋 Journal de temps</div>
+          <span id="tlog-total" class="tlog-total-badge">Total : —</span>
+        </div>
+        <textarea class="timelog-ta" id="timelog-ta" placeholder="Aucune session enregistrée..."></textarea>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+          <button class="btn-ghost" id="btn-copy-tlog" style="flex:1;" onclick="copyTimelog()">📋 Copier</button>
+          <button class="btn-ghost"                    style="flex:1;" onclick="clearTimelog()">🗑 Effacer</button>
+        </div>
+      </div>
+      <div>
+        <div class="secret-section-title">📦 Export développeur</div>
+        <div style="font-size:.72rem;color:var(--tx2);line-height:1.65;margin-bottom:.75rem;">
+          Télécharge l'intégralité du programme avec toutes tes données intégrées dans un seul fichier <code style="font-family:'Space Mono',monospace;background:var(--bg3);padding:.1rem .35rem;border-radius:4px;">.html</code>. Cette sauvegarde permet de restaurer l'application dans l'état exact où elle se trouvait au moment de l'export.
+        </div>
+        <button class="btn-dl" onclick="downloadHTML()">📦 Télécharger le fichier HTML complet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+/* ════════════════════════════════════════════════════════════════════════
+   APP — RoadMap Bunker
+════════════════════════════════════════════════════════════════════════ */
+const APP = {
+  name:        "RoadMap Bunker",
+  version:     "v1.0",
+  description: "Suivi de la création du site Bunker",
+  author:      "HiveOS — Hive (Quentin)",
+  url:         "https://hivetools.netlify.app"
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   SEED DATA — Données initiales (les sections et leurs tâches)
+   /SEED_START/
+   const DATA = [...];
+   /SEED_END/
+════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   UTILITAIRES
+════════════════════════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function copyText(text, btn, label) {
+  const ok = () => {
+    if (!btn) return;
+    const o = btn.textContent;
+    btn.textContent = label || '✓ Copié';
+    setTimeout(() => btn.textContent = o, 2000);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(() => fbCopy(text,ok));
+  } else fbCopy(text, ok);
+}
+function fbCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); if(cb) cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   THÈMES & JOUR/NUIT
+════════════════════════════════════════════════════════════════════════ */
+let currentTheme = localStorage.getItem('app-theme')    || 'theme-hiveos';
+let isDayMode    = localStorage.getItem('app-day-mode') === '1';
+
+function applyTheme() {
+  document.body.className = currentTheme + (isDayMode ? ' day' : '');
+  $('btn-daynight').textContent = isDayMode ? '🌙' : '☀️';
+  document.querySelectorAll('[data-t]').forEach(el =>
+    el.classList.toggle('on', el.dataset.t === currentTheme));
+}
+function setTheme(el) {
+  currentTheme = el.dataset.t;
+  localStorage.setItem('app-theme', currentTheme);
+  applyTheme();
+  $('theme-menu').classList.remove('open');
+}
+function toggleDayNight() {
+  isDayMode = !isDayMode;
+  localStorage.setItem('app-day-mode', isDayMode ? '1' : '0');
+  applyTheme();
+}
+function toggleThemeMenu() { $('theme-menu').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.theme-wrap')) $('theme-menu').classList.remove('open');
+});
+
+/* ════════════════════════════════════════════════════════════════════════
+   SCROLL HEADER (pas de sidebar)
+════════════════════════════════════════════════════════════════════════ */
+let lastY = 0;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const hide = y > lastY && y > 80;
+  $('hive-header').classList.toggle('hidden', hide);
+  lastY = y;
+}, { passive:true });
+
+/* ════════════════════════════════════════════════════════════════════════
+   MODALS
+════════════════════════════════════════════════════════════════════════ */
+function openModal(id)       { $(id).classList.add('open'); }
+function closeModal(id)      { $(id).classList.remove('open'); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   BLOC-NOTES (inchangé)
+════════════════════════════════════════════════════════════════════════ */
+const NP_KEY = 'hiveos_notepad';
+
+function toggleNotepad() { $('notepad').classList.toggle('open'); }
+
+$('np-close-btn').addEventListener('click',   e => { e.stopPropagation(); $('notepad').classList.remove('open'); });
+$('np-close-btn').addEventListener('touchend',e => { e.stopPropagation(); e.preventDefault(); $('notepad').classList.remove('open'); });
+
+$('np-copy-btn').addEventListener('click', () => copyText($('np-ta').value, $('np-copy-btn'), '✓ Copié'));
+$('np-send-btn').addEventListener('click', () => {
+  const t = $('np-ta').value.trim(); if (!t) return;
+  window.location.href = `mailto:systemhiveos@gmail.com?subject=${encodeURIComponent(`[${APP.name} ${APP.version}] — Notes & Retours`)}&body=${encodeURIComponent(t)}`;
+});
+$('np-improve-toggle').addEventListener('click', () => {
+  $('np-improve-menu').classList.toggle('show');
+  $('np-improve-result').classList.remove('show');
+});
+$('np-result-close').addEventListener('click', () => {
+  $('np-improve-result').classList.remove('show');
+  $('np-improve-menu').classList.remove('show');
+});
+
+function npResultReplace() {
+  $('np-ta').value = $('np-result-ta').value;
+  $('np-improve-result').classList.remove('show');
+  localStorage.setItem(NP_KEY, $('np-ta').value);
+}
+function npResultCopy() { copyText($('np-result-ta').value); }
+
+const IMPROVE_PROMPTS = {
+  dev:     "Reformule ce texte en instructions claires et actionnables pour un développeur. Verbes d'action, points si nécessaire.",
+  list:    "Transforme ce texte en liste numérotée. Chaque point : une action ou bug distinct. Court et précis.",
+  correct: "Corrige le français et améliore la clarté sans changer le fond. Ton naturel.",
+  short:   "Résume en 2-3 phrases maximum.",
+  prompt:  ""
+};
+
+async function runImprove(mode) {
+  const text = $('np-ta').value.trim(); if (!text) return;
+  $('np-improve-menu').classList.remove('show');
+  $('np-result-ta').value = '⏳ Génération en cours...';
+  $('np-improve-result').classList.add('show');
+  if (mode === 'prompt') {
+    IMPROVE_PROMPTS.prompt = `Transforme ce texte en un prompt clair prêt pour n'importe quelle IA. Contexte : ${APP.name} — ${APP.description}. Formule la demande de façon précise.`;
+  }
+  const apiKey = localStorage.getItem('hiveos_api_key');
+  if (!apiKey) { $('np-result-ta').value = '⚠️ Clé API non configurée.\nOuvrez le menu secret (Ctrl+Shift+D) pour la configurer.'; return; }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-api-key':apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1000, system:IMPROVE_PROMPTS[mode], messages:[{role:'user',content:text}] })
+    });
+    const data = await res.json();
+    $('np-result-ta').value = data.content?.[0]?.text || 'Erreur de génération.';
+  } catch(e) { $('np-result-ta').value = 'Erreur — vérifiez votre connexion et votre clé API.'; }
+}
+
+$('np-ta').addEventListener('input', () => localStorage.setItem(NP_KEY, $('np-ta').value));
+
+/* Drag & resize bloc-notes (inchangé) */
+(function() {
+  const win = $('notepad'), handle = $('np-drag'); let ox, oy;
+  function startD(cx,cy) { ox=cx-win.offsetLeft; oy=cy-win.offsetTop; win.style.right='unset'; }
+  function moveD(cx,cy)  { win.style.left=(cx-ox)+'px'; win.style.top=(cy-oy)+'px'; }
+  handle.addEventListener('mousedown', e => {
+    if (e.target.closest('.np-x')) return;
+    startD(e.clientX,e.clientY);
+    const mv=e2=>moveD(e2.clientX,e2.clientY);
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',mv),{once:true});
+  });
+  handle.addEventListener('touchstart', e => { if(e.target.closest('.np-x')) return; const t=e.touches[0]; startD(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+  handle.addEventListener('touchmove',  e => { const t=e.touches[0]; moveD(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+})();
+(function() {
+  const win=$('notepad'), handle=$('np-resize'), ta=$('np-ta'); let sx,sy,sw,th;
+  function startR(cx,cy) { sx=cx; sy=cy; sw=win.offsetWidth; th=ta.offsetHeight; }
+  function doR(cx,cy) { win.style.width=Math.max(260,sw+(cx-sx))+'px'; ta.style.height=Math.max(80,th+(cy-sy))+'px'; }
+  handle.addEventListener('mousedown',e=>{ startR(e.clientX,e.clientY); e.preventDefault(); e.stopPropagation();
+    const mv=e2=>doR(e2.clientX,e2.clientY);
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',mv),{once:true});
+  });
+  handle.addEventListener('touchstart',e=>{ const t=e.touches[0]; startR(t.clientX,t.clientY); e.stopPropagation(); },{passive:false});
+  handle.addEventListener('touchmove', e=>{ const t=e.touches[0]; doR(t.clientX,t.clientY); e.preventDefault(); },{passive:false});
+})();
+
+/* ════════════════════════════════════════════════════════════════════════
+   DONNÉES DE L'APPLICATION — RoadMap Bunker (identique à l'original)
+════════════════════════════════════════════════════════════════════════ */
+
+// Catégories (sections) avec leurs tâches
+// Chaque tâche : { id, title, description, done }
+const DEFAULT_DATA = {
+  sections: [
+    {
+      id: 'presentation',
+      name: 'Page de Présentation du Bunker',
+      icon: '🏠',
+      tasks: [
+        { id: 'pres1', title: 'Section Hero / Accueil', description: 'Bannière avec logo Bunker, slogan "L\'abri des vrais gamers", bouton Discord visible.', done: false },
+        { id: 'pres2', title: 'Présentation du concept Bunker', description: 'Communauté gaming multi-jeux, entraide, tournois, bonne ambiance. Univers militaire/sécurisé.', done: false },
+        { id: 'pres3', title: 'Liste des jeux disponibles', description: 'Afficher les 8 jeux actuels (Destiny, COD, No Man\'s Sky, Marathon, Diablo, Tekken, Among Us, Rocket League) avec mention "D\'autres jeux ajoutables sur demande".', done: false },
+        { id: 'pres4', title: 'Système de rôle Référent', description: 'Chaque jeu a un Référent (ou Sentinelle) qui gère sa section. Possibilité de postuler pour devenir référent d\'un nouveau jeu.', done: false }
+      ]
+    },
+    {
+      id: 'staff',
+      name: 'Page Staff & Organigramme',
+      icon: '👥',
+      tasks: [
+        { id: 'staff1', title: 'Organigramme visuel', description: 'Schéma : Fondateur → Administrateurs → Modérateurs → Référents jeu → Membres.', done: false },
+        { id: 'staff2', title: 'Fiches staff détaillées', description: 'Pseudo, rôle, responsabilités, jeux gérés, contact Discord.', done: false },
+        { id: 'staff3', title: 'Explication du fonctionnement', description: 'Organisation, qui fait quoi, processus de décision, réunions.', done: false },
+        { id: 'staff4', title: 'Section "Référents de jeu"', description: 'Mise en avant des référents actuels, contact possible.', done: false }
+      ]
+    },
+    {
+      id: 'serveur',
+      name: 'Page Serveur • Simulateur Discord',
+      icon: '💬',
+      tasks: [
+        { id: 'serv1', title: 'Simulateur visuel du serveur', description: 'Interface façon Discord avec canaux à gauche, messages au centre.', done: false },
+        { id: 'serv2', title: 'Liste des salons avec descriptions', description: '📢 #annonces, 💬 #général-bunker, 🎮 Salons par jeu (destiny, cod, nomansky, marathon, diablo, tekken, amongus, rocketleague), 🏆 #tournois, 🔧 #outils-bunker, 🎤 #vocal-général.', done: false },
+        { id: 'serv3', title: 'Explication des rôles et badges', description: 'Couleurs, permissions, hiérarchie.', done: false },
+        { id: 'serv4', title: 'Règlement du serveur', description: 'Affiché comme dans le salon #règlement.', done: false },
+        { id: 'serv5', title: 'Guide "Comment nous rejoindre"', description: 'Étapes, vérification, rôles jeux, présentation.', done: false }
+      ]
+    },
+    {
+      id: 'jeux',
+      name: 'Section Jeux • Pages Individuelles',
+      icon: '🎮',
+      tasks: [
+        { id: 'jeux1', title: 'Grille / liste des 8 jeux cliquables', description: 'Destiny, COD, No Man\'s Sky, Marathon, Diablo, Tekken, Among Us, Rocket League. Carte par jeu avec icône, nom, référent. Lien vers page dédiée.', done: false },
+        { id: 'jeux2', title: 'Pages individuelles par jeu', description: 'Chaque page contient : Présentation du jeu dans le Bunker, Référent / Sentinelle assigné, Événements et tournois à venir, Classement des joueurs, Lien vers salon Discord.', done: false },
+        { id: 'jeux3', title: 'Formulaire de demande d\'ajout de jeu', description: 'Nom du jeu, Type (FPS, MOBA, survie...), Pourquoi l\'ajouter, Pseudo du demandeur.', done: false }
+      ]
+    },
+    {
+      id: 'logiciels',
+      name: 'Section Logiciels & Outils',
+      icon: '⚙️',
+      tasks: [
+        { id: 'log1', title: 'Générateur de tournoi', description: 'Saisie des pseudos, arbre jusqu\'à la finale, classement automatique.', done: false },
+        { id: 'log2', title: 'Outil d\'étude dynamique de jeu', description: 'Analyse de stats, métriques, comparateur (KDA, headshot%, etc.).', done: false },
+        { id: 'log3', title: 'Calendrier des événements', description: 'Agenda interactif des tournois et soirées jeux.', done: false },
+        { id: 'log4', title: 'Pages individuelles par logiciel', description: 'Chaque outil a sa page avec explications et interface.', done: false },
+        { id: 'log5', title: 'Formulaire suggestion de logiciel', description: 'Pour proposer de nouveaux outils à la communauté.', done: false }
+      ]
+    },
+    {
+      id: 'agent',
+      name: 'Agent Bunker • IA du Site',
+      icon: '🤖',
+      tasks: [
+        { id: 'agent1', title: 'Interface de chat avec l\'Agent', description: 'Chatbot avec avatar bunker, réponse instantanée.', done: false },
+        { id: 'agent2', title: 'Base de connaissances', description: 'Connaît toutes les pages du site, fonctionnement du serveur Discord, liste des jeux, référents, tournois, règlement, rôles, logiciels disponibles.', done: false },
+        { id: 'agent3', title: 'Fonctionnalités', description: 'Répondre aux questions, guider les nouveaux, expliquer les outils.', done: false },
+        { id: 'agent4', title: 'Nom de l\'Agent', description: 'Suggestions : B.U.N.K., Sentinelle-IA, Agent Bunker.', done: false },
+        { id: 'agent5', title: 'Intégration technique', description: 'API connectée au contenu, réponses préprogrammées ou IA légère.', done: false }
+      ]
+    },
+    {
+      id: 'etapes',
+      name: 'Prochaines étapes globales',
+      icon: '🚀',
+      tasks: [
+        { id: 'etp1', title: 'Maquettage / design', description: '', done: false },
+        { id: 'etp2', title: 'Développement page par page', description: '', done: false },
+        { id: 'etp3', title: 'Tests et retours communauté', description: '', done: false },
+        { id: 'etp4', title: 'Mise en ligne sur Netlify', description: '', done: false }
+      ]
+    },
+    {
+      id: 'structure',
+      name: 'Visuel Structure',
+      icon: '📁',
+      tasks: [], // pas de tâches, contenu spécial
+      specialContent: `
+<div class="tree">
+<span class="folder">bunker-site/</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="file">index.html</span>              <span class="comment">← Page d'accueil (Hero + présentation)</span>
+<span class="branch">├──</span> <span class="file">staff.html</span>              <span class="comment">← Page Staff & Organigramme</span>
+<span class="branch">├──</span> <span class="file">serveur.html</span>            <span class="comment">← Page Simulateur Discord</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="folder">jeux/</span>
+<span class="branch">│   ├──</span> <span class="file">index.html</span>          <span class="comment">← Liste des 8 jeux</span>
+<span class="branch">│   ├──</span> <span class="file">destiny.html</span>        <span class="comment">← Destiny</span>
+<span class="branch">│   ├──</span> <span class="file">cod.html</span>            <span class="comment">← Call of Duty</span>
+<span class="branch">│   ├──</span> <span class="file">nomansky.html</span>       <span class="comment">← No Man's Sky</span>
+<span class="branch">│   ├──</span> <span class="file">marathon.html</span>       <span class="comment">← Marathon</span>
+<span class="branch">│   ├──</span> <span class="file">diablo.html</span>         <span class="comment">← Diablo</span>
+<span class="branch">│   ├──</span> <span class="file">tekken.html</span>         <span class="comment">← Tekken</span>
+<span class="branch">│   ├──</span> <span class="file">amongus.html</span>        <span class="comment">← Among Us</span>
+<span class="branch">│   └──</span> <span class="file">rocketleague.html</span>   <span class="comment">← Rocket League</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="folder">logiciels/</span>
+<span class="branch">│   ├──</span> <span class="file">index.html</span>          <span class="comment">← Liste des logiciels</span>
+<span class="branch">│   ├──</span> <span class="file">tournoi.html</span>        <span class="comment">← Générateur de tournoi</span>
+<span class="branch">│   └──</span> <span class="file">etude.html</span>          <span class="comment">← Outil d'étude dynamique</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="file">agent.html</span>              <span class="comment">← Agent Bunker IA</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="folder">css/</span>
+<span class="branch">│   └──</span> <span class="file">style.css</span>           <span class="comment">← Style commun à toutes les pages</span>
+<span class="branch">│</span>
+<span class="branch">├──</span> <span class="folder">js/</span>
+<span class="branch">│   └──</span> <span class="file">script.js</span>           <span class="comment">← JavaScript commun (navbar mobile, thème, etc.)</span>
+<span class="branch">│</span>
+<span class="branch">└──</span> <span class="folder">assets/</span>
+    <span class="branch">└──</span> <span class="file">logo.png</span>            <span class="comment">← Ton logo (à ajouter plus tard)</span>
+</div>
+      `
+    }
+  ]
+};
+
+// État courant
+let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+// Fonctions de persistence
+function getAppState() {
+  return JSON.parse(JSON.stringify(state));
+}
+
+function setAppState(newState) {
+  state = JSON.parse(JSON.stringify(newState));
+  renderRoadmap();
+  localStorage.setItem('app_data_state', JSON.stringify(state));
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDU DE LA ROADMAP (toutes sections sur la même page)
+════════════════════════════════════════════════════════════════════════ */
+
+function getProgress() {
+  let total = 0, done = 0;
+  state.sections.forEach(section => {
+    section.tasks.forEach(task => {
+      total++;
+      if (task.done) done++;
+    });
+  });
+  return { total, done };
+}
+
+function renderRoadmap() {
+  const container = $('roadmap-container');
+  const { total, done } = getProgress();
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  let html = `
+    <div class="roadmap-header">
+      <div class="roadmap-title"><span class="icon">🛡️</span> RoadMap Bunker</div>
+      <div class="progress-stats">${done}/${total} tâches</div>
+    </div>
+    <div class="progress-card">
+      <div class="progress-row">
+        <span>Progression globale</span>
+        <span>${percent}%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style="width:${percent}%;"></div>
+      </div>
+      <div class="progress-row">
+        <span class="progress-stats">✅ ${done} terminées</span>
+        <span class="progress-stats">⏳ ${total - done} restantes</span>
+      </div>
+    </div>
+  `;
+
+  state.sections.forEach((section, idx) => {
+    const doneCount = section.tasks.filter(t => t.done).length;
+    const badgeText = section.tasks.length ? `${doneCount}/${section.tasks.length}` : '';
+    html += `
+      <details class="section-details" ${idx === 0 ? 'open' : ''}>
+        <summary class="section-summary">
+          <span class="section-icon">${section.icon}</span>
+          <span class="section-title">${section.name}</span>
+          ${badgeText ? `<span class="section-badge">${badgeText}</span>` : ''}
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="section-content">
+    `;
+    if (section.specialContent) {
+      // Contenu spécial (arborescence)
+      html += section.specialContent;
+    } else {
+      // Liste des tâches
+      html += `<ul class="task-list">`;
+      section.tasks.forEach((task, i) => {
+        const doneClass = task.done ? 'done' : '';
+        const desc = task.description ? `<div class="task-desc">${task.description}</div>` : '';
+        html += `
+          <li class="task-item ${doneClass}">
+            <input type="checkbox" class="task-check" ${task.done ? 'checked' : ''} onchange="toggleTask('${section.id}', ${i})">
+            <div class="task-content">
+              <div class="task-title">${task.title}</div>
+              ${desc}
+            </div>
+          </li>
+        `;
+      });
+      html += `</ul>`;
+      // Ajout des notes spécifiques si présentes dans l'original
+      if (section.id === 'presentation') {
+        html += `<div class="note-box">💡 Le rôle <strong>"Sentinelle [Jeu]"</strong> ou <strong>"Officier [Jeu]"</strong> sera attribué automatiquement ou manuellement.</div>`;
+      } else if (section.id === 'agent') {
+        html += `<div class="note-box">🤖 L'<strong>Agent Bunker</strong> est un robot militaire virtuel qui connaît tout du Bunker. Appelé aussi <strong>"BUNK-IA"</strong>.</div>`;
+      }
+    }
+    html += `</div></details>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// Basculer une tâche
+function toggleTask(sectionId, taskIndex) {
+  const section = state.sections.find(s => s.id === sectionId);
+  if (!section) return;
+  const task = section.tasks[taskIndex];
+  if (!task) return;
+  task.done = !task.done;
+  localStorage.setItem('app_data_state', JSON.stringify(state));
+  renderRoadmap();
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SAUVEGARDE
+════════════════════════════════════════════════════════════════════════ */
+
+function openSaveModal() {
+  $('sv-json-preview').textContent = JSON.stringify(getAppState(), null, 2);
+  $('sv-import-ta').value = '';
+  openModal('save-ov');
+}
+
+$('do-sv-url').addEventListener('click', function() {
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(getAppState()))));
+  const url     = window.location.href.split('#')[0] + '#d=' + encoded;
+  history.replaceState(null, '', url);
+  copyText(url, this, '✓ URL copiée !');
+});
+
+$('do-sv-copy-json').addEventListener('click', function() {
+  copyText($('sv-json-preview').textContent, this, '✓ Copié !');
+});
+
+$('do-sv-dl-json').addEventListener('click', async () => {
+  const json  = JSON.stringify(getAppState(), null, 2);
+  const fname = APP.name.replace(/\s+/g,'-').toLowerCase() + '-' + new Date().toISOString().slice(0,10) + '.json';
+  const blob  = new Blob([json], { type:'application/json' });
+  if (window.showSaveFilePicker) {
+    try {
+      const h = await window.showSaveFilePicker({ suggestedName:fname, types:[{description:'JSON',accept:{'application/json':['.json']}}] });
+      const w = await h.createWritable(); await w.write(blob); await w.close(); return;
+    } catch(e) { if (e.name==='AbortError') return; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = fname; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+$('do-sv-merge').addEventListener('click', () => {
+  const raw = $('sv-import-ta').value.trim();
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    // Fusion simple : on écrase les sections existantes par id, on garde l'état done des tâches existantes
+    const newState = JSON.parse(JSON.stringify(state));
+    data.sections.forEach(newSec => {
+      const existing = newState.sections.find(s => s.id === newSec.id);
+      if (existing) {
+        // Fusionner les tâches : on garde l'état done des tâches existantes
+        const taskMap = new Map();
+        existing.tasks.forEach(t => taskMap.set(t.id, t));
+        newSec.tasks.forEach(t => {
+          if (taskMap.has(t.id)) {
+            t.done = taskMap.get(t.id).done; // conserver l'état coché
+          }
+          taskMap.set(t.id, t);
+        });
+        existing.tasks = Array.from(taskMap.values());
+      } else {
+        newState.sections.push(newSec);
+      }
+    });
+    setAppState(newState);
+    $('sv-import-ta').value = '';
+    closeModal('save-ov');
+  } catch { alert('❌ JSON invalide — vérifiez le contenu collé.'); }
+});
+
+$('do-sv-rpl').addEventListener('click', () => {
+  const raw = $('sv-import-ta').value.trim();
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    setAppState(data);
+    $('sv-import-ta').value = '';
+    closeModal('save-ov');
+  } catch { alert('❌ JSON invalide — vérifiez le contenu collé.'); }
+});
+
+$('do-sv-reset').addEventListener('click', () => {
+  if (!confirm('⚠️ Remettre à zéro ? Toutes les données saisies seront supprimées. Cette action est irréversible.')) return;
+  localStorage.removeItem('app_data_state');
+  setAppState(DEFAULT_DATA);
+  closeModal('save-ov');
+});
+
+/* ════════════════════════════════════════════════════════════════════════
+   MENU SECRET — Ctrl+Shift+D
+════════════════════════════════════════════════════════════════════════ */
+function openSecret()     { $('timelog-ta').value=localStorage.getItem('hiveos_timelog')||''; $('secret-ov').classList.add('open'); updateLogTotal(); }
+function closeSecret()    { $('secret-ov').classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.ctrlKey&&e.shiftKey&&e.key==='D'){e.preventDefault();openSecret();} });
+
+/* ════════════════════════════════════════════════════════════════════════
+   POINTEUSE (inchangé)
+════════════════════════════════════════════════════════════════════════ */
+let timerSec=0, timerRunning=false, timerInterval=null;
+
+function updateTimerDisplay() {
+  $('timer-display').textContent = `${pad(Math.floor(timerSec/3600))}:${pad(Math.floor((timerSec%3600)/60))}:${pad(timerSec%60)}`;
+}
+function timerStart() {
+  if(timerRunning) return; timerRunning=true;
+  $('btn-timer-start').textContent='▶ En cours...';
+  timerInterval=setInterval(()=>{timerSec++;updateTimerDisplay();},1000);
+}
+function timerPause() {
+  if(!timerRunning) return; timerRunning=false; clearInterval(timerInterval);
+  $('btn-timer-start').textContent='▶ Reprendre';
+}
+function timerStop()  { timerPause(); if(timerSec>0) logTime(); timerSec=0; updateTimerDisplay(); $('btn-timer-start').textContent='▶ Démarrer'; }
+function timerReset() { timerPause(); timerSec=0; updateTimerDisplay(); $('btn-timer-start').textContent='▶ Démarrer'; }
+
+function logTime() {
+  if(timerSec<1) return;
+  const h=Math.floor(timerSec/3600), m=Math.floor((timerSec%3600)/60), s=timerSec%60;
+  const dur=h>0?`${h}h ${pad(m)}min`:m>0?`${m}min ${pad(s)}s`:`${s}s`;
+  const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const entry=`${date}  ─  ${APP.name}  ─  ${dur}\n`;
+  const updated=(localStorage.getItem('hiveos_timelog')||'')+entry;
+  localStorage.setItem('hiveos_timelog',updated);
+  $('timelog-ta').value=updated;
+  updateLogTotal();
+}
+function clearTimelog() { if(!confirm('Effacer le journal ?')) return; localStorage.removeItem('hiveos_timelog'); $('timelog-ta').value=''; updateLogTotal(); }
+window.addEventListener('beforeunload', () => { if(timerRunning) logTime(); });
+
+/* ════════════════════════════════════════════════════════════════════════
+   JOURNAL DE TEMPS — CALCUL TOTAL & COPIE (inchangé)
+════════════════════════════════════════════════════════════════════════ */
+function parseLogSec(line) {
+  let s = 0;
+  const h   = line.match(/(\d+)h/);   if(h)   s += parseInt(h[1])   * 3600;
+  const m   = line.match(/(\d+)min/); if(m)   s += parseInt(m[1])   * 60;
+  const sec = line.match(/(\d+)s\b/); if(sec) s += parseInt(sec[1]);
+  return s;
+}
+function calcLogTotal() {
+  return (localStorage.getItem('hiveos_timelog') || '')
+    .split('\n').filter(l => l.trim()).reduce((acc, l) => acc + parseLogSec(l), 0);
+}
+function fmtTotal(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if(h > 0) return `${h}h ${pad(m)}min`;
+  if(m > 0) return `${m}min ${pad(s)}s`;
+  return `${s}s`;
+}
+function updateLogTotal() {
+  const el = $('tlog-total'); if(!el) return;
+  const t  = calcLogTotal();
+  el.textContent = t > 0 ? `Total : ${fmtTotal(t)}` : 'Total : —';
+}
+function copyTimelog() {
+  const log = (localStorage.getItem('hiveos_timelog') || '').trimEnd();
+  if (!log) return;
+  const sep = '─'.repeat(38);
+  const txt = `${log}\n\n${sep}\nTotal  :  ${fmtTotal(calcLogTotal())}`;
+  copyText(txt, $('btn-copy-tlog'), '✓ Copié !');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   TÉLÉCHARGEMENT HTML (menu secret)
+════════════════════════════════════════════════════════════════════════ */
+async function downloadHTML() {
+  let html = document.documentElement.outerHTML;
+  html = html.replace(
+    /\/SEED_START\/([\s\S]*?)\/SEED_END\//,
+    `/SEED_START/\nconst SAVED_DATA=${JSON.stringify(getAppState(),null,2)};\n/SEED_END/`
+  );
+  const filename = APP.name.replace(/\s+/g,'-').toLowerCase()+'.html';
+  const blob = new Blob([html],{type:'text/html;charset=utf-8'});
+  if (window.showSaveFilePicker) {
+    try {
+      const h=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Page Web',accept:{'text/html':['.html']}}]});
+      const w=await h.createWritable(); await w.write(blob); await w.close(); return;
+    } catch(e) { if(e.name==='AbortError') return; }
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════════════ */
+
+(function init() {
+  applyTheme();
+  $('hive-app-name').textContent    = APP.name;
+  $('hive-app-version').textContent = APP.version;
+
+  const np = localStorage.getItem(NP_KEY); if(np) $('np-ta').value=np;
+
+  // Charger l'état depuis localStorage ou URL
+  let loaded = false;
+  const hash = window.location.hash;
+  if (hash.startsWith('#d=')) {
+    try {
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3)))));
+      setAppState(decoded);
+      loaded = true;
+    } catch(e) {}
+  }
+  if (!loaded) {
+    const ls = localStorage.getItem('app_data_state');
+    if (ls) {
+      try {
+        const parsed = JSON.parse(ls);
+        setAppState(parsed);
+        loaded = true;
+      } catch(e) {}
+    }
+  }
+  if (!loaded) {
+    setAppState(DEFAULT_DATA);
+  }
+
+  // Rendu initial
+  renderRoadmap();
+})();
+
+</script>
+</body>
+</html>
