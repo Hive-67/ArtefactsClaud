@@ -29,6 +29,7 @@
 
         <div class="home-buttons">
           <button class="btn btn-primary" id="btn-play">▶ Jouer</button>
+          <button class="btn" id="btn-duel">⚔ Duel contre l'IA</button>
           <button class="btn" id="btn-marathon">🏁 Marathon</button>
           <button class="btn" id="btn-open-settings">⚙ Paramètres</button>
           <button class="btn" id="btn-open-help">❔ Comment jouer</button>
@@ -90,6 +91,36 @@
       </div>
     </section>
 
+    <!-- ===================== ÉCRAN DUEL CONTRE L'IA ===================== -->
+    <section id="screen-duel" class="screen">
+      <div class="duel-top">
+        <button class="icon-btn" id="btn-duel-pause" title="Pause">⏸</button>
+        <div class="duel-top-title">⚔ DUEL <span id="duel-ai-diff"></span></div>
+        <button class="icon-btn" id="btn-duel-mute" title="Couper la musique">🎵</button>
+      </div>
+      <div class="duel-arena">
+        <!-- Plateau de l'IA (miniature) -->
+        <div class="duel-side duel-ai-side">
+          <div class="duel-name">IA</div>
+          <canvas id="duel-canvas-ai" width="120" height="240"></canvas>
+          <div class="energy ai"><div class="energy-fill" id="energy-ai"></div></div>
+          <div class="duel-mini-score">Score <b id="duel-ai-score">0</b></div>
+        </div>
+        <!-- Ton plateau -->
+        <div class="duel-side duel-human-side">
+          <div class="duel-name">TOI</div>
+          <div class="duel-board-row">
+            <canvas id="duel-canvas-p1" width="300" height="600"></canvas>
+            <div class="duel-aside">
+              <div class="duel-next-box"><span>Suivant</span><canvas id="duel-next" width="70" height="170"></canvas></div>
+              <div class="duel-score-box"><span>Score</span><b id="duel-p1-score">0</b><span>Lignes</span><b id="duel-p1-lines">0</b></div>
+            </div>
+          </div>
+          <div class="energy big"><div class="energy-fill" id="energy-p1"></div><span class="energy-txt">ÉNERGIE — fais des lignes, puis ⇄ Échanger</span></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Contrôles tactiles mobiles (positionnables) — au niveau de l'app
          pour rester affichables même hors de l'écran de jeu (édition). -->
     <div id="touch-controls" class="touch-controls">
@@ -100,6 +131,7 @@
       <button class="tc-btn" data-action="rotateCCW">⟲</button>
       <button class="tc-btn" data-action="harddrop">⤓</button>
       <button class="tc-btn" data-action="hold">H</button>
+      <button class="tc-btn tc-swap" data-action="swap">⇄</button>
     </div>
 
     <!-- ===================== OVERLAYS ===================== -->
@@ -129,6 +161,38 @@
         <div class="overlay-buttons">
           <button class="btn btn-primary" id="btn-again">↻ Rejouer</button>
           <button class="btn" id="btn-go-home">🏠 Accueil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration du Duel IA -->
+    <div id="overlay-duel-setup" class="overlay">
+      <div class="overlay-card">
+        <h2>⚔ Duel contre l'IA</h2>
+        <p class="duel-setup-text">Deux plateaux, toi contre l'ordinateur. Remplis ta jauge en faisant des lignes, puis <b>échange ta pièce</b> avec celle de l'IA pour la saboter. Premier à déborder a perdu !</p>
+        <label class="duel-setup-label">Choisis la difficulté</label>
+        <div class="duel-diff">
+          <button class="btn duel-diff-btn" data-diff="facile">🙂 Facile</button>
+          <button class="btn duel-diff-btn" data-diff="moyen">😎 Moyen</button>
+          <button class="btn duel-diff-btn" data-diff="difficile">😈 Difficile</button>
+        </div>
+        <button class="btn btn-ghost" id="btn-duel-cancel">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Résultat du Duel IA -->
+    <div id="overlay-duel-result" class="overlay">
+      <div class="overlay-card">
+        <h2 class="go-title" id="duel-result-title">Victoire</h2>
+        <p class="duel-setup-text" id="duel-result-sub"></p>
+        <div class="go-stats">
+          <div class="go-row"><span>Ton score</span><b id="duel-r-score">0</b></div>
+          <div class="go-row"><span>Tes lignes</span><b id="duel-r-lines">0</b></div>
+          <div class="go-row go-best"><span>Difficulté</span><b id="duel-r-diff">Moyen</b></div>
+        </div>
+        <div class="overlay-buttons">
+          <button class="btn btn-primary" id="btn-duel-again">↻ Rejouer</button>
+          <button class="btn" id="btn-duel-home">🏠 Accueil</button>
         </div>
       </div>
     </div>
@@ -253,8 +317,11 @@
             <div class="help-item"><kbd>↑</kbd> / <kbd>X</kbd><span>Rotation horaire</span></div>
             <div class="help-item"><kbd>Z</kbd> / <kbd>Ctrl</kbd><span>Rotation anti-horaire</span></div>
             <div class="help-item"><kbd>C</kbd> / <kbd>Maj</kbd><span>Réserve (hold)</span></div>
+            <div class="help-item"><kbd>E</kbd> / <kbd>Entrée</kbd><span>Échanger (Duel IA)</span></div>
             <div class="help-item"><kbd>P</kbd> / <kbd>Échap</kbd><span>Pause</span></div>
           </div>
+          <h3>⚔ Duel contre l'IA</h3>
+          <p>Toi contre l'ordinateur sur deux plateaux. Fais des lignes pour remplir ta jauge d'énergie, puis <b>échange ta pièce avec celle de l'IA</b> (<kbd>E</kbd> ou le bouton ⇄) pour la saboter au bon moment. Attention : c'est mutuel, et l'IA peut te le faire aussi ! Premier à déborder a perdu.</p>
           <h3>Sur mobile</h3>
           <p>Utilise les boutons tactiles, ou les gestes : glisse pour déplacer, glisse vers le bas pour chute rapide, tape pour tourner. Tout est repositionnable dans les paramètres.</p>
           <h3>Score</h3>

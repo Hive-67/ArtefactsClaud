@@ -15,6 +15,7 @@ python3 -m http.server 8000
 ## Fonctionnalités
 
 - **Moteur complet** : 7 tetrominoes, rotation **SRS** avec *wall kicks*, sac de 7 (7-bag), pièce **fantôme**, **réserve** (hold), file des 5 pièces suivantes, *hard drop* / *soft drop*.
+- **Mode Duel contre l'IA** : deux plateaux côte à côte, toi contre l'ordinateur (3 difficultés). Remplis ta jauge d'énergie en faisant des lignes, puis **échange ta pièce active avec celle de l'IA** (touche `E` ou bouton ⇄) pour la saboter — c'est mutuel et à double tranchant. Premier à déborder a perdu.
 - **25 niveaux** (jusqu'à 30 en mode Marathon) : la vitesse de chute augmente à chaque palier de 10 lignes.
 - **Scoring avancé** : simples/doubles/triples, **Tetris**, **T-spins**, combos et bonus **back-to-back**.
 - **Audio 100% procédural** (Web Audio API) : effets sonores + **5 musiques** de fond au choix, aucun fichier externe.

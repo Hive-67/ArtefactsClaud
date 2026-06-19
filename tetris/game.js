@@ -169,13 +169,14 @@
   function cells(piece) {
     return SHAPES[piece.type][piece.rot].map(([cx, cy]) => [piece.x + cx, piece.y + cy]);
   }
-  function collides(piece) {
+  function collidesIn(grid, piece) {
     for (const [x, y] of cells(piece)) {
       if (x < 0 || x >= COLS || y >= TOTAL_ROWS) return true;
-      if (y >= 0 && State.grid[y][x]) return true;
+      if (y >= 0 && grid[y][x]) return true;
     }
     return false;
   }
+  function collides(piece) { return collidesIn(State.grid, piece); }
 
   // ---------------- Mouvements ----------------
   function tryMove(dx, dy) {
@@ -421,25 +422,27 @@
     ctx.closePath();
   }
 
-  function drawCell(ctx, gx, gy, type, alpha = 1, ghost = false) {
-    const x = gx * CELL, y = gy * CELL;
+  function paintCell(ctx, x, y, cell, type, alpha = 1, ghost = false) {
     const [c1, c2] = COLORS[type];
     ctx.save();
     ctx.globalAlpha = alpha;
     if (ghost) {
       ctx.strokeStyle = c1; ctx.lineWidth = 2; ctx.globalAlpha = 0.5;
-      roundRect(ctx, x + 2, y + 2, CELL - 4, CELL - 4, 5); ctx.stroke();
+      roundRect(ctx, x + 2, y + 2, cell - 4, cell - 4, 5); ctx.stroke();
       ctx.restore(); return;
     }
-    const grad = ctx.createLinearGradient(x, y, x, y + CELL);
+    const grad = ctx.createLinearGradient(x, y, x, y + cell);
     grad.addColorStop(0, c1); grad.addColorStop(1, c2);
     ctx.fillStyle = grad;
-    roundRect(ctx, x + 1, y + 1, CELL - 2, CELL - 2, 5); ctx.fill();
+    roundRect(ctx, x + 1, y + 1, cell - 2, cell - 2, 5); ctx.fill();
     // reflet
     ctx.globalAlpha = alpha * 0.35;
     ctx.fillStyle = '#ffffff';
-    roundRect(ctx, x + 3, y + 3, CELL - 6, (CELL - 6) * 0.4, 4); ctx.fill();
+    roundRect(ctx, x + 3, y + 3, cell - 6, (cell - 6) * 0.4, 4); ctx.fill();
     ctx.restore();
+  }
+  function drawCell(ctx, gx, gy, type, alpha = 1, ghost = false) {
+    paintCell(ctx, gx * CELL, gy * CELL, CELL, type, alpha, ghost);
   }
 
   function render() {
@@ -577,6 +580,7 @@
     { keys: ['ArrowRight'], label: '→', name: 'Droite', action: () => startMove(1) },
   ];
   function onKeyDown(e) {
+    if (mode === 'duel') { duelKeyDown(e); return; }
     if (!State.running) return;
     if (['p', 'Escape'].includes(e.key)) { togglePause(); return; }
     if (State.paused || State.over) return;
@@ -591,6 +595,7 @@
     }
   }
   function onKeyUp(e) {
+    if (mode === 'duel') { duelKeyUp(e); return; }
     switch (e.key) {
       case 'ArrowLeft': stopMove(-1); break;
       case 'ArrowRight': stopMove(1); break;
@@ -608,6 +613,7 @@
       const press = (e) => {
         e.preventDefault();
         if (layoutEditing) return;
+        if (mode === 'duel') { duelTouchPress(action); return; }
         if (!State.running || State.paused) return;
         switch (action) {
           case 'left': startMove(-1); break;
@@ -620,6 +626,7 @@
         }
       };
       const release = (e) => {
+        if (mode === 'duel') { duelTouchRelease(action); return; }
         if (action === 'left') stopMove(-1);
         if (action === 'right') stopMove(1);
         if (action === 'softdrop') State.softDropping = false;
@@ -804,8 +811,10 @@
   }
   function updateTouchVisibility() {
     if (layoutEditing) return; // en édition, les boutons restent visibles
-    const show = Settings.touchOn && isTouchDevice() && State.running;
+    const playing = (mode === 'solo' && State.running) || (mode === 'duel' && Duel.running);
+    const show = Settings.touchOn && isTouchDevice() && playing;
     $('#touch-controls').classList.toggle('visible', show);
+    $('#touch-controls').classList.toggle('duel', mode === 'duel' && Duel.running);
   }
 
   // ============================================================
@@ -821,6 +830,9 @@
 
   function startGame(marathon = false) {
     TetAudio.unlock();
+    mode = 'solo';
+    $('#touch-controls').classList.remove('duel');
+    Duel.running = false;
     State.grid = makeGrid();
     State.bag = []; State.next = []; State.hold = null;
     State.score = 0; State.lines = 0;
@@ -844,6 +856,7 @@
   }
 
   function togglePause() {
+    if (mode === 'duel') { toggleDuelPause(); return; }
     if (!State.running || State.over) return;
     State.paused = !State.paused;
     SFX('pause');
@@ -852,6 +865,9 @@
   }
   function quitToHome() {
     State.running = false; State.paused = false;
+    Duel.running = false; Duel.paused = false;
+    mode = 'solo';
+    $('#touch-controls').classList.remove('duel');
     TetAudio.stopMusic();
     closeAllOverlays();
     refreshHomeStats();
@@ -965,15 +981,30 @@
     // Pause overlay
     $('#btn-resume').addEventListener('click', togglePause);
     $('#btn-pause-settings').addEventListener('click', openSettings);
-    $('#btn-restart').addEventListener('click', () => { SFX('click'); startGame(State.marathon); });
+    $('#btn-restart').addEventListener('click', () => { SFX('click'); if (mode === 'duel') startDuel(Duel.diffName); else startGame(State.marathon); });
     $('#btn-quit').addEventListener('click', () => { SFX('click'); quitToHome(); });
 
     // Game over
     $('#btn-again').addEventListener('click', () => { SFX('click'); startGame(State.marathon); });
     $('#btn-go-home').addEventListener('click', () => { SFX('click'); quitToHome(); });
 
+    // Duel IA
+    $('#btn-duel').addEventListener('click', () => { TetAudio.unlock(); SFX('click'); showOverlay('overlay-duel-setup'); });
+    $('#btn-duel-cancel').addEventListener('click', () => { SFX('click'); hideOverlay('overlay-duel-setup'); });
+    $$('.duel-diff-btn').forEach(b => b.addEventListener('click', () => { SFX('click'); startDuel(b.dataset.diff); }));
+    $('#btn-duel-pause').addEventListener('click', toggleDuelPause);
+    $('#btn-duel-mute').addEventListener('click', () => {
+      Settings.musicOn = !Settings.musicOn;
+      $('#btn-duel-mute').textContent = Settings.musicOn ? '🎵' : '🔇';
+      TetAudio.setMusicEnabled(Settings.musicOn);
+      if (Settings.musicOn) TetAudio.startMusic();
+      persist();
+    });
+    $('#btn-duel-again').addEventListener('click', () => { SFX('click'); startDuel(Duel.diffName); });
+    $('#btn-duel-home').addEventListener('click', () => { SFX('click'); quitToHome(); });
+
     // Settings
-    $('#btn-close-settings').addEventListener('click', () => { hideOverlay('overlay-settings'); if (State.paused) showOverlay('overlay-pause'); });
+    $('#btn-close-settings').addEventListener('click', () => { hideOverlay('overlay-settings'); if (State.paused || Duel.paused) showOverlay('overlay-pause'); });
     $('#btn-close-help').addEventListener('click', () => hideOverlay('overlay-help'));
     $$('.settings-tabs .tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -1011,8 +1042,8 @@
     window.addEventListener('keyup', onKeyUp);
 
     // Resize
-    window.addEventListener('resize', () => { applyButtonLayout(); if ($('#screen-game').classList.contains('active')) { fitCanvas(); render(); } });
-    window.addEventListener('orientationchange', () => setTimeout(() => { applyButtonLayout(); fitCanvas(); render(); }, 200));
+    window.addEventListener('resize', () => { applyButtonLayout(); if ($('#screen-game').classList.contains('active')) { fitCanvas(); render(); } if (mode === 'duel' && Duel.running) fitDuelCanvas(); });
+    window.addEventListener('orientationchange', () => setTimeout(() => { applyButtonLayout(); fitCanvas(); render(); if (mode === 'duel' && Duel.running) fitDuelCanvas(); }, 200));
 
     // pause si l'onglet perd le focus
     document.addEventListener('visibilitychange', () => { if (document.hidden && State.running && !State.paused && !State.over) togglePause(); });
@@ -1022,6 +1053,391 @@
     if (State.paused) hideOverlay('overlay-pause');
     syncSettingsUI(); buildMusicList(); buildThemeList(); buildKeymap();
     showOverlay('overlay-settings'); SFX('click');
+  }
+
+  // ============================================================
+  //  MODE DUEL CONTRE L'IA
+  // ============================================================
+  let mode = 'solo';
+  const Duel = { running: false, paused: false, human: null, ai: null, diff: null, diffName: 'moyen', input: { dir: 0, das: 0, arr: 0 }, lastTime: 0 };
+
+  const EN_MAX = 100, EN_PER_LINE = 26, EN_SWAP_COST = 50;
+  const AI_DIFF = {
+    facile:    { moveMs: 150, gravityScale: 1.7,  weights: { h: -0.45, l: 0.70, holes: -0.35, bump: -0.18 }, mistakes: 0.22, swapChance: 0.18, swapMs: 5000, swapBad: -22 },
+    moyen:     { moveMs: 95,  gravityScale: 1.15, weights: { h: -0.51, l: 0.76, holes: -0.36, bump: -0.18 }, mistakes: 0.08, swapChance: 0.40, swapMs: 3200, swapBad: -15 },
+    difficile: { moveMs: 55,  gravityScale: 0.85, weights: { h: -0.51, l: 0.85, holes: -0.42, bump: -0.20 }, mistakes: 0.00, swapChance: 0.62, swapMs: 2200, swapBad: -10 },
+  };
+
+  let duelCanvasP1, duelCtxP1, duelCanvasAI, duelCtxAI;
+  function duelCanvases() {
+    if (!duelCanvasP1) {
+      duelCanvasP1 = $('#duel-canvas-p1'); duelCtxP1 = duelCanvasP1.getContext('2d');
+      duelCanvasAI = $('#duel-canvas-ai'); duelCtxAI = duelCanvasAI.getContext('2d');
+    }
+  }
+
+  function newDuelPlayer(level, isAI) {
+    return {
+      grid: makeGrid(), bag: [], next: [], current: null, hold: null, canHold: true,
+      score: 0, lines: 0, level, startLevel: level, dropInterval: gravityMs(level), dropTimer: 0,
+      lockTimer: 0, lockResets: 0, energy: 0, over: false, isAI, softDropping: false,
+      lastWasRotate: false, plan: null, aiMoveTimer: 0, aiSwapTimer: 0, flash: 0,
+    };
+  }
+
+  // ---- opérations moteur génériques (par joueur) ----
+  function dBagNext(P) {
+    if (P.bag.length === 0) {
+      const b = PIECES.slice();
+      for (let i = b.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [b[i], b[j]] = [b[j], b[i]]; }
+      P.bag.push(...b);
+    }
+    return P.bag.shift();
+  }
+  function dSpawn(P) {
+    while (P.next.length < 5) P.next.push(dBagNext(P));
+    const type = P.next.shift();
+    P.next.push(dBagNext(P));
+    P.current = { type, rot: 0, x: 3, y: 0 };
+    P.canHold = true; P.lockTimer = 0; P.lockResets = 0; P.plan = null; P.lastWasRotate = false;
+    if (collidesIn(P.grid, P.current)) dTopOut(P);
+  }
+  function dMove(P, dx, dy) {
+    const p = { ...P.current, x: P.current.x + dx, y: P.current.y + dy };
+    if (!collidesIn(P.grid, p)) {
+      P.current = p;
+      if (dy === 0 && P.lockResets < 15) { P.lockTimer = 0; P.lockResets++; }
+      return true;
+    }
+    return false;
+  }
+  function dRotate(P, dir, silent) {
+    const from = P.current.rot, to = (from + dir + 4) % 4;
+    if (P.current.type === 'O') { P.current.rot = to; return true; }
+    const table = P.current.type === 'I' ? KICKS_I : KICKS;
+    const kicks = table[`${from}>${to}`] || [[0, 0]];
+    for (const [kx, ky] of kicks) {
+      const p = { ...P.current, rot: to, x: P.current.x + kx, y: P.current.y - ky };
+      if (!collidesIn(P.grid, p)) {
+        P.current = p; P.lastWasRotate = true;
+        if (P.lockResets < 15) { P.lockTimer = 0; P.lockResets++; }
+        if (!silent) { SFX('rotate'); vibrate(8); }
+        return true;
+      }
+    }
+    if (!silent) SFX('invalid');
+    return false;
+  }
+  function dHardDrop(P) {
+    let d = 0;
+    while (true) { const p = { ...P.current, y: P.current.y + 1 }; if (collidesIn(P.grid, p)) break; P.current = p; d++; }
+    P.score += d * 2;
+    if (!P.isAI) { SFX('harddrop'); vibrate(18); }
+    dLock(P);
+  }
+  function dHold(P) {
+    if (!P.canHold) { if (!P.isAI) SFX('invalid'); return; }
+    if (!P.isAI) { SFX('hold'); vibrate(8); }
+    const cur = P.current.type;
+    if (P.hold == null) { P.hold = cur; dSpawn(P); }
+    else {
+      const h = P.hold; P.hold = cur;
+      P.current = { type: h, rot: 0, x: 3, y: 0 }; P.lockTimer = 0; P.lockResets = 0; P.plan = null;
+      if (collidesIn(P.grid, P.current)) dTopOut(P);
+    }
+    P.canHold = false;
+  }
+  function dLock(P) {
+    for (const [x, y] of cells(P.current)) if (y >= 0) P.grid[y][x] = P.current.type;
+    const full = [];
+    for (let y = 0; y < TOTAL_ROWS; y++) if (P.grid[y].every(c => c)) full.push(y);
+    if (full.length) {
+      for (const y of full) P.grid.splice(y, 1);
+      for (let i = 0; i < full.length; i++) P.grid.unshift(new Array(COLS).fill(null));
+      P.lines += full.length;
+      P.score += [0, 100, 300, 500, 800][full.length] * P.level;
+      P.energy = Math.min(EN_MAX, P.energy + EN_PER_LINE * full.length + (full.length === 4 ? 20 : 0));
+      const nl = P.startLevel + Math.floor(P.lines / LINES_PER_LEVEL);
+      if (nl > P.level) { P.level = nl; P.dropInterval = gravityMs(P.level); }
+      P.flash = full.length >= 4 ? 240 : 130;
+      if (!P.isAI) { SFX(full.length === 4 ? 'tetris' : 'line'); vibrate(20); } else SFX('line');
+    } else {
+      if (cells(P.current).every(([, y]) => y < HIDDEN)) { dTopOut(P); return; }
+      if (!P.isAI) SFX('lock');
+    }
+    P.lastWasRotate = false;
+    dSpawn(P);
+  }
+  function dTopOut(P) {
+    if (P.over) return;
+    P.over = true;
+    endDuel(P.isAI ? 'human' : 'ai');
+  }
+
+  // ---- échange de pièces (le cœur du mode) ----
+  function morphPiece(X, newType) {
+    X.current.type = newType;
+    if (!collidesIn(X.grid, X.current)) { X.lockTimer = 0; X.lockResets = 0; return; }
+    for (let up = 1; up <= 3; up++) { const p = { ...X.current, y: X.current.y - up }; if (!collidesIn(X.grid, p)) { X.current = p; X.lockTimer = 0; X.lockResets = 0; return; } }
+    for (const dx of [-1, 1, -2, 2]) { const p = { ...X.current, x: X.current.x + dx }; if (!collidesIn(X.grid, p)) { X.current = p; X.lockTimer = 0; return; } }
+    X.current = { type: newType, rot: 0, x: 3, y: 0 }; X.lockTimer = 0;
+    if (collidesIn(X.grid, X.current)) dTopOut(X);
+  }
+  function duelSwap(initiator) {
+    if (!Duel.running || Duel.paused) return false;
+    const P = initiator, Q = (initiator === Duel.human) ? Duel.ai : Duel.human;
+    if (!P.current || !Q.current || P.over || Q.over) return false;
+    if (P.energy < EN_SWAP_COST) { if (!P.isAI) { SFX('invalid'); vibrate(12); } return false; }
+    P.energy -= EN_SWAP_COST;
+    const tP = P.current.type, tQ = Q.current.type;
+    morphPiece(P, tQ); morphPiece(Q, tP);
+    P.plan = null; Q.plan = null;
+    P.flash = Math.max(P.flash, 180); Q.flash = Math.max(Q.flash, 300);
+    SFX('hold'); vibrate(30);
+    return true;
+  }
+
+  // ---- IA : placement + sabotage ----
+  function gridFeatures(grid) {
+    const heights = new Array(COLS).fill(0);
+    let holes = 0;
+    for (let x = 0; x < COLS; x++) {
+      let seen = false;
+      for (let y = 0; y < TOTAL_ROWS; y++) {
+        if (grid[y][x]) { if (!seen) { seen = true; heights[x] = TOTAL_ROWS - y; } }
+        else if (seen) holes++;
+      }
+    }
+    let agg = 0, bump = 0, maxH = 0;
+    for (let x = 0; x < COLS; x++) { agg += heights[x]; maxH = Math.max(maxH, heights[x]); }
+    for (let x = 0; x < COLS - 1; x++) bump += Math.abs(heights[x] - heights[x + 1]);
+    return { agg, holes, bump, maxH };
+  }
+  function bestPlacement(grid, type, w) {
+    let best = { score: -1e9, rot: 0, x: 3 };
+    for (let rot = 0; rot < 4; rot++) {
+      for (let x = -2; x < COLS; x++) {
+        const start = { type, rot, x, y: 0 };
+        if (collidesIn(grid, start)) continue;
+        let landed = start;
+        while (!collidesIn(grid, { ...landed, y: landed.y + 1 })) landed = { ...landed, y: landed.y + 1 };
+        const g = grid.map(r => r.slice());
+        for (const [cx, cy] of cells(landed)) if (cy >= 0) g[cy][cx] = type;
+        let lines = 0;
+        for (let y = 0; y < TOTAL_ROWS; y++) if (g[y].every(c => c)) lines++;
+        const f = gridFeatures(g);
+        const score = w.h * f.agg + w.l * lines + w.holes * f.holes + w.bump * f.bump;
+        if (score > best.score) best = { score, rot, x: landed.x };
+      }
+    }
+    return best;
+  }
+  function aiThink(P, dt) {
+    if (!P.current) return;
+    if (!P.plan) {
+      const best = bestPlacement(P.grid, P.current.type, Duel.diff.weights);
+      if (Math.random() < Duel.diff.mistakes) best.x += (Math.random() < 0.5 ? -1 : 1);
+      P.plan = best; P.aiMoveTimer = 0;
+    }
+    P.aiMoveTimer += dt;
+    if (P.aiMoveTimer < Duel.diff.moveMs) return;
+    P.aiMoveTimer = 0;
+    const plan = P.plan;
+    if (P.current.rot !== plan.rot) { if (!dRotate(P, 1, true)) dHardDrop(P); return; }
+    if (P.current.x < plan.x) { if (!dMove(P, 1, 0)) dHardDrop(P); return; }
+    if (P.current.x > plan.x) { if (!dMove(P, -1, 0)) dHardDrop(P); return; }
+    dHardDrop(P);
+  }
+  function aiMaybeSwap(P, dt) {
+    P.aiSwapTimer += dt;
+    if (P.aiSwapTimer < Duel.diff.swapMs) return;
+    P.aiSwapTimer = 0;
+    if (P.energy < EN_SWAP_COST) return;
+    if (Math.random() > Duel.diff.swapChance) return;
+    const myBad = P.plan && P.plan.score < Duel.diff.swapBad;
+    const humanClean = gridFeatures(Duel.human.grid).maxH < 6;
+    if (myBad || humanClean) duelSwap(P);
+  }
+
+  // ---- entrées du joueur humain ----
+  function duelStartMove(dir) { Duel.input.dir = dir; Duel.input.das = 0; Duel.input.arr = 0; if (dMove(Duel.human, dir, 0)) { SFX('move'); vibrate(4); } }
+  function duelStopMove(dir) { if (Duel.input.dir === dir) Duel.input.dir = 0; }
+  function handleDuelDAS(dt) {
+    const i = Duel.input; if (i.dir === 0) return;
+    i.das += dt;
+    if (i.das < Settings.das) return;
+    if (Settings.arr <= 0) { while (dMove(Duel.human, i.dir, 0)) {} i.arr = 0; return; }
+    i.arr += dt;
+    if (i.arr >= Settings.arr) { i.arr = 0; dMove(Duel.human, i.dir, 0); }
+  }
+  function duelKeyDown(e) {
+    if (['p', 'Escape'].includes(e.key)) { toggleDuelPause(); return; }
+    const H = Duel.human;
+    if (!Duel.running || Duel.paused || !H || H.over) return;
+    switch (e.key) {
+      case 'ArrowLeft': if (!e.repeat) duelStartMove(-1); e.preventDefault(); break;
+      case 'ArrowRight': if (!e.repeat) duelStartMove(1); e.preventDefault(); break;
+      case 'ArrowDown': H.softDropping = true; e.preventDefault(); break;
+      case 'ArrowUp': case 'x': case 'X': if (!e.repeat) dRotate(H, 1, false); e.preventDefault(); break;
+      case 'z': case 'Z': case 'Control': if (!e.repeat) dRotate(H, -1, false); e.preventDefault(); break;
+      case ' ': if (!e.repeat) dHardDrop(H); e.preventDefault(); break;
+      case 'c': case 'C': case 'Shift': if (!e.repeat) dHold(H); e.preventDefault(); break;
+      case 'e': case 'E': case 'Enter': if (!e.repeat) duelSwap(H); e.preventDefault(); break;
+    }
+  }
+  function duelKeyUp(e) {
+    const H = Duel.human; if (!H) return;
+    switch (e.key) {
+      case 'ArrowLeft': duelStopMove(-1); break;
+      case 'ArrowRight': duelStopMove(1); break;
+      case 'ArrowDown': H.softDropping = false; break;
+    }
+  }
+  function duelTouchPress(action) {
+    const H = Duel.human;
+    if (!Duel.running || Duel.paused || !H || H.over) return;
+    switch (action) {
+      case 'left': duelStartMove(-1); break;
+      case 'right': duelStartMove(1); break;
+      case 'softdrop': H.softDropping = true; break;
+      case 'rotateCW': dRotate(H, 1, false); break;
+      case 'rotateCCW': dRotate(H, -1, false); break;
+      case 'harddrop': dHardDrop(H); break;
+      case 'hold': dHold(H); break;
+      case 'swap': duelSwap(H); break;
+    }
+  }
+  function duelTouchRelease(action) {
+    const H = Duel.human; if (!H) return;
+    if (action === 'left') duelStopMove(-1);
+    if (action === 'right') duelStopMove(1);
+    if (action === 'softdrop') H.softDropping = false;
+  }
+
+  // ---- boucle, rendu, cycle de vie ----
+  function stepPlayer(P, dt) {
+    if (!P || P.over) return;
+    if (P.isAI) { aiThink(P, dt); if (!Duel.running) return; aiMaybeSwap(P, dt); if (!Duel.running) return; }
+    if (P.over) return;
+    const base = P.softDropping ? Math.min(50, P.dropInterval) : P.dropInterval;
+    const interval = P.isAI ? base * Duel.diff.gravityScale : base;
+    P.dropTimer += dt;
+    if (P.dropTimer >= interval) {
+      P.dropTimer = 0;
+      const p = { ...P.current, y: P.current.y + 1 };
+      if (!collidesIn(P.grid, p)) { P.current = p; if (P.softDropping && !P.isAI) P.score += 1; P.lastWasRotate = false; }
+    }
+    if (P.current && collidesIn(P.grid, { ...P.current, y: P.current.y + 1 })) {
+      P.lockTimer += dt; if (P.lockTimer >= 500) dLock(P);
+    } else P.lockTimer = 0;
+    if (P.flash > 0) P.flash -= dt;
+  }
+  function duelLoop(time) {
+    if (mode !== 'duel' || !Duel.running) return;
+    const dt = Math.min(50, time - (Duel.lastTime || time)); Duel.lastTime = time;
+    if (!Duel.paused) {
+      stepPlayer(Duel.human, dt);
+      if (Duel.running) stepPlayer(Duel.ai, dt);
+      handleDuelDAS(dt);
+    }
+    renderDuel();
+    if (Duel.running) requestAnimationFrame(duelLoop);
+  }
+  function setCanvasSize(c, cell) { c.width = cell * COLS; c.height = cell * ROWS; c.style.width = (cell * COLS) + 'px'; c.style.height = (cell * ROWS) + 'px'; }
+  function fitDuelCanvas() {
+    duelCanvases();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mobile = vw < 780;
+    let availW = mobile ? vw * 0.9 : Math.min(360, vw * 0.4);
+    let availH = mobile ? vh * 0.6 : vh * 0.72;
+    let cell = Math.max(10, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+    setCanvasSize(duelCanvasP1, cell);
+    let aiCell = mobile ? Math.max(6, Math.floor((vw * 0.28) / COLS)) : Math.max(8, Math.floor(cell * 0.62));
+    setCanvasSize(duelCanvasAI, aiCell);
+  }
+  function drawBoardP(P, canvas, ctx, ghost) {
+    const W = canvas.width, H = canvas.height, cell = W / COLS;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fillRect(0, 0, W, H);
+    if (Settings.grid) {
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+      for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(x * cell, 0); ctx.lineTo(x * cell, H); ctx.stroke(); }
+      for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * cell); ctx.lineTo(W, y * cell); ctx.stroke(); }
+    }
+    for (let y = HIDDEN; y < TOTAL_ROWS; y++) for (let x = 0; x < COLS; x++) if (P.grid[y][x]) paintCell(ctx, x * cell, (y - HIDDEN) * cell, cell, P.grid[y][x]);
+    if (P.current && !P.over) {
+      if (ghost && Settings.ghost) {
+        let gy = P.current.y; while (!collidesIn(P.grid, { ...P.current, y: gy + 1 })) gy++;
+        for (const [x, y] of cells({ ...P.current, y: gy })) if (y >= HIDDEN) paintCell(ctx, x * cell, (y - HIDDEN) * cell, cell, P.current.type, 1, true);
+      }
+      for (const [x, y] of cells(P.current)) if (y >= HIDDEN) paintCell(ctx, x * cell, (y - HIDDEN) * cell, cell, P.current.type);
+    }
+    if (P.flash > 0) { ctx.fillStyle = 'rgba(255,255,255,' + Math.min(0.6, P.flash / 600) + ')'; ctx.fillRect(0, 0, W, H); }
+    if (P.over) { ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, 0, W, H); }
+  }
+  function drawDuelNext() {
+    const c = $('#duel-next'), x = c.getContext('2d');
+    x.clearRect(0, 0, c.width, c.height);
+    const n = Math.min(3, Duel.human.next.length);
+    for (let i = 0; i < n; i++) drawMini(x, Duel.human.next[i], c.width / 2, (i + 0.5) * (c.height / n), 15);
+  }
+  function renderDuel() {
+    if (!Duel.human) return;
+    drawBoardP(Duel.human, duelCanvasP1, duelCtxP1, true);
+    drawBoardP(Duel.ai, duelCanvasAI, duelCtxAI, false);
+    const ep1 = $('#energy-p1'), eai = $('#energy-ai');
+    ep1.style.width = (Duel.human.energy / EN_MAX * 100) + '%';
+    eai.style.width = (Duel.ai.energy / EN_MAX * 100) + '%';
+    ep1.classList.toggle('ready', Duel.human.energy >= EN_SWAP_COST);
+    $('#touch-controls').classList.toggle('swap-ready', Duel.human.energy >= EN_SWAP_COST);
+    drawDuelNext();
+    $('#duel-p1-score').textContent = Duel.human.score.toLocaleString('fr-FR');
+    $('#duel-p1-lines').textContent = Duel.human.lines;
+    $('#duel-ai-score').textContent = Duel.ai.score.toLocaleString('fr-FR');
+  }
+
+  function startDuel(diff) {
+    TetAudio.unlock();
+    mode = 'duel';
+    Duel.diffName = diff; Duel.diff = AI_DIFF[diff] || AI_DIFF.moyen;
+    const lvl = parseInt($('#start-level').value, 10) || 1;
+    Duel.human = newDuelPlayer(lvl, false);
+    Duel.ai = newDuelPlayer(lvl, true);
+    dSpawn(Duel.human); dSpawn(Duel.ai);
+    Duel.input = { dir: 0, das: 0, arr: 0 };
+    Duel.running = true; Duel.paused = false; Duel.lastTime = 0;
+    const label = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' }[diff] || '';
+    $('#duel-ai-diff').textContent = label ? '· ' + label : '';
+    $('#btn-duel-mute').textContent = Settings.musicOn ? '🎵' : '🔇';
+    closeAllOverlays();
+    showScreen('screen-duel');
+    $('#touch-controls').classList.add('duel');
+    fitDuelCanvas(); applyButtonLayout(); updateTouchVisibility();
+    if (Settings.musicOn) TetAudio.startMusic();
+    requestAnimationFrame(duelLoop);
+  }
+  function toggleDuelPause() {
+    if (!Duel.running) return;
+    Duel.paused = !Duel.paused;
+    SFX('pause');
+    if (Duel.paused) { showOverlay('overlay-pause'); TetAudio.pauseAll(); }
+    else { hideOverlay('overlay-pause'); TetAudio.resumeAll(); Duel.lastTime = performance.now(); }
+  }
+  function endDuel(winner) {
+    if (!Duel.running) return;
+    Duel.running = false; Duel.paused = false; Duel.winner = winner;
+    TetAudio.stopMusic();
+    SFX(winner === 'human' ? 'levelup' : 'gameover');
+    vibrate(winner === 'human' ? 40 : 60);
+    const win = winner === 'human';
+    const t = $('#duel-result-title');
+    t.textContent = win ? '🏆 Victoire !' : '💀 Défaite';
+    t.className = 'go-title ' + (win ? 'win' : 'lose');
+    $('#duel-result-sub').textContent = win ? "Tu as fait déborder l'IA !" : "L'IA t'a fait déborder.";
+    $('#duel-r-score').textContent = Duel.human.score.toLocaleString('fr-FR');
+    $('#duel-r-lines').textContent = Duel.human.lines;
+    $('#duel-r-diff').textContent = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' }[Duel.diffName] || '';
+    setTimeout(() => { renderDuel(); showOverlay('overlay-duel-result'); }, 500);
   }
 
   // ============================================================

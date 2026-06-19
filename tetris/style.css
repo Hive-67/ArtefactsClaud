@@ -352,3 +352,50 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 @media (hover:none) and (pointer:coarse){
   .panel-left .stat-box{font-size:13px;}
 }
+
+/* ===================== MODE DUEL CONTRE L'IA ===================== */
+#screen-duel.active{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;}
+.duel-top{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:920px;padding:10px 14px;gap:10px;}
+.duel-top-title{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:3px;color:var(--accent);font-size:16px;}
+.duel-top-title span{color:var(--text-dim);font-size:13px;letter-spacing:1px;}
+.duel-arena{position:relative;flex:1;width:100%;display:flex;align-items:center;justify-content:center;gap:34px;padding:6px 10px 12px;}
+.duel-side{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.duel-name{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:2px;font-size:12px;color:var(--text-dim);}
+.duel-human-side .duel-name{color:var(--accent);}
+.duel-board-row{display:flex;gap:12px;align-items:flex-start;}
+#duel-canvas-p1,#duel-canvas-ai{background:rgba(0,0,0,.32);border-radius:10px;box-shadow:var(--shadow);}
+.duel-aside{display:flex;flex-direction:column;gap:12px;}
+.duel-next-box,.duel-score-box{background:var(--panel);border:1px solid var(--panel-border);border-radius:12px;padding:8px 10px;text-align:center;font-size:11px;color:var(--text-dim);}
+.duel-next-box span,.duel-score-box span{display:block;text-transform:uppercase;letter-spacing:1px;}
+.duel-score-box b{display:block;color:var(--text);font-size:18px;font-family:'Orbitron',sans-serif;margin:2px 0 8px;}
+.duel-score-box b:last-child{margin-bottom:0;}
+.energy{position:relative;width:170px;height:14px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--panel-border);}
+.energy.big{width:min(82vw,360px);height:22px;margin-top:4px;}
+.energy.ai{width:110px;height:9px;}
+.energy-fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width .2s ease;}
+.energy-fill.ready{box-shadow:0 0 16px var(--accent);animation:enpulse 1s infinite;}
+.energy-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);letter-spacing:.4px;white-space:nowrap;overflow:hidden;}
+@keyframes enpulse{50%{filter:brightness(1.45);}}
+.duel-mini-score{font-size:11px;color:var(--text-dim);}
+.duel-mini-score b{color:var(--text);}
+.tc-swap{--tc-color:#ffe14a;display:none !important;font-size:calc(var(--btn-size,64px)*.5) !important;}
+#touch-controls.duel .tc-swap,#touch-controls.editing .tc-swap{display:grid !important;}
+#touch-controls.swap-ready .tc-swap{box-shadow:0 0 0 1.5px #ffe14a,0 0 22px #ffe14a;animation:enpulse 1s infinite;}
+.duel-setup-text{color:var(--text-dim);font-size:14px;line-height:1.5;margin:8px 0;max-width:380px;}
+.duel-setup-label{display:block;font-weight:700;color:var(--text);margin:6px 0 2px;}
+.duel-diff{display:flex;flex-direction:column;gap:10px;margin:12px 0;}
+.go-title.win{background:linear-gradient(135deg,var(--good),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.go-title.lose{background:linear-gradient(135deg,var(--danger),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+/* Téléphone : ton plateau en grand, l'IA en miniature dans le coin */
+@media (max-width:780px){
+  .duel-arena{flex-direction:column;gap:6px;}
+  .duel-ai-side{position:absolute;top:4px;right:6px;z-index:6;gap:3px;background:rgba(10,10,22,.55);padding:6px;border-radius:12px;backdrop-filter:blur(5px);}
+  .duel-ai-side .duel-name{font-size:9px;}
+  .duel-mini-score{font-size:9px;}
+  .duel-board-row{flex-direction:column;align-items:center;gap:8px;}
+  .duel-aside{flex-direction:row;gap:8px;}
+  .duel-next-box,.duel-score-box{display:flex;align-items:center;gap:6px;padding:6px 8px;}
+  .duel-next-box span,.duel-score-box span{display:inline;}
+  .duel-score-box b{display:inline;font-size:14px;margin:0;}
+}
