@@ -1665,23 +1665,32 @@ const TetAudio = (function () {
   // gestes (swipe) sur le plateau
   function bindSwipe() {
     const stack = $('.canvas-stack');
-    let sx = 0, sy = 0, st = 0, lastX = 0, moved = false, startCol = 0;
+    let sx = 0, sy = 0, st = 0, lastX = 0, moved = false, axis = null;
     stack.addEventListener('touchstart', (e) => {
       if (!Settings.swipe || !State.running || State.paused) return;
-      const t = e.touches[0]; sx = lastX = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
+      const t = e.touches[0]; sx = lastX = t.clientX; sy = t.clientY; st = Date.now(); moved = false; axis = null;
     }, { passive: true });
     stack.addEventListener('touchmove', (e) => {
       if (!Settings.swipe || !State.running || State.paused) return;
       const t = e.touches[0];
-      const dx = t.clientX - lastX;
-      const threshold = CELL * 0.8;
-      if (Math.abs(dx) > threshold) {
-        const dir = dx > 0 ? 1 : -1;
-        if (tryMoveSilent(dir, 0)) { SFX('move'); resetLock(); vibrate(5); }
-        lastX = t.clientX; moved = true;
+      const tdx = t.clientX - sx, tdy = t.clientY - sy;
+      // Verrouillage d'axe : on choisit "horizontal" ou "vertical" selon le
+      // premier mouvement franc, et on s'y tient pour tout le geste. Ainsi un
+      // glissement vers le bas fait UNIQUEMENT descendre, sans dérive latérale.
+      if (axis === null) {
+        if (tdy > CELL * 0.7 && tdy > Math.abs(tdx)) axis = 'v';
+        else if (Math.abs(tdx) > CELL * 0.5 && Math.abs(tdx) >= tdy) axis = 'h';
       }
-      const dy = t.clientY - sy;
-      if (dy > CELL * 1.2) { State.softDropping = true; }
+      if (axis === 'v') { State.softDropping = true; return; } // chute seule, latéral bloqué
+      if (axis === 'h') {
+        const dx = t.clientX - lastX;
+        const threshold = CELL * 0.8;
+        if (Math.abs(dx) > threshold) {
+          const dir = dx > 0 ? 1 : -1;
+          if (tryMoveSilent(dir, 0)) { SFX('move'); resetLock(); vibrate(5); }
+          lastX = t.clientX; moved = true;
+        }
+      }
     }, { passive: true });
     stack.addEventListener('touchend', (e) => {
       State.softDropping = false;
