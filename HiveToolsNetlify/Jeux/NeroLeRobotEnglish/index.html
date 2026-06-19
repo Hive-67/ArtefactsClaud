@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nero — Anglais de l'espace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     VARIABLES — palette Nero
+     ========================================================= */
+  :root{
+    --bg:#0b1026; --bg2:#1a2150; --card:#fdfdff;
+    --tx:#fff; --tx-s:#aab4e8; --ink:#1b2150;
+    --ac:#ff3b3b; --ac2:#ffd60a; --ok:#2fbf4f; --err:#ff4d4d; --blue:#2f6bff;
+    --c1:#e23b3b;--c2:#2fbf4f;--c3:#2f6bff;--c4:#ff5fa2;--c5:#ffd60a;--c6:#ff8a3d;
+    --fd:'Baloo 2',system-ui,sans-serif;
+    --fb:'Fredoka',system-ui,sans-serif;
+    --sh:0 14px 34px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;margin:0;}
+  body{font-family:var(--fb);background:radial-gradient(120% 90% at 50% -10%,var(--bg2),var(--bg) 70%);
+       color:var(--tx);overflow:hidden;touch-action:manipulation;}
+
+  /* ---- Décor ---- */
+  #space{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .star{position:absolute;border-radius:50%;background:#fff;opacity:.8;animation:twinkle 3s ease-in-out infinite;}
+  .planet{position:absolute;border-radius:50%;box-shadow:inset -10px -8px 24px rgba(0,0,0,.45);}
+  .porthole{position:absolute;right:-120px;top:8%;width:300px;height:300px;border-radius:50%;
+            border:10px solid rgba(120,150,255,.12);box-shadow:0 0 60px rgba(80,120,255,.18) inset;}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.85);}50%{opacity:.95;transform:scale(1.15);}}
+
+  /* ---- App ---- */
+  #app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;padding:16px;gap:12px;}
+  .screen{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:14px;
+          animation:pop .35s ease both;}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
+
+  /* ---- Typo ---- */
+  .title{font-family:var(--fd);font-weight:800;letter-spacing:2px;font-size:clamp(44px,12vw,82px);
+         line-height:.9;margin:0;text-shadow:0 0 22px rgba(120,150,255,.5);}
+  .title span{color:var(--ac2);}
+  .sub{font-family:var(--fd);font-weight:600;font-size:clamp(14px,4vw,19px);color:var(--tx-s);margin:0;text-align:center;}
+  .tag{font-size:13px;color:var(--tx-s);}
+
+  /* ---- Boutons ---- */
+  .btn{font-family:var(--fd);font-weight:800;cursor:pointer;border:none;border-radius:22px;
+       padding:16px 32px;font-size:21px;color:#fff;background:linear-gradient(180deg,#ff5a5a,var(--ac));
+       box-shadow:var(--sh);transition:transform .12s ease;display:inline-flex;align-items:center;gap:10px;}
+  .btn:hover{transform:translateY(-3px);}.btn:active{transform:translateY(1px) scale(.98);}
+  .btn.green{background:linear-gradient(180deg,#4fd66c,var(--ok));}
+  .btn.ghost{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);font-size:16px;padding:12px 22px;}
+  .btn:disabled{opacity:.42;cursor:not-allowed;transform:none;}
+  .btn:focus-visible{outline:4px solid var(--ac2);outline-offset:3px;}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--fd);font-weight:700;
+        background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);padding:8px 15px;
+        border-radius:999px;font-size:15px;}
+  .iconbtn{cursor:pointer;border:none;background:#eef1ff;color:var(--ink);width:44px;height:44px;
+           border-radius:13px;font-size:20px;display:grid;place-items:center;transition:transform .1s ease;flex-shrink:0;}
+  .iconbtn:hover{transform:scale(1.08);}.iconbtn:active{transform:scale(.93);}
+  .iconbtn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+
+  /* ---- Bouton son coin ---- */
+  #cornerMute{position:fixed;top:14px;right:14px;z-index:40;cursor:pointer;border:none;
+              background:rgba(255,255,255,.12);color:#fff;width:44px;height:44px;border-radius:13px;
+              font-size:20px;display:grid;place-items:center;transition:transform .1s ease;}
+  #cornerMute:hover{transform:scale(1.08);}
+  #cornerMute:focus-visible{outline:3px solid var(--ac2);outline-offset:2px;}
+
+  /* ---- HUD (2 rangées) ---- */
+  #hud{width:100%;max-width:560px;display:flex;flex-direction:column;gap:5px;}
+  #hudR1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  #hudLevel{font-family:var(--fd);font-weight:700;font-size:clamp(13px,3.5vw,15px);color:var(--tx-s);
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #hudScore{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ac2);flex-shrink:0;}
+  #hudR2{display:flex;align-items:center;gap:8px;}
+  #progWrap{flex:1;height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;}
+  #progBar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ok),var(--ac2));transition:width .4s ease;}
+  #hudProg{font-family:var(--fd);font-weight:800;font-size:15px;color:#fff;flex-shrink:0;min-width:44px;text-align:right;}
+
+  /* ---- Carte de question ---- */
+  .card{width:100%;background:var(--card);color:var(--ink);border-radius:26px;padding:18px 15px;
+        box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;gap:11px;}
+  .instr{font-family:var(--fd);font-weight:700;font-size:clamp(15px,4vw,18px);color:var(--ink);margin:0;text-align:center;}
+  .pw{font-family:var(--fd);font-weight:800;font-size:clamp(28px,8vw,46px);color:var(--ac);text-transform:lowercase;}
+  .pfr{font-size:clamp(13px,3.8vw,16px);color:#8a93b8;font-weight:500;}
+  .listen{width:88px;height:88px;border-radius:50%;border:none;cursor:pointer;font-size:38px;
+          background:linear-gradient(180deg,#5aa0ff,var(--blue));color:#fff;
+          box-shadow:0 10px 22px rgba(47,107,255,.4);transition:transform .12s ease;}
+  .listen:hover{transform:scale(1.06);}.listen:active{transform:scale(.94);}
+  .listen:focus-visible{outline:4px solid var(--ac2);outline-offset:3px;}
+  .badge-dir{font-size:12px;font-weight:600;color:#8a93b8;background:#eef1ff;padding:4px 11px;border-radius:999px;}
+
+  /* ---- Grille réponses ---- */
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;width:100%;}
+  .opt{cursor:pointer;border:none;border-radius:20px;padding:13px;font-size:50px;
+       background:#eef1ff;box-shadow:0 6px 0 rgba(27,33,80,.10);transition:transform .1s ease;
+       display:grid;place-items:center;min-height:86px;}
+  .opt.word{font-family:var(--fd);font-weight:800;font-size:clamp(17px,5vw,25px);color:#fff;}
+  .opt.word.k0{background:linear-gradient(180deg,#ef5a5a,var(--c1));}
+  .opt.word.k1{background:linear-gradient(180deg,#56d473,var(--c2));}
+  .opt.word.k2{background:linear-gradient(180deg,#5a8cff,var(--c3));}
+  .opt.word.k3{background:linear-gradient(180deg,#ff7fb6,var(--c4));}
+  .opt:hover{transform:translateY(-3px);}.opt:active{transform:translateY(1px);}
+  .opt:focus-visible{outline:4px solid var(--blue);outline-offset:3px;}
+  .opt.good{animation:goodPop .5s ease;background:linear-gradient(180deg,#5fe07d,var(--ok))!important;color:#fff;}
+  .opt.bad{animation:shake .4s ease;background:linear-gradient(180deg,#ff7676,var(--err))!important;color:#fff;}
+  @keyframes goodPop{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+
+  /* ---- Jeu épellation ---- */
+  .slots{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+  .slot{width:clamp(38px,10vw,46px);height:clamp(48px,12vw,56px);border-radius:12px;
+        background:#eef1ff;border:3px dashed #c3cbf0;display:grid;place-items:center;
+        font-family:var(--fd);font-weight:800;font-size:clamp(22px,6vw,28px);color:var(--ink);}
+  .slot.filled{border-style:solid;border-color:var(--blue);background:#fff;cursor:pointer;}
+  .slot.sel{border-color:var(--ac2);box-shadow:0 0 0 3px rgba(255,214,10,.4);background:#fffdf0;}
+  .slot.shake{animation:shake .4s ease;}
+  .slot.good{border-color:var(--ok);background:#e7fbeb;}
+  .tray{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:56px;}
+  .tile{width:clamp(38px,10vw,46px);height:clamp(48px,12vw,56px);border-radius:12px;cursor:grab;
+        user-select:none;background:linear-gradient(180deg,#ffe45a,var(--ac2));color:#4a3a00;
+        font-family:var(--fd);font-weight:800;font-size:clamp(22px,6vw,28px);
+        display:grid;place-items:center;box-shadow:0 5px 0 rgba(120,90,0,.25);touch-action:none;border:none;}
+  .tile.dragging{cursor:grabbing;z-index:50;pointer-events:none;box-shadow:0 14px 26px rgba(0,0,0,.4);}
+  .tile:focus-visible{outline:4px solid var(--blue);outline-offset:3px;}
+  .mini-actions{display:flex;gap:10px;}
+  .hint{font-size:11px;color:#8a93b8;text-align:center;}
+
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}
+                   60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+
+  /* ---- Nero ---- */
+  #nero{will-change:transform;}
+  #nero.idle{animation:float 3.4s ease-in-out infinite;}
+  #nero.correct{animation:jump .6s ease;}
+  #nero.wrong{animation:shake .5s ease;}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-12px) rotate(1deg);}}
+  @keyframes jump{0%{transform:translateY(0);}30%{transform:translateY(-26px) scale(1.06);}
+                  55%{transform:translateY(0) scale(.97);}75%{transform:translateY(-10px);}100%{transform:translateY(0);}}
+  .nero-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+  .nero-lg #nero{width:clamp(150px,42vw,200px);}
+  .nero-md #nero{width:clamp(100px,24vw,138px);}
+  .nero-sm #nero{width:clamp(90px,22vw,120px);}
+  /* Bulle dialogue */
+  .nero-bubble{position:absolute;bottom:calc(100% - 4px);left:50%;
+    transform:translateX(-50%) scale(1);background:#fff;border-radius:18px 18px 18px 6px;
+    padding:9px 15px;font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ink);
+    box-shadow:0 8px 28px rgba(0,0,0,.28);min-width:160px;max-width:min(270px,80vw);
+    text-align:center;line-height:1.35;z-index:20;pointer-events:none;white-space:normal;
+    animation:popB .35s cubic-bezier(.34,1.56,.64,1) both;}
+  .nero-bubble::after{content:'';position:absolute;top:100%;left:22px;border:9px solid transparent;border-top-color:#fff;}
+  @keyframes popB{from{opacity:0;transform:translateX(-50%) scale(.7);}to{opacity:1;transform:translateX(-50%) scale(1);}}
+
+  /* ---- Overlay niveau suivant ---- */
+  #lvlup{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;
+         justify-content:center;gap:14px;background:rgba(11,16,38,.93);cursor:pointer;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .lu-title{font-family:var(--fd);font-weight:800;font-size:clamp(26px,7.5vw,42px);
+            color:var(--ac2);text-shadow:0 0 24px rgba(255,214,10,.5);text-align:center;}
+  .lu-sub{font-family:var(--fd);font-weight:700;font-size:clamp(18px,5vw,26px);color:#fff;text-align:center;}
+  .lu-next{font-family:var(--fd);font-weight:600;font-size:clamp(14px,4vw,19px);color:var(--tx-s);text-align:center;}
+
+  /* ---- Prénom ---- */
+  .name-input{font-family:var(--fd);font-weight:700;font-size:23px;text-align:center;
+              padding:15px 17px;border-radius:17px;border:3px solid #cdd6f5;
+              width:min(310px,86vw);color:var(--ink);background:#fff;outline:none;}
+  .name-input:focus{border-color:var(--blue);}
+
+  /* ---- Réglages ---- */
+  .panel{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+         border-radius:22px;padding:15px;display:flex;flex-direction:column;gap:16px;}
+  .sl{display:flex;flex-direction:column;gap:8px;}
+  .sl-lab{font-family:var(--fd);font-weight:700;font-size:15px;color:#fff;}
+  .seg{display:flex;gap:7px;flex-wrap:wrap;}
+  .seg button{flex:1;min-width:66px;font-family:var(--fd);font-weight:700;font-size:14px;cursor:pointer;
+              border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;
+              padding:11px 7px;border-radius:13px;transition:transform .1s ease;}
+  .seg button:hover{transform:translateY(-2px);}
+  .seg button.active{background:linear-gradient(180deg,#ff5a5a,var(--ac));border-color:transparent;}
+  .seg button:focus-visible{outline:3px solid var(--ac2);outline-offset:2px;}
+  .toast-txt{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ok);text-align:center;min-height:16px;}
+  .danger{color:#ffd0d0;}
+
+  /* ---- Fin ---- */
+  .score-big{font-family:var(--fd);font-weight:800;font-size:clamp(54px,14vw,98px);
+             color:var(--ac2);line-height:1;text-shadow:0 0 26px rgba(255,214,10,.4);}
+  .record{font-family:var(--fd);font-weight:800;color:#fff;
+          background:linear-gradient(180deg,#ff8a3d,var(--ac));padding:7px 17px;
+          border-radius:999px;animation:goodPop .8s ease infinite;}
+  .review{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+          border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:7px;
+          max-height:30vh;overflow:auto;}
+  .review h3{margin:2px 0 5px;font-family:var(--fd);font-size:15px;color:#fff;}
+  .rev-row{display:flex;align-items:center;gap:10px;font-size:14px;color:#fff;
+           background:rgba(255,255,255,.05);padding:7px 11px;border-radius:11px;}
+  .rev-row .em{font-size:22px;}.rev-row .en{font-family:var(--fd);font-weight:700;color:var(--ac2);}
+  .rev-row .fr{color:var(--tx-s);margin-left:auto;}
+  .perfect{font-family:var(--fd);font-weight:700;color:var(--ok);font-size:19px;}
+
+  /* ---- Confettis ---- */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
+  .conf{position:absolute;width:11px;height:11px;border-radius:2px;top:-14px;animation:fall 1.1s ease-in forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:0;}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms!important;animation-iteration-count:1!important;}.star{opacity:.6;}
+  }
+</style>
+</head>
+<body>
+<!-- body vide : tout rendu dynamiquement -->
+<script>
+'use strict';
+(function(){
+
+/* ==========================================================
+   SEED — vocabulaire (10 niveaux × 10 mots = 100 mots)
+   Pour ajouter un niveau : ajouter un objet dans SEED.levels.
+   Chaque mot : en (anglais), fr (français), emoji.
+   ========================================================== */
+/*__SEED_START__*/
+const SEED = {
+  keys:{ best:'nro_best', mute:'nro_mute', pts:'nro_pts', goal:'nro_goal',
+         player:'nro_player', bestLv:'nro_bestlv' },
+  defaults:{ points:10, levelGoal:8 },
+  pointChoices:[5,10,15],
+  goalChoices:[5,8,10],
+  levels:[
+    { id:'animals',   name:'Animaux',         emoji:'🐾', words:[
+      { en:'cat',        fr:'chat',          emoji:'🐱' },
+      { en:'dog',        fr:'chien',         emoji:'🐶' },
+      { en:'bird',       fr:'oiseau',        emoji:'🐦' },
+      { en:'fish',       fr:'poisson',       emoji:'🐟' },
+      { en:'cow',        fr:'vache',         emoji:'🐄' },
+      { en:'pig',        fr:'cochon',        emoji:'🐷' },
+      { en:'hen',        fr:'poule',         emoji:'🐔' },
+      { en:'duck',       fr:'canard',        emoji:'🦆' },
+      { en:'frog',       fr:'grenouille',    emoji:'🐸' },
+      { en:'bee',        fr:'abeille',       emoji:'🐝' },
+    ]},
+    { id:'fruits',    name:'Fruits & Légumes', emoji:'🍎', words:[
+      { en:'apple',      fr:'pomme',         emoji:'🍎' },
+      { en:'banana',     fr:'banane',        emoji:'🍌' },
+      { en:'orange',     fr:'orange',        emoji:'🍊' },
+      { en:'grape',      fr:'raisin',        emoji:'🍇' },
+      { en:'carrot',     fr:'carotte',       emoji:'🥕' },
+      { en:'tomato',     fr:'tomate',        emoji:'🍅' },
+      { en:'lemon',      fr:'citron',        emoji:'🍋' },
+      { en:'cherry',     fr:'cerise',        emoji:'🍒' },
+      { en:'pear',       fr:'poire',         emoji:'🍐' },
+      { en:'strawberry', fr:'fraise',        emoji:'🍓' },
+    ]},
+    { id:'house',     name:'Maison',          emoji:'🏠', words:[
+      { en:'bed',        fr:'lit',           emoji:'🛏️'  },
+      { en:'door',       fr:'porte',         emoji:'🚪' },
+      { en:'chair',      fr:'chaise',        emoji:'🪑' },
+      { en:'lamp',       fr:'lampe',         emoji:'💡' },
+      { en:'window',     fr:'fenêtre',       emoji:'🪟' },
+      { en:'sofa',       fr:'canapé',        emoji:'🛋️'  },
+      { en:'mirror',     fr:'miroir',        emoji:'🪞' },
+      { en:'fridge',     fr:'réfrigérateur', emoji:'🧊' },
+      { en:'kitchen',    fr:'cuisine',       emoji:'🍳' },
+      { en:'television', fr:'télévision',    emoji:'📺' },
+    ]},
+    { id:'colors',    name:'Couleurs',        emoji:'🎨', words:[
+      { en:'red',        fr:'rouge',         emoji:'🔴' },
+      { en:'blue',       fr:'bleu',          emoji:'🔵' },
+      { en:'green',      fr:'vert',          emoji:'🟢' },
+      { en:'yellow',     fr:'jaune',         emoji:'🟡' },
+      { en:'pink',       fr:'rose',          emoji:'🩷' },
+      { en:'purple',     fr:'violet',        emoji:'🟣' },
+      { en:'white',      fr:'blanc',         emoji:'⬜' },
+      { en:'black',      fr:'noir',          emoji:'⬛' },
+      { en:'brown',      fr:'marron',        emoji:'🟫' },
+      { en:'grey',       fr:'gris',          emoji:'🩶' },
+    ]},
+    { id:'space',     name:'Espace',          emoji:'🚀', words:[
+      { en:'star',       fr:'étoile',        emoji:'⭐' },
+      { en:'moon',       fr:'lune',          emoji:'🌙' },
+      { en:'sun',        fr:'soleil',        emoji:'☀️'  },
+      { en:'rocket',     fr:'fusée',         emoji:'🚀' },
+      { en:'alien',      fr:'extraterrestre',emoji:'👽' },
+      { en:'planet',     fr:'planète',       emoji:'🪐' },
+      { en:'comet',      fr:'comète',        emoji:'☄️'  },
+      { en:'astronaut',  fr:'astronaute',    emoji:'🧑‍🚀' },
+      { en:'telescope',  fr:'télescope',     emoji:'🔭' },
+      { en:'spaceship',  fr:'vaisseau',      emoji:'🛸' },
+    ]},
+    { id:'transport', name:'Transports',      emoji:'🚗', words:[
+      { en:'car',        fr:'voiture',       emoji:'🚗' },
+      { en:'bus',        fr:'bus',           emoji:'🚌' },
+      { en:'train',      fr:'train',         emoji:'🚂' },
+      { en:'plane',      fr:'avion',         emoji:'✈️'  },
+      { en:'boat',       fr:'bateau',        emoji:'⛵' },
+      { en:'bike',       fr:'vélo',          emoji:'🚲' },
+      { en:'truck',      fr:'camion',        emoji:'🚚' },
+      { en:'taxi',       fr:'taxi',          emoji:'🚕' },
+      { en:'scooter',    fr:'trottinette',   emoji:'🛴' },
+      { en:'helicopter', fr:'hélicoptère',   emoji:'🚁' },
+    ]},
+    { id:'body',      name:'Corps humain',    emoji:'💪', words:[
+      { en:'hand',       fr:'main',          emoji:'✋' },
+      { en:'eye',        fr:'œil',           emoji:'👁️'  },
+      { en:'ear',        fr:'oreille',       emoji:'👂' },
+      { en:'nose',       fr:'nez',           emoji:'👃' },
+      { en:'mouth',      fr:'bouche',        emoji:'👄' },
+      { en:'arm',        fr:'bras',          emoji:'💪' },
+      { en:'leg',        fr:'jambe',         emoji:'🦵' },
+      { en:'foot',       fr:'pied',          emoji:'🦶' },
+      { en:'tooth',      fr:'dent',          emoji:'🦷' },
+      { en:'brain',      fr:'cerveau',       emoji:'🧠' },
+    ]},
+    { id:'school',    name:'École',           emoji:'📚', words:[
+      { en:'book',       fr:'livre',         emoji:'📚' },
+      { en:'pen',        fr:'stylo',         emoji:'🖊️'  },
+      { en:'pencil',     fr:'crayon',        emoji:'✏️'  },
+      { en:'ruler',      fr:'règle',         emoji:'📏' },
+      { en:'scissors',   fr:'ciseaux',       emoji:'✂️'  },
+      { en:'bag',        fr:'cartable',      emoji:'🎒' },
+      { en:'computer',   fr:'ordinateur',    emoji:'💻' },
+      { en:'globe',      fr:'mappemonde',    emoji:'🌍' },
+      { en:'bell',       fr:'cloche',        emoji:'🔔' },
+      { en:'paint',      fr:'peinture',      emoji:'🎨' },
+    ]},
+    { id:'food',      name:'Nourriture',      emoji:'🍕', words:[
+      { en:'pizza',      fr:'pizza',         emoji:'🍕' },
+      { en:'bread',      fr:'pain',          emoji:'🍞' },
+      { en:'milk',       fr:'lait',          emoji:'🥛' },
+      { en:'egg',        fr:'œuf',           emoji:'🥚' },
+      { en:'cake',       fr:'gâteau',        emoji:'🎂' },
+      { en:'soup',       fr:'soupe',         emoji:'🥣' },
+      { en:'rice',       fr:'riz',           emoji:'🍚' },
+      { en:'cheese',     fr:'fromage',       emoji:'🧀' },
+      { en:'meat',       fr:'viande',        emoji:'🥩' },
+      { en:'cookie',     fr:'biscuit',       emoji:'🍪' },
+    ]},
+    { id:'nature',    name:'Nature',          emoji:'🌿', words:[
+      { en:'tree',       fr:'arbre',         emoji:'🌳' },
+      { en:'flower',     fr:'fleur',         emoji:'🌸' },
+      { en:'rain',       fr:'pluie',         emoji:'🌧️'  },
+      { en:'cloud',      fr:'nuage',         emoji:'☁️'  },
+      { en:'snow',       fr:'neige',         emoji:'❄️'  },
+      { en:'fire',       fr:'feu',           emoji:'🔥' },
+      { en:'mountain',   fr:'montagne',      emoji:'⛰️'  },
+      { en:'forest',     fr:'forêt',         emoji:'🌲' },
+      { en:'beach',      fr:'plage',         emoji:'🏖️'  },
+      { en:'rainbow',    fr:'arc-en-ciel',   emoji:'🌈' },
+    ]},
+  ]
+};
+/*__SEED_END__*/
+
+/* Injection des IDs (id = 'levelId-wordIndex') */
+SEED.levels.forEach(lv => lv.words.forEach((w,i) => { w.id = lv.id + '-' + i; }));
+/* Mots de tous les niveaux (utile pour fallback distractors) */
+const ALL_WORDS = SEED.levels.flatMap(lv => lv.words);
+
+/* Réglages mutables (chargés depuis le stockage) */
+const SETTINGS = { points: SEED.defaults.points, levelGoal: SEED.defaults.levelGoal };
+
+/* Phrases de Nero (toutes les 7 réponses) */
+const NERO_PHRASES = [
+  n => `Super ${n} ! Tu gères ! 🚀`,
+  n => `${n}, tu es incroyable ! ⭐`,
+  n => `Nero est fier de toi !`,
+  n => `Continue comme ça, ${n} !`,
+  n => `Wow, quelle progression ! 🌟`,
+  n => `${n} = astronaute de l'anglais ! 👽`,
+  n => `Tu apprends si vite ! 🎉`,
+  n => `${n}, tu es une vraie fusée ! 🚀`,
+  n => `L'espace te connaît, ${n} ! 🌌`,
+  n => `7 de plus ? Nero est bluffé ! 🤖`,
+  n => `${n}, champion(ne) de l'espace ! 🏆`,
+  n => `Tu maîtrises l'anglais comme un pro !`,
+];
+
+/* ===========================================================
+   PERSISTANCE
+   =========================================================== */
+const Store = {
+  async get(k){
+    try{
+      if(window.storage&&typeof window.storage.get==='function'){
+        const r=await window.storage.get(k); return r?r.value:null;
+      }
+    }catch(e){}
+    try{return localStorage.getItem(k);}catch(e){return null;}
+  },
+  async set(k,v){
+    try{
+      if(window.storage&&typeof window.storage.set==='function'){
+        await window.storage.set(k,String(v)); return;
+      }
+    }catch(e){}
+    try{localStorage.setItem(k,String(v));}catch(e){}
+  }
+};
+
+/* ===========================================================
+   AUDIO (Web Audio API)
+   Fix crackling :
+   • linearRampToValueAtTime(0) au lieu de exponentialRampToValueAtTime(0.0001)
+     → la rampe expo vers ~0 est numériquement instable (tous moteurs Web Audio)
+   • DynamicsCompressor en sortie → prévient l'écrêtage
+   • Music scheduling : timeout 3700ms (lookahead 300ms) au lieu de 4000ms
+     → les timers OS dérivent de 200-300ms, causant des blancs entre les mesures
+   =========================================================== */
+const A = { ctx:null, master:null, comp:null, sfx:null, music:null, musicOn:false, bar:null };
+
+function ensureAudio(){
+  if(A.ctx){ if(A.ctx.state==='suspended') A.ctx.resume(); return; }
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  A.ctx = new AC();
+  A.comp = A.ctx.createDynamicsCompressor();
+  A.comp.threshold.value=-16; A.comp.knee.value=8;
+  A.comp.ratio.value=6; A.comp.attack.value=0.003; A.comp.release.value=0.12;
+  A.comp.connect(A.ctx.destination);
+  A.master = A.ctx.createGain(); A.master.gain.value=S.muted?0:1; A.master.connect(A.comp);
+  A.sfx = A.ctx.createGain(); A.sfx.gain.value=0.8; A.sfx.connect(A.master);
+  A.music = A.ctx.createGain(); A.music.gain.value=0.35; A.music.connect(A.master);
+}
+function applyMute(){ if(A.master) A.master.gain.value=S.muted?0:1; }
+
+/* Note courte — rampe linéaire vers 0 → zéro craquement */
+function blip(freq, t, dur, type, peak){
+  const o=A.ctx.createOscillator(), g=A.ctx.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak, t+0.015);
+  g.gain.linearRampToValueAtTime(0, t+dur);   // ← propre
+  o.connect(g); g.connect(A.sfx); o.start(t); o.stop(t+dur+0.02);
+}
+function sfx(kind){
+  if(!A.ctx) return; const t=A.ctx.currentTime;
+  if(kind==='click'){ blip(660,t,0.07,'triangle',0.11); }
+  else if(kind==='correct'){ [523.25,659.25,783.99].forEach((f,i)=>blip(f,t+i*.09,0.14,'sine',0.15)); }
+  else if(kind==='wrong'){
+    const o=A.ctx.createOscillator(), g=A.ctx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(240,t); o.frequency.linearRampToValueAtTime(110,t+.26);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.1,t+.015);
+    g.gain.linearRampToValueAtTime(0,t+.28);           // ← propre
+    o.connect(g); g.connect(A.sfx); o.start(t); o.stop(t+.30);
+  }
+}
+/* Note douce musique — même principe */
+function noteM(freq, t, dur, type, peak){
+  const o=A.ctx.createOscillator(), g=A.ctx.createGain();
+  o.type=type||'triangle'; o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(peak||.045,t+.08);
+  g.gain.linearRampToValueAtTime(0,t+dur);              // ← propre
+  o.connect(g); g.connect(A.music); o.start(t); o.stop(t+dur+.02);
+}
+/* Boucle musicale avec lookahead 300ms → évite les blancs entre les mesures */
+function schedBar(){
+  if(!A.musicOn||!A.ctx) return;
+  const t0=A.ctx.currentTime+.08;
+  [[523.25,0],[659.25,.5],[783.99,1],[659.25,1.5],[587.33,2],[783.99,2.5],[1046.5,3],[783.99,3.5]]
+    .forEach(([f,off])=>noteM(f,t0+off,.38,'triangle',.04));
+  [[130.81,0],[196.0,2]].forEach(([f,off])=>noteM(f,t0+off,1.55,'sine',.035));
+  A.bar=setTimeout(schedBar,3700); // lookahead : 300ms avant la fin de mesure
+}
+function startMusic(){ if(!A.ctx||A.musicOn) return; A.musicOn=true; schedBar(); }
+function stopMusic(){ A.musicOn=false; if(A.bar){ clearTimeout(A.bar); A.bar=null; } }
+
+/* ===========================================================
+   PRONONCIATION (SpeechSynthesis EN + FR)
+   Délai 20ms post-cancel → évite glitches iOS
+   =========================================================== */
+const SPK={en:null,fr:null};
+function initVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const pick=()=>{
+    const vs=speechSynthesis.getVoices();
+    SPK.en=vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en'))||null;
+    SPK.fr=vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith('fr'))||null;
+  };
+  pick(); speechSynthesis.onvoiceschanged=pick;
+}
+function say(text, lang){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(lang==='fr'){u.lang='fr-FR'; if(SPK.fr)u.voice=SPK.fr;}
+    else{u.lang='en-US'; if(SPK.en)u.voice=SPK.en;}
+    u.rate=.9; u.pitch=1.05;
+    setTimeout(()=>{ try{speechSynthesis.speak(u);}catch(e){} },20);
+  }catch(e){}
+}
+
+/* ===========================================================
+   OUTILS DOM
+   =========================================================== */
+function h(tag,attrs){
+  const e=document.createElement(tag);
+  if(attrs){
+    for(const k in attrs){
+      const v=attrs[k]; if(v==null) continue;
+      if(k==='class') e.className=v;
+      else if(k==='html') e.innerHTML=v;
+      else if(k==='text') e.textContent=v;
+      else if(k==='style'&&typeof v==='object') Object.assign(e.style,v);
+      else if(k.startsWith('on')&&typeof v==='function') e.addEventListener(k.slice(2).toLowerCase(),v);
+      else e.setAttribute(k,v);
+    }
+  }
+  for(let i=2;i<arguments.length;i++){
+    const c=arguments[i]; if(c==null) continue;
+    (Array.isArray(c)?c:[c]).forEach(ch=>{
+      if(ch==null) return;
+      e.appendChild(typeof ch==='object'?ch:document.createTextNode(String(ch)));
+    });
+  }
+  return e;
+}
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const getCss=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+
+/* ===========================================================
+   NERO (SVG vectoriel + humeurs)
+   =========================================================== */
+function neroSVG(extraCls){
+  const cls='idle'+(extraCls?' '+extraCls:'');
+  return [
+    '<svg id="nero" class="'+cls+'" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
+    '<defs>',
+    '<radialGradient id="dome" cx="40%" cy="30%" r="75%">',
+    '<stop offset="0%" stop-color="#eaf4ff" stop-opacity=".85"/>',
+    '<stop offset="100%" stop-color="#bcd6ff" stop-opacity=".30"/>',
+    '</radialGradient>',
+    '<filter id="nGw" x="-80%" y="-80%" width="260%" height="260%">',
+    '<feGaussianBlur stdDeviation="3.2" result="b"/>',
+    '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>',
+    '</filter>',
+    '</defs>',
+    // jambes + baskets
+    '<rect x="74" y="186" width="20" height="34" rx="8" fill="#2f6bff"/>',
+    '<rect x="106" y="186" width="20" height="34" rx="8" fill="#2f6bff"/>',
+    '<rect x="62" y="214" width="40" height="22" rx="11" fill="#fff" stroke="#cdd6f5" stroke-width="2"/>',
+    '<rect x="98" y="214" width="40" height="22" rx="11" fill="#fff" stroke="#cdd6f5" stroke-width="2"/>',
+    // bras + pinces
+    '<rect x="40" y="120" width="20" height="46" rx="10" fill="#ffd60a"/>',
+    '<rect x="140" y="120" width="20" height="46" rx="10" fill="#ffd60a"/>',
+    '<path d="M44 168 a12 12 0 1 0 12 12" fill="none" stroke="#ffd60a" stroke-width="9" stroke-linecap="round"/>',
+    '<path d="M156 168 a12 12 0 1 1 -12 12" fill="none" stroke="#ffd60a" stroke-width="9" stroke-linecap="round"/>',
+    // corps + 6 pastilles
+    '<rect x="56" y="110" width="88" height="82" rx="20" fill="#fff" stroke="#dbe2fb" stroke-width="3"/>',
+    '<rect x="74" y="124" width="16" height="14" rx="4" fill="#e23b3b"/>',
+    '<rect x="92" y="124" width="16" height="14" rx="4" fill="#2fbf4f"/>',
+    '<rect x="110" y="124" width="16" height="14" rx="4" fill="#2f6bff"/>',
+    '<rect x="74" y="142" width="16" height="14" rx="4" fill="#ff5fa2"/>',
+    '<rect x="92" y="142" width="16" height="14" rx="4" fill="#ffd60a"/>',
+    '<rect x="110" y="142" width="16" height="14" rx="4" fill="#ff8a3d"/>',
+    '<rect x="88" y="164" width="24" height="20" rx="6" fill="#ffd60a"/>',
+    // cou + tête
+    '<rect x="88" y="100" width="24" height="16" rx="6" fill="#e8edff"/>',
+    '<circle cx="100" cy="64" r="44" fill="url(#dome)" stroke="#cfe0ff" stroke-width="3"/>',
+    // casquette + antenne
+    '<path d="M58 56 a42 42 0 0 1 84 0 z" fill="#ff3b3b"/>',
+    '<ellipse cx="100" cy="56" rx="44" ry="9" fill="#ff3b3b"/>',
+    '<rect x="97" y="14" width="6" height="16" rx="3" fill="#ffd60a"/>',
+    '<circle cx="100" cy="11" r="7" fill="#ff3b3b"/>',
+    // yeux
+    '<circle cx="84" cy="62" r="13" fill="#fff" stroke="#ffd60a" stroke-width="3"/>',
+    '<circle cx="116" cy="62" r="13" fill="#fff" stroke="#ffd60a" stroke-width="3"/>',
+    '<circle cx="86" cy="63" r="6" fill="#2f6bff"/><circle cx="86" cy="63" r="2.6" fill="#0a1a44"/>',
+    '<circle cx="114" cy="63" r="6" fill="#2f6bff"/><circle cx="114" cy="63" r="2.6" fill="#0a1a44"/>',
+    // nez (état) + bouche
+    '<circle id="nero-nose" cx="100" cy="78" r="9" fill="#ffd60a" filter="url(#nGw)"/>',
+    '<path d="M86 92 q14 12 28 0" fill="none" stroke="#ff3b3b" stroke-width="5" stroke-linecap="round"/>',
+    '</svg>',
+  ].join('');
+}
+
+function setNeroMood(mood){
+  const n=document.getElementById('nero'), nose=document.getElementById('nero-nose');
+  if(!n) return;
+  n.classList.remove('idle','correct','wrong'); void n.offsetWidth;
+  n.classList.add(mood==='correct'?'correct':mood==='wrong'?'wrong':'idle');
+  if(nose) nose.setAttribute('fill', getCss(mood==='correct'?'--ok':mood==='wrong'?'--err':'--ac2'));
+}
+
+function showNeroBubble(text){
+  const wrap=document.querySelector('.nero-wrap'); if(!wrap) return;
+  const old=wrap.querySelector('.nero-bubble'); if(old) old.remove();
+  const b=h('div',{class:'nero-bubble'},text); wrap.appendChild(b);
+  clearTimeout(S._bt);
+  S._bt=setTimeout(()=>{
+    if(!b.parentNode) return;
+    b.style.transition='opacity .4s ease'; b.style.opacity='0';
+    setTimeout(()=>{ try{b.remove();}catch(e){} },450);
+  },2800);
+}
+
+/* ===========================================================
+   ÉTAT GLOBAL
+   =========================================================== */
+const S = {
+  phase:'home', name:'', score:0, best:0, bestLevel:0,
+  level:1,           // niveau courant (1-indexed)
+  mastered:new Set(),// IDs des mots acquis ce niveau
+  queue:[],          // file des mots à présenter (IDs non acquis)
+  lastWordId:null, lastType:null,
+  streak:0, review:new Map(),
+  locked:false, newRecord:false, newBestLevel:false,
+  answerCount:0, muted:false, _bt:null
+};
+
+const app=h('div',{id:'app'});
+
+/* ===========================================================
+   DÉCOR + SON COIN
+   =========================================================== */
+function buildSpace(){
+  const sp=h('div',{id:'space'});
+  for(let i=0;i<70;i++){
+    const sz=Math.random()*2.4+1;
+    sp.appendChild(h('span',{class:'star',style:{
+      left:(Math.random()*100)+'%',top:(Math.random()*100)+'%',
+      width:sz+'px',height:sz+'px',animationDelay:(Math.random()*3)+'s'}}));
+  }
+  sp.appendChild(h('div',{class:'planet',style:{left:'-60px',bottom:'8%',width:'150px',height:'150px',
+    background:'radial-gradient(circle at 35% 30%, #ff8a3d, #b23a1e)'}}));
+  sp.appendChild(h('div',{class:'planet',style:{right:'12%',top:'14%',width:'70px',height:'70px',
+    background:'radial-gradient(circle at 35% 30%, #6db0ff, #2a4fb0)'}}));
+  sp.appendChild(h('div',{class:'porthole'}));
+  document.body.appendChild(sp);
+}
+let muteBtn;
+function buildCornerMute(){
+  muteBtn=h('button',{id:'cornerMute','aria-label':'Son',onclick:toggleMute},S.muted?'🔇':'🔊');
+  document.body.appendChild(muteBtn);
+}
+function toggleMute(){
+  S.muted=!S.muted; applyMute(); Store.set(SEED.keys.mute,S.muted?1:0);
+  if(muteBtn) muteBtn.textContent=S.muted?'🔇':'🔊';
+  if(!S.muted){ ensureAudio(); sfx('click'); }
+}
+
+/* ===========================================================
+   ÉCRAN PRÉNOM
+   =========================================================== */
+function renderName(){
+  S.phase='name'; app.innerHTML='';
+  const nb=h('div',{class:'nero-wrap nero-sm'}); nb.innerHTML=neroSVG();
+  const inp=h('input',{class:'name-input',type:'text',maxlength:'12',
+    placeholder:'Ton prénom…','aria-label':'Ton prénom',value:S.name||''});
+  const btn=h('button',{class:'btn green',onclick:go},"C'est parti ! 🚀");
+  btn.disabled=inp.value.trim().length===0;
+  function go(){
+    const v=inp.value.trim(); if(!v) return;
+    ensureAudio(); sfx('click'); S.name=v; Store.set(SEED.keys.player,v); renderHome();
+  }
+  inp.addEventListener('input',()=>{ btn.disabled=inp.value.trim().length===0; });
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  app.appendChild(h('div',{class:'screen'},nb,
+    h('h1',{class:'title'},'NER',h('span',null,'O')),
+    h('p',{class:'sub'},'Bienvenue à bord !'),
+    h('p',{class:'instr',style:{color:'#fff'}},"Comment tu t'appelles ?"),
+    inp,btn
+  ));
+  setNeroMood('idle'); setTimeout(()=>inp.focus(),60);
+}
+
+/* ===========================================================
+   ACCUEIL
+   =========================================================== */
+function renderHome(){
+  S.phase='home'; app.innerHTML='';
+  const nb=h('div',{class:'nero-wrap nero-lg'}); nb.innerHTML=neroSVG();
+  app.appendChild(h('div',{class:'screen'},nb,
+    h('h1',{class:'title'},'NER',h('span',null,'O')),
+    h('p',{class:'sub'},"Apprends l'anglais dans l'espace"),
+    h('div',{class:'chip'},'👋 Salut '+cap(S.name)+' !'),
+    h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap',justifyContent:'center'}},
+      h('div',{class:'chip'},'🏆 Score max : '+S.best),
+      h('div',{class:'chip'},'🎯 Niv. max : '+S.bestLevel+'/'+SEED.levels.length)
+    ),
+    h('button',{class:'btn',onclick:startGame},'▶ Jouer'),
+    h('button',{class:'btn ghost',onclick:renderSettings},'⚙️ Réglages'),
+    h('p',{class:'tag'},SEED.levels.length+' niveaux · '+ALL_WORDS.length+' mots · objectif '+SETTINGS.levelGoal+'/niveau')
+  ));
+  setNeroMood('idle');
+}
+
+/* ===========================================================
+   RÉGLAGES
+   =========================================================== */
+function renderSettings(){
+  S.phase='settings'; app.innerHTML='';
+  const toast=h('div',{class:'toast-txt'},'');
+  function seg(choices,cur,lf,onPick){
+    const s=h('div',{class:'seg'});
+    choices.forEach(v=>{
+      const b=h('button',{class:v===cur?'active':''},lf(v));
+      b.addEventListener('click',()=>{ sfx('click'); onPick(v);
+        [...s.children].forEach((c,i)=>c.classList.toggle('active',choices[i]===v)); });
+      s.appendChild(b);
+    });
+    return s;
+  }
+  app.appendChild(h('div',{class:'screen'},
+    h('h1',{class:'title',style:{fontSize:'clamp(30px,9vw,52px)'}},'Réglages'),
+    h('div',{class:'panel'},
+      h('div',{class:'sl'},h('div',{class:'sl-lab'},'🎯 Objectif par niveau (bonnes réponses)'),
+        seg(SEED.goalChoices,SETTINGS.levelGoal,v=>String(v),v=>{ SETTINGS.levelGoal=v; Store.set(SEED.keys.goal,v); })),
+      h('div',{class:'sl'},h('div',{class:'sl-lab'},'⭐ Points par bonne réponse'),
+        seg(SEED.pointChoices,SETTINGS.points,v=>String(v),v=>{ SETTINGS.points=v; Store.set(SEED.keys.pts,v); })),
+      h('div',{class:'sl'},h('div',{class:'sl-lab'},'🔊 Son'),
+        seg([true,false],!S.muted,v=>v?'Activé':'Coupé',v=>{
+          S.muted=!v; applyMute(); Store.set(SEED.keys.mute,S.muted?1:0);
+          if(muteBtn) muteBtn.textContent=S.muted?'🔇':'🔊'; }))
+    ),
+    h('div',{class:'panel'},
+      h('button',{class:'btn ghost',onclick:()=>{
+        sfx('click'); S.best=0; S.bestLevel=0;
+        Store.set(SEED.keys.best,0); Store.set(SEED.keys.bestLv,0);
+        toast.textContent='Records remis à zéro ✓'; }},
+        h('span',{class:'danger'},'🗑️ Réinitialiser les records')),
+      h('button',{class:'btn ghost',onclick:()=>{ sfx('click'); renderName(); }},'👤 Changer de joueur'),
+      toast
+    ),
+    h('button',{class:'btn green',onclick:renderHome},'← Retour')
+  ));
+}
+
+/* ===========================================================
+   COQUE DE JEU (HUD + Nero + zone de question)
+   =========================================================== */
+let gameArea;
+function renderPlayShell(){
+  app.innerHTML='';
+  const progBar=h('div',{id:'progBar'});
+  const hud=h('div',{id:'hud'},
+    h('div',{id:'hudR1'},h('div',{id:'hudLevel'},''),h('div',{id:'hudScore'},'⭐ 0')),
+    h('div',{id:'hudR2'},h('div',{id:'progWrap'},progBar),h('div',{id:'hudProg'},''))
+  );
+  const nb=h('div',{class:'nero-wrap nero-md'}); nb.innerHTML=neroSVG();
+  gameArea=h('div',{id:'gameArea',class:'screen',style:{marginTop:'4px'}});
+  app.appendChild(h('div',{class:'screen'},hud,nb,gameArea));
+  setNeroMood('idle'); updateHUD();
+}
+
+function updateHUD(){
+  const lv=SEED.levels[S.level-1];
+  const bar=document.getElementById('progBar');
+  const lvEl=document.getElementById('hudLevel');
+  const scEl=document.getElementById('hudScore');
+  const prEl=document.getElementById('hudProg');
+  const goal=Math.min(SETTINGS.levelGoal,lv.words.length);
+  if(lvEl) lvEl.textContent='Niv.'+S.level+'/'+SEED.levels.length+' · '+lv.emoji+' '+lv.name;
+  if(scEl) scEl.textContent='⭐ '+S.score;
+  if(prEl) prEl.textContent=S.mastered.size+'/'+goal+' ✓';
+  if(bar) bar.style.width=Math.min(100,(S.mastered.size/goal)*100)+'%';
+}
+
+/* ===========================================================
+   LOGIQUE DE JEU
+   =========================================================== */
+function startGame(){
+  ensureAudio(); startMusic();
+  S.phase='play'; S.score=0; S.level=1; S.streak=0;
+  S.mastered=new Set(); S.queue=[];
+  S.review=new Map(); S.lastWordId=null; S.lastType=null;
+  S.locked=false; S.newRecord=false; S.newBestLevel=false; S.answerCount=0;
+  renderPlayShell(); nextRound();
+}
+
+/* Sélection du prochain mot — anti-répétition :
+   - Les mots acquis (mastered) ne reviennent JAMAIS dans ce niveau
+   - La file est rechargée avec les non-acquis quand elle est vide
+   - On évite l'affichage du même mot deux fois d'affilée */
+function pickWord(){
+  const lv=SEED.levels[S.level-1];
+  const avail=lv.words.filter(w=>!S.mastered.has(w.id));
+  if(!avail.length) return rand(lv.words); // sécurité (ne devrait pas arriver)
+  if(!S.queue.length) S.queue=shuf(avail.map(w=>w.id));
+  if(S.queue.length>1 && S.queue[0]===S.lastWordId)
+    [S.queue[0],S.queue[1]]=[S.queue[1],S.queue[0]];
+  const id=S.queue.shift();
+  return lv.words.find(w=>w.id===id)||rand(avail);
+}
+
+/* Distractors : autres mots du MÊME niveau (cohérence thématique)
+   → plus stimulant pédagogiquement que des mots d'autres thèmes */
+function distractors(word,n){
+  const lv=SEED.levels[S.level-1];
+  const others=shuf(lv.words.filter(w=>w.id!==word.id));
+  if(others.length<n){
+    const extra=shuf(ALL_WORDS.filter(w=>w.id!==word.id&&!others.find(o=>o.id===w.id)));
+    return others.concat(extra).slice(0,n);
+  }
+  return others.slice(0,n);
+}
+
+/* Nombre de choix : 3 pour les 3 premiers niveaux, 4 ensuite */
+const optCount=()=>(S.level<=3?3:4);
+
+function nextRound(){
+  if(S.phase!=='play') return;
+  S.locked=false;
+  const types=['qcm','audio','spell']; let t;
+  do{ t=rand(types); }while(t===S.lastType && Math.random()<0.7);
+  S.lastType=t;
+  const word=pickWord(); S.lastWordId=word.id;
+  if(t==='qcm') roundQCM(word);
+  else if(t==='audio') roundAudio(word);
+  else roundSpell(word);
+}
+
+function award(){
+  const lvBonus=(S.level-1)*3;
+  S.score += SETTINGS.points + lvBonus + Math.min(S.streak,5)*2;
+  S.streak++;
+}
+
+function answer(correct,word,onMark){
+  if(S.locked) return; S.locked=true;
+  S.answerCount++;
+
+  if(correct){
+    S.mastered.add(word.id); award();
+    setNeroMood('correct'); sfx('correct'); confetti();
+  } else {
+    S.streak=0; S.review.set(word.id,word);
+    setNeroMood('wrong'); sfx('wrong');
+  }
+  updateHUD();
+  if(typeof onMark==='function') onMark(correct);
+
+  /* Nero s'adresse à l'utilisateur toutes les 7 réponses */
+  if(S.answerCount%7===0){
+    const msg=NERO_PHRASES[Math.floor(Math.random()*NERO_PHRASES.length)](cap(S.name));
+    setTimeout(()=>showNeroBubble(msg),200);
+  }
+
+  /* Niveau terminé ? */
+  const goal=Math.min(SETTINGS.levelGoal, SEED.levels[S.level-1].words.length);
+  if(S.mastered.size>=goal){
+    setTimeout(()=>{ setNeroMood('idle'); showLevelUp(); },1000);
+  } else {
+    setTimeout(()=>{ setNeroMood('idle'); nextRound(); },1000);
+  }
+}
+
+/* ===========================================================
+   TRANSITION DE NIVEAU
+   =========================================================== */
+function showLevelUp(){
+  const isLast=(S.level>=SEED.levels.length);
+  const bonus=S.level*20; S.score+=bonus;
+  if(S.level>S.bestLevel){ S.bestLevel=S.level; S.newBestLevel=true; Store.set(SEED.keys.bestLv,S.level); }
+  updateHUD();
+
+  const nb=h('div',{class:'nero-wrap nero-md'}); nb.innerHTML=neroSVG();
+  const next=!isLast?SEED.levels[S.level]:{name:'terminés',emoji:'🏆'};
+  const ov=h('div',{id:'lvlup'},nb,
+    h('div',{class:'lu-title'},'✅ Niveau '+S.level+' réussi !'),
+    h('div',{class:'chip'},'🌟 +'+bonus+' points bonus !'),
+    isLast
+      ? h('div',{class:'lu-next'},'🏆 Tu as terminé tous les niveaux !')
+      : h('div',{class:'lu-next'},'Prochain : Niveau '+(S.level+1)+' · '+next.emoji+' '+next.name),
+    h('p',{style:{fontSize:'13px',color:'var(--tx-s)',margin:'4px 0 0'}},'(touche pour continuer)')
+  );
+  document.body.appendChild(ov);
+  setNeroMood('correct'); confetti(); sfx('correct');
+
+  const go=()=>{ ov.remove(); if(isLast) endGame(); else doNextLevel(); };
+  setTimeout(go,2500); ov.addEventListener('click',go,{once:true});
+}
+
+function doNextLevel(){
+  S.level++; S.mastered=new Set(); S.queue=[];
+  S.lastWordId=null; S.lastType=null; S.locked=false;
+  updateHUD(); nextRound();
+}
+
+/* ===========================================================
+   MINI-JEU 1 : mot anglais affiché → bonne image (emoji)
+   =========================================================== */
+function roundQCM(word){
+  gameArea.innerHTML='';
+  const opts=shuf(distractors(word,optCount()-1).concat(word));
+  const grid=h('div',{class:'opts'});
+  opts.forEach(o=>{
+    const b=h('button',{class:'opt','aria-label':o.en},o.emoji);
+    b.addEventListener('click',()=>{
+      if(S.locked) return; sfx('click');
+      const ok=o.id===word.id; b.classList.add(ok?'good':'bad');
+      answer(ok,word,()=>{ if(!ok) [...grid.children].forEach((c,i)=>{ if(opts[i].id===word.id)c.classList.add('good'); }); });
+    });
+    grid.appendChild(b);
+  });
+  gameArea.appendChild(h('div',{class:'card'},
+    h('p',{class:'instr'},'Trouve la bonne image'),
+    h('div',{class:'pw'},word.en),
+    h('button',{class:'iconbtn','aria-label':'Réécouter',onclick:()=>{ sfx('click'); say(word.en,'en'); }},'🔊')
+  ));
+  gameArea.appendChild(grid);
+  say(word.en,'en');
+}
+
+/* ===========================================================
+   MINI-JEU 2 : écoute → bonne traduction (EN↔FR au hasard)
+   =========================================================== */
+function roundAudio(word){
+  gameArea.innerHTML='';
+  const enToFr=Math.random()<0.5;
+  const sText=enToFr?word.en:word.fr, sLang=enToFr?'en':'fr';
+  const labelOf=o=>enToFr?o.fr:o.en;
+  const instr=enToFr?'Écoute en anglais → choisis en français':'Écoute en français → choisis en anglais';
+  const opts=shuf(distractors(word,optCount()-1).concat(word));
+  const grid=h('div',{class:'opts'});
+  opts.forEach((o,i)=>{
+    const b=h('button',{class:'opt word k'+(i%4)},labelOf(o));
+    b.addEventListener('click',()=>{
+      if(S.locked) return; sfx('click');
+      const ok=o.id===word.id; b.classList.add(ok?'good':'bad');
+      answer(ok,word,()=>{ if(!ok) [...grid.children].forEach((c,j)=>{ if(opts[j].id===word.id)c.classList.add('good'); }); });
+    });
+    grid.appendChild(b);
+  });
+  gameArea.appendChild(h('div',{class:'card'},
+    h('span',{class:'badge-dir'},enToFr?'🇬🇧 → 🇫🇷':'🇫🇷 → 🇬🇧'),
+    h('p',{class:'instr'},instr),
+    h('button',{class:'listen','aria-label':'Écouter',onclick:()=>{ sfx('click'); say(sText,sLang); }},'🔊')
+  ));
+  gameArea.appendChild(grid);
+  say(sText,sLang);
+}
+
+/* ===========================================================
+   MINI-JEU 3 : construire le mot lettre par lettre
+   • Tap lettre → pose dans la case sélectionnée (ou 1re libre)
+   • Tap case remplie → sélectionne (contour jaune)
+       re-tap = vide · tap lettre suivant = remplace
+   • Glisser → dépose (remplace si case occupée, ancienne lettre libérée)
+   =========================================================== */
+function roundSpell(word){
+  gameArea.innerHTML='';
+  const letters=word.en.split('');
+  const slots=letters.map(()=>null);
+  let tray=shuf(letters.map((ch,i)=>({id:i,ch})));
+  if(tray.map(t=>t.ch).join('')===word.en && letters.length>1) tray=shuf(tray);
+  let selSlot=null;
+  const slotsEl=h('div',{class:'slots'}), trayEl=h('div',{class:'tray'});
+  const firstEmpty=()=>slots.findIndex(s=>!s);
+
+  function check(){
+    const ok=slots.map(s=>s?s.ch:'').join('')===word.en;
+    [...slotsEl.children].forEach(c=>c.classList.add(ok?'good':'shake'));
+    answer(ok,word,()=>{
+      if(!ok) letters.forEach((ch,i)=>{ slotsEl.children[i].textContent=ch; slotsEl.children[i].classList.add('good'); });
+    });
+  }
+
+  function place(tileId,slotIdx){
+    const ti=tray.findIndex(t=>t.id===tileId); if(ti<0) return false;
+    const tile=tray[ti];
+    if(slots[slotIdx]) tray.push(slots[slotIdx]); // libère l'ancienne
+    tray.splice(ti,1); slots[slotIdx]=tile; selSlot=null; render();
+    if(slots.every(s=>s)) setTimeout(check,140);
+    return true;
+  }
+
+  function onSlotClick(i){
+    if(S.locked) return;
+    if(slots[i]){
+      if(selSlot===i){ tray.push(slots[i]); slots[i]=null; selSlot=null; sfx('click'); render(); }
+      else { selSlot=i; sfx('click'); render(); }
+    } else { selSlot=(selSlot===i?null:i); render(); }
+  }
+
+  let drag=null;
+  function onPD(e,tile,tid){
+    if(S.locked) return;
+    drag={id:tid,el:tile,sx:e.clientX,sy:e.clientY,moved:false};
+    try{tile.setPointerCapture(e.pointerId);}catch(er){}
+    tile.addEventListener('pointermove',onPM);
+    tile.addEventListener('pointerup',onPU);
+    tile.addEventListener('pointercancel',onPU);
+  }
+  function onPM(e){
+    if(!drag) return;
+    const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
+    if(Math.abs(dx)>6||Math.abs(dy)>6){
+      drag.moved=true; drag.el.classList.add('dragging');
+      drag.el.style.transform='translate('+dx+'px,'+dy+'px) scale(1.1)';
+    }
+  }
+  function onPU(e){
+    if(!drag) return;
+    const d=drag; drag=null;
+    d.el.removeEventListener('pointermove',onPM);
+    d.el.removeEventListener('pointerup',onPU);
+    d.el.removeEventListener('pointercancel',onPU);
+    if(!d.moved){
+      const idx=selSlot!=null?selSlot:firstEmpty();
+      if(idx>=0){ sfx('click'); place(d.id,idx); } return;
+    }
+    d.el.style.pointerEvents='none';
+    const tgt=document.elementFromPoint(e.clientX,e.clientY);
+    const slEl=tgt&&tgt.closest?tgt.closest('[data-slot]'):null;
+    if(slEl){ const idx=parseInt(slEl.getAttribute('data-slot'),10); if(place(d.id,idx)){ sfx('click'); return; } }
+    render();
+  }
+
+  function render(){
+    slotsEl.innerHTML='';
+    slots.forEach((s,i)=>{
+      const cls='slot'+(s?' filled':'')+(selSlot===i?' sel':'');
+      const cell=h('div',{class:cls,'data-slot':i},s?s.ch:'');
+      cell.addEventListener('click',()=>onSlotClick(i));
+      slotsEl.appendChild(cell);
+    });
+    trayEl.innerHTML='';
+    tray.forEach(t=>{
+      const tile=h('button',{class:'tile','aria-label':'Lettre '+t.ch},t.ch);
+      tile.addEventListener('pointerdown',e=>onPD(e,tile,t.id));
+      tile.addEventListener('keydown',ev=>{
+        if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault();
+          const idx=selSlot!=null?selSlot:firstEmpty(); if(idx>=0){ sfx('click'); place(t.id,idx); } }
+      });
+      trayEl.appendChild(tile);
+    });
+  }
+
+  gameArea.appendChild(h('div',{class:'card'},
+    h('p',{class:'instr'},'Construis le mot en anglais'),
+    h('div',{style:{fontSize:'52px',lineHeight:'1'}},word.emoji),
+    h('div',{class:'pfr'},word.fr),
+    slotsEl,
+    h('div',{class:'mini-actions'},
+      h('button',{class:'iconbtn','aria-label':'Tout effacer',onclick:()=>{
+        if(S.locked) return;
+        slots.forEach((s,i)=>{ if(s){ tray.push(s); slots[i]=null; } }); selSlot=null; render(); }},'↺'),
+      h('button',{class:'iconbtn','aria-label':'Écouter',onclick:()=>{ sfx('click'); say(word.en,'en'); }},'🔊')
+    ),
+    h('p',{class:'hint'},'Touche une case pour sélectionner → re-touche pour vider')
+  ));
+  gameArea.appendChild(trayEl);
+  render();
+}
+
+/* ===========================================================
+   FIN DE PARTIE
+   =========================================================== */
+function endGame(){
+  if(S.phase==='end') return; S.phase='end';
+  stopMusic();
+  if(S.score>S.best){ S.best=S.score; S.newRecord=true; Store.set(SEED.keys.best,S.best); }
+  renderEnd();
+}
+function renderEnd(){
+  app.innerHTML='';
+  const nb=h('div',{class:'nero-wrap nero-lg'}); nb.innerHTML=neroSVG();
+  const rev=[...S.review.values()];
+  const revBlock=rev.length===0
+    ? h('div',{class:'review'},h('p',{class:'perfect'},'🎉 Zéro faute, bravo !'))
+    : (()=>{
+        const b=h('div',{class:'review'},h('h3',null,'Mots à réviser'));
+        rev.forEach(w=>b.appendChild(h('div',{class:'rev-row'},
+          h('span',{class:'em'},w.emoji),h('span',{class:'en'},w.en),h('span',{class:'fr'},w.fr))));
+        return b;
+      })();
+  app.appendChild(h('div',{class:'screen'},nb,
+    h('p',{class:'sub'},cap(S.name)+' a terminé ! 🎉'),
+    S.newRecord?h('div',{class:'record'},'🏆 Nouveau record !'):null,
+    S.newBestLevel?h('div',{class:'record',style:{background:'linear-gradient(180deg,#4fd66c,var(--ok))'}},'📈 Meilleur niveau !'):null,
+    h('div',{class:'score-big'},String(S.score)),
+    h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap',justifyContent:'center'}},
+      h('div',{class:'chip'},'🏆 Record : '+S.best),
+      h('div',{class:'chip'},'🎯 Niv. max : '+S.bestLevel+'/'+SEED.levels.length)
+    ),
+    revBlock,
+    h('div',{style:{display:'flex',gap:'10px',flexWrap:'wrap',justifyContent:'center'}},
+      h('button',{class:'btn green',onclick:startGame},'↻ Rejouer'),
+      h('button',{class:'btn ghost',onclick:renderHome},'🏠 Accueil')
+    )
+  ));
+  setNeroMood('correct'); setTimeout(()=>setNeroMood('idle'),700);
+}
+
+/* ===========================================================
+   CONFETTIS
+   =========================================================== */
+let confLayer;
+function confetti(){
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  if(!confLayer){ confLayer=h('div',{id:'confetti'}); document.body.appendChild(confLayer); }
+  const cols=['--c1','--c2','--c3','--c4','--c5','--c6'].map(getCss);
+  for(let i=0;i<18;i++){
+    const c=h('span',{class:'conf',style:{left:(Math.random()*100)+'%',background:cols[i%cols.length],
+      animationDelay:(Math.random()*.2)+'s',transform:'rotate('+(Math.random()*360)+'deg)'}});
+    confLayer.appendChild(c); setTimeout(()=>c.remove(),1350);
+  }
+}
+
+/* ===========================================================
+   INIT
+   =========================================================== */
+async function init(){
+  document.body.appendChild(app);
+  buildSpace(); buildCornerMute(); initVoices();
+  const [b,m,pts,goal,nm,bl]=await Promise.all([
+    Store.get(SEED.keys.best), Store.get(SEED.keys.mute), Store.get(SEED.keys.pts),
+    Store.get(SEED.keys.goal), Store.get(SEED.keys.player), Store.get(SEED.keys.bestLv)
+  ]);
+  S.best=parseInt(b,10)||0;
+  S.bestLevel=parseInt(bl,10)||0;
+  S.muted=(m==='1'||m===1);
+  if(muteBtn) muteBtn.textContent=S.muted?'🔇':'🔊';
+  SETTINGS.points=parseInt(pts,10)||SEED.defaults.points;
+  SETTINGS.levelGoal=parseInt(goal,10)||SEED.defaults.levelGoal;
+  S.name=(nm||'').trim();
+  if(S.name) renderHome(); else renderName();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+
+})();
+</script>
+</body>
+</html>
